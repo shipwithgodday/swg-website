@@ -15,6 +15,9 @@ function Hero() {
       <div className="absolute inset-0 bg-black opacity-40 md:hidden" />
       <Container className="mt-56 relative">
         <div className="w-full md:w-4/5 lg:w-3/5 space-y-6 text-white pb-20">
+          <span className="px-3 py-1.5 md:px-5 md:py-2 rounded-l-full text-black bg-primary uppercase text-xs md:text-sm">
+            #shipwithgodday
+          </span>
           <h1 className="font-bold text-3xl sm:text-4xl md:text-5xl  xl:text-6xl capitalize tracking-wide md:leading-14 xl:leading-20">
             facilitating{' '}
             <span className="text-primary">seamless</span> Sea

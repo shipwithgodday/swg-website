@@ -14,7 +14,9 @@ function AboutBanner() {
         {/* Desktop version - original layout */}
         <div className="hidden md:block relative z-20">
           <div className="w-4/5">
-            <span className="uppercase font-semibold">about us</span>
+            <span className="px-3 py-1.5 md:px-5 md:py-2 rounded-l-full text-black bg-primary uppercase text-xs md:text-sm">
+              #shipwithgodday
+            </span>
 
             <div className="mt-3">
               <SectionHeader>who are we?</SectionHeader>
