@@ -6,25 +6,28 @@ import { Icon } from '../ui/icon';
 
 function CTA() {
   return (
-    <Container className="rounded-2xl my-16 md:my-24 lg:my-32 overflow-hidden relative">
+    <Container className=" my-8 sm:my-12 md:my-24 lg:my-32 relative">
       <div
-        className="py-28 px-12 relative"
+        className="py-12 sm:py-20 md:py-28 px-4 sm:px-8 md:px-12 relative rounded-2xl overflow-hidden"
         style={{
           backgroundImage: 'url(/port.png)',
           backgroundSize: 'cover',
           backgroundPosition: 'center',
         }}>
         <div className="absolute inset-0 bg-black opacity-70" />
-        <div className="relative z-10 w-4/5">
-          <SectionHeader className="text-white">
-            ready to ship?
-          </SectionHeader>
-          <p className="text-primary text-xl italic mt-3">
+        <div className="relative z-10 w-full sm:w-[90%] md:w-4/5">
+          <div className="hidden md:block text-white">
+            <SectionHeader>ready to ship?</SectionHeader>
+          </div>
+          <div className="md:hidden text-white">
+            <SectionHeader size="sm">ready to ship?</SectionHeader>
+          </div>
+          <p className="text-primary text-lg sm:text-xl italic mt-2 sm:mt-3">
             Let&apos;s get your goods moving—quickly, safely, and
             affordably.
           </p>
 
-          <p className="mt-8 text-xl text-white">
+          <p className="mt-6 sm:mt-8 text-base sm:text-lg md:text-xl text-white">
             Whether you&apos;re a first-time importer or a seasoned
             business owner, we&apos;re here to make the process easy.
             From sourcing products to making supplier payments and
@@ -34,9 +37,9 @@ function CTA() {
             Ghana.
           </p>
 
-          <Button className="mt-8">
+          <Button className="mt-6 sm:mt-8">
             Schedule A Call
-            <Icon name="ArrowRight" />
+            <Icon name="ArrowRight" className="ml-2" />
           </Button>
         </div>
       </div>

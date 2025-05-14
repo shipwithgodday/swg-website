@@ -12,7 +12,7 @@ function WhyUs() {
           Why Work with us?
         </SectionHeader>
 
-        <p className="mt-3.5 text-lg font-light w-2/3 mb-8 md:mb-12">
+        <p className="mt-3.5 text-lg font-light w-full lg:w-2/3 mb-12">
           We always put our customers first, ensuring your needs are
           met from the very beginning of our process till you have
           your desired goods in hand.
