@@ -1,25 +1,61 @@
-import React from 'react';
+'use client';
+import React, { useRef } from 'react';
 import Container from '../shared/container';
 import SectionHeader from '../shared/section-header';
 import { DollarCircle, Ship } from 'iconsax-reactjs';
 import Users from '@/public/users';
+import { motion, useInView } from 'framer-motion';
 
 function WhyUs() {
+  const headerRef = useRef(null);
+  const isHeaderInView = useInView(headerRef, {
+    once: true,
+    amount: 0.3,
+  });
+
+  const cardsRef = useRef(null);
+  const isCardsInView = useInView(cardsRef, {
+    once: true,
+    amount: 0.1,
+  });
+
   return (
     <section className="my-16 md:my-24 lg:my-32">
       <Container>
-        <SectionHeader highlightedWord="Work">
-          Why Work with us?
-        </SectionHeader>
+        <motion.div
+          ref={headerRef}
+          initial={{ opacity: 0 }}
+          animate={
+            isHeaderInView
+              ? { opacity: 1, y: 0 }
+              : { opacity: 0, y: 20 }
+          }
+          transition={{ duration: 0.6 }}>
+          <SectionHeader highlightedWord="Work">
+            Why Work with us?
+          </SectionHeader>
 
-        <p className="mt-3.5 text-lg font-light w-full lg:w-2/3 mb-12">
-          We always put our customers first, ensuring your needs are
-          met from the very beginning of our process till you have
-          your desired goods in hand.
-        </p>
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={isHeaderInView ? { opacity: 1 } : { opacity: 0 }}
+            transition={{ duration: 0.6, delay: 0.1 }}
+            className="mt-3.5 text-lg font-light w-full lg:w-2/3 mb-12">
+            We always put our customers first, ensuring your needs are
+            met from the very beginning of our process till you have
+            your desired goods in hand.
+          </motion.p>
+        </motion.div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
-          <div
+        <motion.div
+          ref={cardsRef}
+          initial={{ opacity: 0 }}
+          animate={isCardsInView ? { opacity: 1 } : { opacity: 0 }}
+          transition={{ duration: 0.8 }}
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={isCardsInView ? { opacity: 1 } : { opacity: 0 }}
+            transition={{ duration: 0.6, delay: 0.1 }}
             style={{
               backgroundImage: 'url(/customer-centric.png)',
               backgroundSize: 'cover',
@@ -38,9 +74,12 @@ function WhyUs() {
                 </span>
               </div>
             </div>
-          </div>
+          </motion.div>
 
-          <div
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={isCardsInView ? { opacity: 1 } : { opacity: 0 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
             style={{
               backgroundImage: 'url(/pricing.jpg)',
               backgroundSize: 'cover',
@@ -63,9 +102,12 @@ function WhyUs() {
                 </span>
               </div>
             </div>
-          </div>
+          </motion.div>
 
-          <div
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={isCardsInView ? { opacity: 1 } : { opacity: 0 }}
+            transition={{ duration: 0.6, delay: 0.3 }}
             style={{
               backgroundImage: 'url(/fast-shipping.png)',
               backgroundSize: 'cover',
@@ -84,8 +126,8 @@ function WhyUs() {
                 </span>
               </div>
             </div>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
       </Container>
     </section>
   );

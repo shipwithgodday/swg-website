@@ -4,7 +4,7 @@ interface SectionHeaderProps {
   children: React.ReactNode;
   highlightedWord?: string;
   className?: string;
-  size?: 'sm' | 'md' | 'lg' | 'xl';
+  size?: 'sm' | 'md' | 'base' | 'lg' | 'xl';
 }
 
 const SectionHeader: React.FC<SectionHeaderProps> = ({
@@ -17,6 +17,7 @@ const SectionHeader: React.FC<SectionHeaderProps> = ({
   const sizeVariants = {
     sm: 'text-2xl',
     md: 'text-3xl',
+    base: 'text-4xl',
     lg: 'text-5xl',
     xl: 'text-6xl',
   };

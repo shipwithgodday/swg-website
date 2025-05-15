@@ -1,13 +1,25 @@
-import React from 'react';
+'use client';
+import React, { useRef } from 'react';
 import Container from '../shared/container';
 import SectionHeader from '../shared/section-header';
 import { Button } from '../ui/button';
 import { Icon } from '../ui/icon';
+import { motion, useInView } from 'framer-motion';
+import Link from 'next/link';
 
 function CTA() {
+  const contentRef = useRef(null);
+  const isContentInView = useInView(contentRef, {
+    once: true,
+    amount: 0.3,
+  });
+
   return (
     <Container className=" my-8 sm:my-12 md:my-24 lg:my-32 relative">
-      <div
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={isContentInView ? { opacity: 1 } : { opacity: 0 }}
+        transition={{ duration: 0.8 }}
         className="py-12 sm:py-20 md:py-28 px-4 sm:px-8 md:px-12 relative rounded-2xl overflow-hidden"
         style={{
           backgroundImage: 'url(/port.png)',
@@ -15,19 +27,40 @@ function CTA() {
           backgroundPosition: 'center',
         }}>
         <div className="absolute inset-0 bg-black opacity-70" />
-        <div className="relative z-10 w-full sm:w-[90%] md:w-4/5">
+        <motion.div
+          ref={contentRef}
+          initial={{ opacity: 0, y: 20 }}
+          animate={
+            isContentInView
+              ? { opacity: 1, y: 0 }
+              : { opacity: 0, y: 20 }
+          }
+          transition={{ duration: 0.6, delay: 0.2 }}
+          className="relative z-10 w-full sm:w-[90%] md:w-4/5">
           <div className="hidden md:block text-white">
             <SectionHeader>ready to ship?</SectionHeader>
           </div>
           <div className="md:hidden text-white">
             <SectionHeader size="sm">ready to ship?</SectionHeader>
           </div>
-          <p className="text-primary text-lg sm:text-xl italic mt-2 sm:mt-3">
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={
+              isContentInView ? { opacity: 1 } : { opacity: 0 }
+            }
+            transition={{ duration: 0.6, delay: 0.3 }}
+            className="text-primary text-lg sm:text-xl italic mt-2 sm:mt-3">
             Let&apos;s get your goods moving—quickly, safely, and
             affordably.
-          </p>
+          </motion.p>
 
-          <p className="mt-6 sm:mt-8 text-base sm:text-lg md:text-xl text-white">
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={
+              isContentInView ? { opacity: 1 } : { opacity: 0 }
+            }
+            transition={{ duration: 0.6, delay: 0.4 }}
+            className="mt-6 sm:mt-8 text-base sm:text-lg md:text-xl text-white">
             Whether you&apos;re a first-time importer or a seasoned
             business owner, we&apos;re here to make the process easy.
             From sourcing products to making supplier payments and
@@ -35,14 +68,24 @@ function CTA() {
             all. Schedule a quick call with our team and take the
             first step toward hassle-free shipping from China to
             Ghana.
-          </p>
+          </motion.p>
 
-          <Button className="mt-6 sm:mt-8">
-            Schedule A Call
-            <Icon name="ArrowRight" className="ml-2" />
-          </Button>
-        </div>
-      </div>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={
+              isContentInView ? { opacity: 1 } : { opacity: 0 }
+            }
+            transition={{ duration: 0.6, delay: 0.3 }}>
+            <Button>
+              <Link
+                href="/schedule"
+                className="flex items-center gap-2">
+                Schedule a Call <Icon name="ArrowRight" />
+              </Link>
+            </Button>
+          </motion.div>
+        </motion.div>
+      </motion.div>
     </Container>
   );
 }

@@ -1,12 +1,20 @@
-import Container from '@/components/shared/container';
-import React from 'react';
+import ContactSection from '@/components/contact/ContactSection';
+import ContactHero from '@/components/contact/ContactHero';
+
+export const metadata = {
+  title: 'Contact Us | Godday',
+  description:
+    'Get in touch with Godday for any inquiries or assistance.',
+};
 
 function Contact() {
   return (
     <main>
-      <Container>
-        <h1>Contact Us</h1>
-      </Container>
+      <ContactHero />
+      <div id="contact-form">
+        <ContactSection />
+      </div>
+      {/* <ContactFAQ /> */}
     </main>
   );
 }
