@@ -1,21 +1,18 @@
 'use server';
 
-import { neon } from '@neondatabase/serverless';
 import { addDays, parseISO, format } from 'date-fns';
+import dbConnect from '@/lib/mongoose';
+import BookingModel from '@/models/Booking';
 
 const ALL_TIME_SLOTS = [
+  '10:00',
+  '11:00',
   '12:00',
-  '12:45',
   '13:00',
-  '13:45',
   '14:00',
-  '14:45',
   '15:00',
-  '15:45',
   '16:00',
-  '16:45',
   '17:00',
-  '17:45',
 ];
 
 // This is the key optimization - we'll fetch availability for multiple dates at once
@@ -27,24 +24,33 @@ export async function getDateRangeAvailability(
     throw new Error('Date range is required');
   }
 
-  // Instantiate a connection to your Neon (Vercel Postgres) database
-  const sql = neon(process.env.DATABASE_URL!);
-
   try {
+    // Connect to MongoDB
+    await dbConnect();
+
     // Fetch all bookings within the date range in a single query
-    const result = (await sql`
-      SELECT date, time
-      FROM bookings
-      WHERE date BETWEEN ${startDate} AND ${endDate}
-      ORDER BY date, time;
-    `) as { date: string; time: string }[];
+    // Use lean() to get plain JS objects instead of Mongoose documents
+    const bookings = await BookingModel.find({
+      date: { $gte: startDate, $lte: endDate },
+    })
+      .select('date time')
+      .lean();
+
+    // Convert MongoDB documents to plain JS objects
+    const serializedBookings = bookings.map((booking) => ({
+      date: booking.date,
+      time: booking.time,
+    }));
 
     // Group bookings by date for easier processing
-    const bookingsByDate = result.reduce((acc, { date, time }) => {
-      if (!acc[date]) acc[date] = [];
-      acc[date].push(time);
-      return acc;
-    }, {} as Record<string, string[]>);
+    const bookingsByDate = serializedBookings.reduce(
+      (acc: Record<string, string[]>, { date, time }) => {
+        if (!acc[date]) acc[date] = [];
+        acc[date].push(time);
+        return acc;
+      },
+      {} as Record<string, string[]>
+    );
 
     // Calculate available time slots for each date in the range
     const start = parseISO(startDate);

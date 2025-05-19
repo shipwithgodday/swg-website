@@ -1,6 +1,7 @@
 'use server';
 
-import { neon } from '@neondatabase/serverless';
+import dbConnect from '@/lib/mongoose';
+import BookingModel from '@/models/Booking';
 
 type BookingData = {
   date: string;
@@ -8,6 +9,7 @@ type BookingData = {
   fullName: string;
   phoneNumber: string;
   email: string;
+  organization?: string;
   desiredService: string;
   meetingType: string;
 };
@@ -19,43 +21,63 @@ export async function createBooking(data: BookingData) {
     fullName,
     phoneNumber,
     email,
+    organization,
     desiredService,
     meetingType,
   } = data;
 
-  // connect to Neon
-  const sql = neon(process.env.DATABASE_URL!);
-
   try {
-    // insert the new booking
-    const result = await sql`
-      INSERT INTO bookings (
-        date,
-        time,
-        fullName,
-        phoneNumber,
-        email,
-        desiredService,
-        meetingType
-      ) VALUES (
-        ${date},
-        ${time},
-        ${fullName},
-        ${phoneNumber},
-        ${email},
-        ${desiredService},
-        ${meetingType}
-      )
-      RETURNING *;
-    `;
+    // Connect to MongoDB
+    await dbConnect();
+
+    // Create a new booking document
+    const newBooking = new BookingModel({
+      date,
+      time,
+      fullName,
+      phoneNumber,
+      email,
+      organization,
+      desiredService,
+      meetingType,
+    });
+
+    // Save the booking
+    const savedBooking = await newBooking.save();
+
+    // Convert to a plain JavaScript object without Mongoose methods
+    // This ensures it can be serialized for client components
+    const serializedBooking = JSON.parse(
+      JSON.stringify({
+        date: savedBooking.date,
+        time: savedBooking.time,
+        fullName: savedBooking.fullName,
+        phoneNumber: savedBooking.phoneNumber,
+        email: savedBooking.email,
+        organization: savedBooking.organization,
+        desiredService: savedBooking.desiredService,
+        meetingType: savedBooking.meetingType,
+        id: savedBooking._id.toString(),
+      })
+    );
 
     return {
       success: true,
       message: 'Booking created successfully',
-      booking: result[0],
+      booking: serializedBooking,
     };
   } catch (err) {
     console.error('Error creating booking:', err);
+
+    // Check for duplicate key error (booking already exists)
+    if ((err as Error & { code?: number }).code === 11000) {
+      return {
+        success: false,
+        message: 'This time slot is already booked',
+        error: 'Duplicate booking',
+      };
+    }
+
     return {
       success: false,
       message: 'Failed to create booking',

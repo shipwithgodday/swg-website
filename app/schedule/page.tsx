@@ -1,5 +1,4 @@
-import BookingForm from '@/components/schedule/BookingWizard';
-import { BookingProvider } from '@/lib/booking-context';
+import SchedulePage from '@/components/schedule';
 
 export default function BookingPage() {
   return (
@@ -12,11 +11,7 @@ export default function BookingPage() {
       }}
       className="min-h-screen flex items-center justify-center relative">
       <div className="absolute inset-0 bg-black opacity-60 " />
-      <div className="w-full max-w-4xl mx-auto p-4 font-body z-10">
-        <BookingProvider>
-          <BookingForm />
-        </BookingProvider>
-      </div>
+      <SchedulePage />
     </main>
   );
 }

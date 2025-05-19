@@ -1,14 +1,17 @@
 import React from 'react';
 import Container from '../shared/container';
 import SectionHeader from '../shared/section-header';
+import Image from 'next/image';
+import img from '@/public/LooperGroup.svg';
+
 function WhyUs() {
   return (
-    <section className="bg-gray-50 py-8 md:py-16">
-      <Container>
-        <div className="hidden md:block">
+    <section className="bg-gradient-to-r from-[#00254F] to-[#00365D] py-8 md:py-16 relative">
+      <Container className="relative z-10">
+        <div className="hidden md:block text-white">
           <SectionHeader highlightedWord={'Us'}>Why Us</SectionHeader>
         </div>
-        <div className="block md:hidden">
+        <div className="block md:hidden text-white">
           <SectionHeader size="md" highlightedWord={'Us'}>
             Why Us
           </SectionHeader>
@@ -38,7 +41,7 @@ function WhyUs() {
           ].map((item, i) => (
             <div
               key={i}
-              className="bg-white p-8 rounded-2xl shadow-sm">
+              className="bg-gray-100 p-8 rounded-2xl shadow-sm">
               <h3 className="text-2xl font-bold text-[#00254F] mb-4">
                 {item.title}
               </h3>
@@ -47,6 +50,17 @@ function WhyUs() {
           ))}
         </div>
       </Container>
+
+      <div className="absolute top-0 bottom-0 right-0 h-full w-full">
+        <div className="relative h-full w-full">
+          <Image
+            src={img}
+            alt="svg"
+            className="h-full w-full object-cover lg:object-contain object-right opacity-70 lg:opacity-100 transition-all duration-300"
+            priority
+          />
+        </div>
+      </div>
     </section>
   );
 }

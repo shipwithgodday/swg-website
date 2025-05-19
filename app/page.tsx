@@ -9,7 +9,7 @@ export default function Home() {
   return (
     <main>
       <Hero />
-      <Services />
+      <Services id="services" />
       <AboutBanner />
       <WhyUs />
       <SocialProof />

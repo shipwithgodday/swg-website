@@ -19,6 +19,12 @@ export const formSchema = z.object({
   email: z
     .string()
     .email({ message: 'Please enter a valid email address' }),
+  organization: z
+    .string()
+    .max(100, {
+      message: 'Organization name must be less than 100 characters',
+    })
+    .optional(),
   desiredService: z.string({
     required_error: 'Please select a desired service',
   }),
@@ -37,6 +43,7 @@ export interface BookingSubmission {
   fullName: string;
   phoneNumber: string;
   email: string;
+  organization?: string;
   projectType: string;
   briefingMeetingPreference: string;
 }

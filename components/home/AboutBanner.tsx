@@ -17,7 +17,12 @@ function AboutBanner() {
   });
 
   return (
-    <section className="bg-gradient-to-r from-[#00254F] to-[#00365D] text-white py-8 md:py-16 relative overflow-hidden">
+    <motion.section
+      className="bg-gradient-to-r from-[#00254F] to-[#00365D] text-white py-8 md:py-16 relative overflow-hidden"
+      initial={{ opacity: 0, y: 30 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.6, delay: 0.3 }}>
       {/* Dark overlay for mobile only */}
       <div className="absolute inset-0 bg-black opacity-60 md:hidden" />
 
@@ -60,13 +65,12 @@ function AboutBanner() {
               <p className="mt-3 md:mt-6 text-sm md:text-base">
                 We always put our customers first, ensuring your needs
                 are met from the very beginning of our process till
-                you have your desired goods in hand. We always put our
-                customers first, ensuring your needs are met from the
-                very beginning of our process till you have your
-                desired goods in hand. We always put our customers
-                first, ensuring your needs are met from the very
-                beginning of our process till you have your desired
-                goods in hand.
+                you have your desired goods in hand. Our dedicated
+                team works tirelessly to provide exceptional service
+                and support throughout your journey. We take pride in
+                our commitment to excellence and our ability to
+                deliver reliable solutions that exceed your
+                expectations.
               </p>
             </motion.div>
           </motion.div>
@@ -100,7 +104,7 @@ function AboutBanner() {
           />
         </div>
       </div>
-    </section>
+    </motion.section>
   );
 }
 

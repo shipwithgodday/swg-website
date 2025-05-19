@@ -27,6 +27,7 @@ export default function PaymentServices() {
       items: [
         'Secure transactions between buyers and Chinese suppliers',
         'Multiple currency support',
+        'Chinese Yuan (RMB) to Ghana Cedi (GHS) currency exchange services',
         'Escrow services to protect both parties',
         'Verification of payment terms and conditions',
         'Documentation of all transactions',
@@ -62,9 +63,9 @@ export default function PaymentServices() {
 
   // Carousel images
   const carouselImages = [
-    '/procurement/1.jpeg',
-    '/procurement/2.jpg',
-    '/procurement/3.jpg',
+    '/payment/3.webp',
+    '/payment/1.jpg',
+    '/payment/2.webp',
   ];
 
   return (

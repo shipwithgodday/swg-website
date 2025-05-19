@@ -50,6 +50,7 @@ export interface BookingContextType {
     endDate: Date
   ) => Promise<void>;
   clearSelectedTime: () => void;
+  invalidateCache: (date: Date) => Promise<void>;
 }
 
 // Create context with default values
@@ -63,6 +64,7 @@ const BookingContext = createContext<BookingContextType>({
   getAvailableTimesForDate: async () => [],
   prefetchDateRange: async () => {},
   clearSelectedTime: () => {},
+  invalidateCache: async () => {},
 });
 
 export const useBooking = () => useContext(BookingContext);
@@ -178,6 +180,44 @@ export const BookingProvider: React.FC<{
     setSelectedTime(null);
   }, []);
 
+  // Invalidate cache for a specific date
+  const invalidateCache = useCallback(
+    async (date: Date): Promise<void> => {
+      const dateStr = format(date, 'yyyy-MM-dd');
+
+      setIsLoading(true);
+      try {
+        // Fetch fresh data for this date
+        const startDate = format(date, 'yyyy-MM-dd');
+        const endDate = format(date, 'yyyy-MM-dd');
+        const availabilityMap = await getDateRangeAvailability(
+          startDate,
+          endDate
+        );
+
+        // Update cache with the new data
+        setAvailabilityCache((prevCache) => ({
+          ...prevCache,
+          [dateStr]: {
+            data: {
+              availableTimes:
+                availabilityMap[dateStr]?.availableTimes || [],
+              totalSlots: ALL_TIME_SLOTS.length,
+              bookedSlotsCount:
+                availabilityMap[dateStr]?.bookedSlotsCount || 0,
+            },
+            timestamp: Date.now(),
+          },
+        }));
+      } catch (error) {
+        console.error('Failed to invalidate cache:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    []
+  );
+
   // Prefetch next 14 days when component mounts
   useEffect(() => {
     const today = new Date();
@@ -197,6 +237,7 @@ export const BookingProvider: React.FC<{
         getAvailableTimesForDate,
         prefetchDateRange,
         clearSelectedTime,
+        invalidateCache,
       }}>
       {children}
     </BookingContext.Provider>

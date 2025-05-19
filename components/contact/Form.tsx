@@ -6,11 +6,12 @@ import { formSchema, FormSchema } from './formSchema';
 import FormField from './FormField';
 import { Button } from '../ui/button';
 import { motion } from 'framer-motion';
-import { CheckCircle } from 'lucide-react';
+import { CheckCircle, XCircle } from 'lucide-react';
 
 function Form() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const {
     register,
@@ -21,16 +22,43 @@ function Form() {
     resolver: zodResolver(formSchema),
   });
 
-  const onSubmit = () => {
+  const onSubmit = async (data: FormSchema) => {
     setIsSubmitting(true);
-    // Simulate API call
-    setTimeout(() => {
+    setError(null);
+
+    try {
+      const response = await fetch(
+        'https://api.web3forms.com/submit',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Accept: 'application/json',
+          },
+          body: JSON.stringify({
+            access_key: process.env.NEXT_PUBLIC_WEB3FORMS_KEY,
+            ...data,
+          }),
+        }
+      );
+
+      const result = await response.json();
+
+      if (result.success) {
+        setIsSubmitted(true);
+        reset();
+        // Reset success message after 5 seconds
+        setTimeout(() => setIsSubmitted(false), 5000);
+      } else {
+        setError(
+          result.message || 'Something went wrong. Please try again.'
+        );
+      }
+    } catch {
+      setError('Failed to send message. Please try again later.');
+    } finally {
       setIsSubmitting(false);
-      setIsSubmitted(true);
-      reset();
-      // Reset success message after 5 seconds
-      setTimeout(() => setIsSubmitted(false), 5000);
-    }, 1500);
+    }
   };
 
   return (
@@ -51,6 +79,15 @@ function Form() {
         </motion.div>
       ) : (
         <>
+          {error && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="mb-4 p-4 bg-red-500/20 border border-red-500 rounded-lg flex items-center gap-2">
+              <XCircle className="w-5 h-5 text-red-500" />
+              <p className="text-red-500 text-sm">{error}</p>
+            </motion.div>
+          )}
           <form
             onSubmit={handleSubmit(onSubmit)}
             className="space-y-6 flex-1">
@@ -66,46 +103,34 @@ function Form() {
               />
             </motion.div>
 
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4, delay: 0.2 }}>
+            <div>
               <FormField
                 name="email"
                 placeholder="Email Address"
                 register={register}
                 errors={errors}
               />
-            </motion.div>
+            </div>
 
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4, delay: 0.3 }}>
+            <div>
               <FormField
                 name="phone"
                 placeholder="Phone number"
                 register={register}
                 errors={errors}
               />
-            </motion.div>
+            </div>
 
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4, delay: 0.4 }}>
+            <div>
               <FormField
                 name="subject"
                 placeholder="Subject (Optional)"
                 register={register}
                 errors={errors}
               />
-            </motion.div>
+            </div>
 
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4, delay: 0.5 }}>
+            <div>
               <FormField
                 name="message"
                 placeholder="Message"
@@ -113,14 +138,9 @@ function Form() {
                 register={register}
                 errors={errors}
               />
-            </motion.div>
+            </div>
 
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4, delay: 0.6 }}
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}>
+            <div>
               <Button
                 type="submit"
                 className="w-full bg-primary hover:bg-primary/90 text-black font-medium relative overflow-hidden group"
@@ -152,7 +172,7 @@ function Form() {
                 )}
                 <span className="absolute bottom-0 left-0 w-full h-1 bg-white/20 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></span>
               </Button>
-            </motion.div>
+            </div>
           </form>
         </>
       )}

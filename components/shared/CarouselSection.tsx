@@ -1,6 +1,6 @@
 'use client';
-import { useState, useEffect } from 'react';
-import { motion, useMotionValue } from 'framer-motion';
+import { useState, useEffect, useRef } from 'react';
+import { motion, useMotionValue, useInView } from 'framer-motion';
 
 interface CarouselSectionProps {
   images: string[];
@@ -20,6 +20,8 @@ const SPRING_OPTIONS = {
 export function CarouselSection({ images }: CarouselSectionProps) {
   const [imgIndex, setImgIndex] = useState(0);
   const dragX = useMotionValue(0);
+  const ref = useRef(null);
+  const isInView = useInView(ref, { once: true, margin: '-100px' });
 
   useEffect(() => {
     const intervalRef = setInterval(() => {
@@ -49,7 +51,14 @@ export function CarouselSection({ images }: CarouselSectionProps) {
   };
 
   return (
-    <div className="relative overflow-hidden my-20">
+    <motion.div
+      ref={ref}
+      initial={{ opacity: 0, y: 50 }}
+      animate={
+        isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 50 }
+      }
+      transition={{ duration: 0.6, ease: 'easeOut' }}
+      className="relative overflow-hidden my-20">
       <motion.div
         drag="x"
         dragConstraints={{
@@ -90,6 +99,6 @@ export function CarouselSection({ images }: CarouselSectionProps) {
           />
         ))}
       </div>
-    </div>
+    </motion.div>
   );
 }

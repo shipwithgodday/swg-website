@@ -1,5 +1,8 @@
+'use client';
 import SectionHeader from '../shared/section-header';
 import { ServiceItem } from './ServiceItem';
+import { motion, useInView } from 'framer-motion';
+import { useRef } from 'react';
 
 interface ServiceSectionProps {
   title: string;
@@ -14,8 +17,18 @@ export function ServiceSection({
   highlightedWord,
   items,
 }: ServiceSectionProps) {
+  const ref = useRef(null);
+  const isInView = useInView(ref, { once: true, margin: '-100px' });
+
   return (
-    <div className="mt-8 sm:mt-12 md:mt-16 lg:mt-20 first:mt-0">
+    <motion.div
+      ref={ref}
+      initial={{ opacity: 0, y: 50 }}
+      animate={
+        isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 50 }
+      }
+      transition={{ duration: 0.6, ease: 'easeOut' }}
+      className="mt-8 sm:mt-12 md:mt-16 lg:mt-20 first:mt-0">
       <div>
         <div className="hidden md:block">
           <SectionHeader size="md" highlightedWord={highlightedWord}>
@@ -37,6 +50,6 @@ export function ServiceSection({
           <ServiceItem key={index} text={item} />
         ))}
       </div>
-    </div>
+    </motion.div>
   );
 }

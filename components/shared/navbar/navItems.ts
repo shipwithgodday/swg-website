@@ -19,4 +19,5 @@ export const navItems: NavItem[] = [
     ],
   },
   { text: 'Contact', url: '/contact' },
+  // { text: 'Email', url: '/email' },
 ];

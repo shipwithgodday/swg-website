@@ -4,6 +4,7 @@ import Image from 'next/image';
 import SectionHeader from '../shared/section-header';
 import { ServiceItem } from './ServiceItem';
 import img from '@/public/shipping/port.jpg';
+import { motion, useInView } from 'framer-motion';
 
 interface ServiceSectionProps {
   title: string;
@@ -21,6 +22,11 @@ export function LastServiceSection({
   const leftColumnRef = useRef<HTMLDivElement>(null);
   const rightColumnRef = useRef<HTMLDivElement>(null);
   const [imageHeight, setImageHeight] = useState<string>('auto');
+  const containerRef = useRef(null);
+  const isInView = useInView(containerRef, {
+    once: true,
+    margin: '-100px',
+  });
 
   // Match heights on resize and content changes
   useEffect(() => {
@@ -60,9 +66,16 @@ export function LastServiceSection({
   }, [items, title, subtitle]);
 
   return (
-    <div className="mt-20 flex flex-col lg:flex-row items-stretch lg:gap-8">
-      <div
+    <div
+      ref={containerRef}
+      className="mt-20 flex flex-col lg:flex-row items-stretch lg:gap-8">
+      <motion.div
         ref={leftColumnRef}
+        initial={{ opacity: 0, x: -100 }}
+        animate={
+          isInView ? { opacity: 1, x: 0 } : { opacity: 0, x: -100 }
+        }
+        transition={{ duration: 0.6, ease: 'easeOut' }}
         className="w-full lg:w-1/2 flex flex-col">
         <div className="content-wrapper">
           <div className="hidden lg:block">
@@ -96,15 +109,20 @@ export function LastServiceSection({
             priority
           />
         </div>
-      </div>
+      </motion.div>
 
-      <div
+      <motion.div
         ref={rightColumnRef}
+        initial={{ opacity: 0, x: 100 }}
+        animate={
+          isInView ? { opacity: 1, x: 0 } : { opacity: 0, x: 100 }
+        }
+        transition={{ duration: 0.6, ease: 'easeOut' }}
         className="bg-gradient-to-r from-[#00254F] to-[#00365D] rounded-2xl px-4 sm:px-6 lg:px-8 py-6 sm:py-8 lg:py-10 mt-4 space-y-2 sm:space-y-3 w-full lg:w-1/2">
         {items.map((item, index) => (
           <ServiceItem key={index} text={item} />
         ))}
-      </div>
+      </motion.div>
     </div>
   );
 }

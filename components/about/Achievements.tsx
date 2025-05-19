@@ -25,7 +25,7 @@ function Achievements() {
           {
             icon: ShieldCheck,
             title: 'Trusted',
-            desc: 'By Makola & Abossey Okai',
+            desc: 'By Kantamanto, Makola & Abossey Okai',
           },
         ].map((item, i) => (
           <div

@@ -56,6 +56,19 @@ export default function UserDetailsForm({
 
       <div className="mb-4">
         <Input
+          type="text"
+          {...register('organization')}
+          placeholder="Organization (Optional)"
+        />
+        {showErrors && errors.organization && (
+          <div className="text-red-500 mt-1 text-sm">
+            {errors.organization.message}
+          </div>
+        )}
+      </div>
+
+      <div className="mb-4">
+        <Input
           type="tel"
           {...register('phoneNumber')}
           placeholder="Phone Number"

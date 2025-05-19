@@ -47,10 +47,10 @@ function Story() {
               </p>
             </div>
             <p>
-              From Makola to Abossey Okai, we&apos;re powering local
-              commerce through global logistics. Our cross-border
-              operations with teams in both China and Ghana ensure
-              seamless end-to-end service.
+              From Makola through Kantamanto to Abossey Okai,
+              we&apos;re powering local commerce through global
+              logistics. Our cross-border operations with teams in
+              both China and Ghana ensure seamless end-to-end service.
             </p>
           </div>
         </div>

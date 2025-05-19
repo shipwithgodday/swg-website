@@ -14,8 +14,8 @@ function Hero() {
         backgroundSize: 'cover',
         backgroundPosition: 'center',
       }}
-      className="h-screen flex items-end lg:items-center relative">
-      <div className="absolute inset-0 bg-black opacity-40 md:hidden" />
+      className="min-h-screen flex items-end lg:items-center relative">
+      <div className="absolute inset-0 bg-gradient-to-r from-black/30 to-black/10" />
       <Container className="mt-56 relative">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -26,7 +26,7 @@ function Hero() {
             <motion.h1
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.3 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
               className="font-extrabold text-3xl sm:text-4xl md:text-5xl xl:text-6xl uppercase mt-2 tracking-wide">
               ship with <span className="text-primary">godday</span>{' '}
               🇬🇭🇨🇳
@@ -35,15 +35,18 @@ function Hero() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.3 }}
-              className="md:text-2xl md:w-5/6">
-              Facilitating seamless sea shipping from China to Ghana.
-              Our mission is to create a seamless supply chain from
-              china to ghana either via air or sea.
+              className="text-lg md:text-xl lg:text-2xl md:w-5/6 text-gray-200">
+              Streamline your supply chain with our comprehensive
+              shipping solutions from China to Ghana. Experience
+              reliable sea and air freight services tailored to your
+              business needs.
             </motion.p>
+
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.3 }}>
+              transition={{ duration: 0.6, delay: 0.3 }}
+              className="flex flex-col md:flex-row gap-4">
               <Button>
                 <Link
                   href="/schedule"
@@ -51,6 +54,40 @@ function Hero() {
                   Schedule a Call <Icon name="ArrowRight" />
                 </Link>
               </Button>
+              <Button
+                variant="outline"
+                className="text-lg px-8 bg-transparent  border-white hover:bg-white hover:text-black">
+                <Link
+                  href="#services"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    document
+                      .getElementById('services')
+                      ?.scrollIntoView({ behavior: 'smooth' });
+                  }}
+                  className="flex items-center gap-2">
+                  Our Services <Icon name="ArrowRight" />
+                </Link>
+              </Button>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.6 }}
+              className="flex items-center gap-6 pt-8">
+              <div className="flex items-center gap-2">
+                <Icon name="Check" className="w-5 h-5 text-primary" />
+                <span>Door-to-Door Delivery</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Icon name="Check" className="w-5 h-5 text-primary" />
+                <span>Real-time Tracking</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Icon name="Check" className="w-5 h-5 text-primary" />
+                <span>24/7 Support</span>
+              </div>
             </motion.div>
           </div>
         </motion.div>

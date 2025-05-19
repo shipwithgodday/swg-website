@@ -1,6 +1,6 @@
 import { DayPicker } from 'react-day-picker';
 import 'react-day-picker/style.css';
-import { addDays, format } from 'date-fns';
+import { addDays, format, isBefore } from 'date-fns';
 import { useBooking } from '@/lib/booking-context';
 
 interface DatePickerProps {
@@ -47,18 +47,24 @@ export default function DatePicker({
   };
 
   // Disable past dates and non-working days (Mon, Wed, Fri only)
-  // const isDateDisabled = (day: Date) => {
-  //   const today = new Date();
-  //   today.setHours(0, 0, 0, 0);
+  const isDateDisabled = (day: Date) => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
 
-  //   if (isBefore(day, today)) {
-  //     return true;
-  //   }
+    // Disable past dates
+    if (isBefore(day, today)) {
+      return true;
+    }
 
-  //   const dayOfWeek = day.getDay();
-  //   // Allow only Monday (1), Wednesday (3), and Friday (5)
-  //   return dayOfWeek !== 1 && dayOfWeek !== 3 && dayOfWeek !== 5;
-  // };
+    const dayOfWeek = day.getDay();
+
+    // Disable Thursdays (4), Saturdays (6) and Sundays (0)
+    if (dayOfWeek === 4 || dayOfWeek === 6 || dayOfWeek === 0) {
+      return true;
+    }
+
+    return false;
+  };
 
   return (
     <div className="w-full">
@@ -66,9 +72,9 @@ export default function DatePicker({
         mode="single"
         selected={selectedDate || undefined}
         onSelect={(date) => date && handleDateSelect(date)}
-        // disabled={isDateDisabled}
+        disabled={isDateDisabled}
         classNames={{
-          today: `border-white text-white`,
+          today: `border-primary text-primary`,
           selected: `bg-primary border-primary text-white rounded-full`,
           chevron: `fill-white cursor-pointer`,
         }}

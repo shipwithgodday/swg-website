@@ -33,6 +33,7 @@ export default function BookingForm() {
     selectedTime,
     setSelectedDate,
     setSelectedTime,
+    invalidateCache,
   } = useBooking();
   const [submitStatus, setSubmitStatus] = useState<
     'success' | 'error' | null
@@ -154,6 +155,7 @@ export default function BookingForm() {
         fullName: values.fullName,
         phoneNumber: values.phoneNumber,
         email: values.email,
+        organization: values.organization,
         desiredService: values.desiredService,
         meetingType: values.meetingType,
       });
@@ -172,6 +174,7 @@ export default function BookingForm() {
             time: values.time,
             fullName: values.fullName,
             phoneNumber: values.phoneNumber,
+            meetingType: values.meetingType,
           },
           clientCalendarLinks,
         }),
@@ -193,6 +196,10 @@ export default function BookingForm() {
       setSelectedDate(new Date());
       setSelectedTime(null);
       setShowErrors(false);
+
+      // Force refresh of availabilityCache for the booked date
+      // This ensures the booked time will not show up when user returns
+      await invalidateCache(values.date);
     } catch (error) {
       console.error(
         'Submission error:',
