@@ -8,19 +8,19 @@ function Info() {
     {
       icon: <Phone className="w-5 h-5" />,
       title: 'Tel:',
-      lines: ['+233 (0) 302 768 899', '+233 (0) 538 237 772'],
+      lines: ['+233 (0) 544 074 578'],
     },
     {
       icon: <Mail className="w-5 h-5" />,
       title: 'Email:',
-      lines: ['operations@alabastergh.com', 'sales@alabastergh.com'],
+      lines: ['ShipWithGodday@gmail.com'],
     },
     {
       icon: <Clock className="w-5 h-5" />,
       title: 'Business Hours:',
       lines: [
         'Monday - Friday: 8:00 AM - 5:00 PM',
-        'Weekend: Closed',
+        'Weekends: Closed',
       ],
     },
     {

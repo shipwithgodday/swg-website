@@ -30,7 +30,7 @@ export default function EmailLayout({
           <UserButton afterSignOutUrl="/" />
         </SignedIn>
       </header>
-      <main className="p-4">{children}</main>
+      <main className="">{children}</main>
     </div>
   );
 }

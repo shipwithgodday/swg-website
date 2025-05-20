@@ -2,7 +2,7 @@ import React from 'react';
 import Container from '../shared/container';
 import SectionHeader from '../shared/section-header';
 import Image from 'next/image';
-import CEOImage from '@/public/procurement/2.jpg'; // Using an executive-looking image from the procurement folder
+import CEOImage from '@/public/ceo.jpeg';
 import { Button } from '../ui/button';
 import Link from 'next/link';
 import { Icon } from '../ui/icon';
@@ -67,6 +67,7 @@ function CEO() {
               <Button>
                 <Link
                   href="https://wa.me/233544074578"
+                  target="_blank"
                   className="inline-flex items-center font-medium">
                   <span>Connect with Godday</span>
                   <Icon name="ArrowRight" className="w-4 h-4 ml-2" />

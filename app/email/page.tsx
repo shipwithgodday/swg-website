@@ -4,13 +4,15 @@ import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
+import Link from 'next/link';
+import { Button } from '@/components/ui/button';
 
 // TipTap imports
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Color from '@tiptap/extension-color';
 import TextStyle from '@tiptap/extension-text-style';
-import Link from '@tiptap/extension-link';
+import { Link as LinkTiptap } from '@tiptap/extension-link';
 
 // Define the form schema
 const emailFormSchema = z.object({
@@ -38,8 +40,8 @@ const MenuButton = ({
     title={title}
     className={`p-2 rounded-md transition-all duration-200 ${
       active
-        ? 'bg-blue-50 ring-1 ring-blue-200'
-        : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+        ? 'bg-white/20 text-white'
+        : 'text-gray-300 hover:bg-white/10 hover:text-white'
     }`}
     type="button">
     {children}
@@ -52,6 +54,7 @@ const customStyles = `
     min-height: 250px;
     padding: 1rem;
     outline: none;
+    color: white;
   }
   
   .ProseMirror p {
@@ -75,7 +78,7 @@ const customStyles = `
   }
   
   .ProseMirror a {
-    color: #1d4ed8;
+    color: #60a5fa;
     text-decoration: underline;
   }
 `;
@@ -113,7 +116,7 @@ export default function EmailPage() {
       StarterKit,
       TextStyle,
       Color,
-      Link.configure({
+      LinkTiptap.configure({
         openOnClick: false,
       }),
     ],
@@ -125,18 +128,22 @@ export default function EmailPage() {
     },
   });
 
-  // Fetch emails from bookings
+  // Fetch emails from the database
   useEffect(() => {
     const fetchEmails = async () => {
       try {
         const response = await fetch('/api/bookings/emails');
-        const data = await response.json();
-
-        if (data.emails) {
-          setEmails(data.emails);
+        if (!response.ok) {
+          throw new Error('Failed to fetch emails');
         }
+        const data = await response.json();
+        setEmails(data.emails);
       } catch (error) {
         console.error('Error fetching emails:', error);
+        setStatus({
+          success: false,
+          message: 'Failed to load recipient list',
+        });
       }
     };
 
@@ -202,7 +209,14 @@ export default function EmailPage() {
         }),
       });
 
-      const result = await response.json();
+      let result;
+      const responseText = await response.text();
+      try {
+        result = JSON.parse(responseText);
+      } catch {
+        console.error('Failed to parse response:', responseText);
+        throw new Error('Invalid response from server');
+      }
 
       if (response.ok) {
         setStatus({
@@ -222,7 +236,10 @@ export default function EmailPage() {
       console.error('Error sending emails:', error);
       setStatus({
         success: false,
-        message: 'An error occurred while sending emails',
+        message:
+          error instanceof Error
+            ? error.message
+            : 'An error occurred while sending emails',
       });
     } finally {
       setLoading(false);
@@ -240,19 +257,38 @@ export default function EmailPage() {
     editorContent !== '<p></p>';
 
   return (
-    <main className="min-h-screen mt-20">
-      <div className="max-w-4xl mx-auto px-4 py-8">
+    <main
+      style={{
+        backgroundImage: "url('/booking-bg.png')",
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat',
+      }}
+      className="min-h-screen flex items-center justify-center relative">
+      <div className="absolute inset-0 bg-black opacity-60" />
+
+      <div className="w-full max-w-4xl mx-auto px-4 py-8 z-10">
         <style jsx global>
           {customStyles}
         </style>
 
-        <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            Bulk Email Sender
-          </h1>
-          <p className="text-gray-600">
-            Send emails to multiple recipients from your bookings
-          </p>
+        <div className="bg-[#00365D] bg-opacity-70 shadow-lg rounded-lg p-6 mb-6 text-white">
+          <div className="flex justify-between items-center">
+            <div>
+              <h1 className="text-3xl font-bold mb-2">
+                Bulk Email Sender
+              </h1>
+              <p className="text-gray-200">
+                Send emails to multiple recipients from your customer
+                base
+              </p>
+            </div>
+            <div className="flex gap-4">
+              <Button asChild>
+                <Link href="/signup">Add Customer</Link>
+              </Button>
+            </div>
+          </div>
         </div>
 
         {status && (
@@ -267,30 +303,30 @@ export default function EmailPage() {
         )}
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-          <div className="bg-white rounded-lg shadow-sm p-6">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+          <div className="bg-[#00365D] bg-opacity-70 shadow-lg rounded-lg p-6">
+            <label className="block text-sm font-medium text-gray-200 mb-2">
               Email Subject
             </label>
             <input
               type="text"
               {...register('subject')}
-              className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+              className="w-full p-3 bg-white/15 backdrop-blur-sm text-white placeholder:text-gray-300 border border-white/20 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
               placeholder="Enter email subject"
             />
             {errors.subject && (
-              <p className="text-red-500 text-sm mt-1">
+              <p className="text-red-400 text-sm mt-1">
                 {errors.subject.message}
               </p>
             )}
           </div>
 
-          <div className="bg-white rounded-lg shadow-sm p-6">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+          <div className="bg-[#00365D] bg-opacity-70 shadow-lg rounded-lg p-6">
+            <label className="block text-sm font-medium text-gray-200 mb-2">
               Email Content
             </label>
-            <div className="border border-gray-200 rounded-lg overflow-hidden">
-              <div className="bg-white p-2 border-b flex flex-wrap items-center gap-2">
-                <div className="flex items-center space-x-1 border-r border-gray-200 pr-3 mr-3">
+            <div className="border border-white/20 rounded-lg overflow-hidden">
+              <div className="bg-[#00365D] p-2 border-b border-white/20 flex flex-wrap items-center gap-2">
+                <div className="flex items-center space-x-1 border-r border-white/20 pr-3 mr-3">
                   <MenuButton
                     onClick={() =>
                       editor.chain().focus().toggleBold().run()
@@ -344,7 +380,7 @@ export default function EmailPage() {
                   </MenuButton>
                 </div>
 
-                <div className="flex items-center space-x-1 border-r border-gray-200 pr-3 mr-3">
+                <div className="flex items-center space-x-1 border-r border-white/20 pr-3 mr-3">
                   <MenuButton
                     onClick={() =>
                       editor.chain().focus().toggleBulletList().run()
@@ -396,7 +432,7 @@ export default function EmailPage() {
                   </MenuButton>
                 </div>
 
-                <div className="flex items-center space-x-1 border-r border-gray-200 pr-3 mr-3">
+                <div className="flex items-center space-x-1 border-r border-white/20 pr-3 mr-3">
                   <MenuButton
                     onClick={() => {
                       const url = window.prompt('Enter URL');
@@ -429,74 +465,74 @@ export default function EmailPage() {
                 <div className="flex items-center space-x-1">
                   <MenuButton
                     onClick={() =>
-                      editor.chain().focus().setColor('#1d4ed8').run()
+                      editor.chain().focus().setColor('#60a5fa').run()
                     }
                     active={editor.isActive('textStyle', {
-                      color: '#1d4ed8',
+                      color: '#60a5fa',
                     })}
                     title="Blue Text">
-                    <span className="text-blue-700 font-medium">
+                    <span className="text-blue-400 font-medium">
                       A
                     </span>
                   </MenuButton>
 
                   <MenuButton
                     onClick={() =>
-                      editor.chain().focus().setColor('#dc2626').run()
+                      editor.chain().focus().setColor('#f87171').run()
                     }
                     active={editor.isActive('textStyle', {
-                      color: '#dc2626',
+                      color: '#f87171',
                     })}
                     title="Red Text">
-                    <span className="text-red-600 font-medium">
+                    <span className="text-red-400 font-medium">
                       A
                     </span>
                   </MenuButton>
 
                   <MenuButton
                     onClick={() =>
-                      editor.chain().focus().setColor('#000000').run()
+                      editor.chain().focus().setColor('#ffffff').run()
                     }
                     active={editor.isActive('textStyle', {
-                      color: '#000000',
+                      color: '#ffffff',
                     })}
-                    title="Black Text">
-                    <span className="font-medium">A</span>
+                    title="White Text">
+                    <span className="text-white font-medium">A</span>
                   </MenuButton>
                 </div>
               </div>
 
               <EditorContent
                 editor={editor}
-                className="prose max-w-none"
+                className="prose max-w-none bg-[#00365D] bg-opacity-70"
               />
             </div>
 
             {errors.content && (
-              <p className="text-red-500 text-sm mt-2">
+              <p className="text-red-400 text-sm mt-2">
                 {errors.content.message}
               </p>
             )}
           </div>
 
-          <div className="bg-white rounded-lg shadow-sm p-6">
+          <div className="bg-[#00365D] bg-opacity-70 shadow-lg rounded-lg p-6">
             <div className="flex justify-between items-center mb-2">
-              <label className="text-sm font-medium text-gray-700">
+              <label className="text-sm font-medium text-gray-200">
                 Recipients
               </label>
               <button
                 type="button"
                 onClick={selectAll}
-                className="text-sm text-blue-600 hover:text-blue-700 transition-colors">
+                className="text-sm text-blue-400 hover:text-blue-300 transition-colors">
                 {selectedEmails.length === emails.length
                   ? 'Deselect All'
                   : 'Select All'}
               </button>
             </div>
 
-            <div className="border border-gray-200 rounded-lg p-4 max-h-[300px] overflow-y-auto">
+            <div className="border border-white/20 rounded-lg p-4 max-h-[300px] overflow-y-auto bg-[#00365D] bg-opacity-70">
               {emails.length === 0 ? (
-                <p className="text-gray-500 text-sm">
+                <p className="text-gray-400 text-sm">
                   No emails found in bookings
                 </p>
               ) : (
@@ -514,7 +550,7 @@ export default function EmailPage() {
                       />
                       <label
                         htmlFor={`email-${email.value}`}
-                        className="ml-2 text-sm text-gray-700">
+                        className="ml-2 text-sm text-gray-200">
                         {email.label}
                       </label>
                     </div>
@@ -524,22 +560,18 @@ export default function EmailPage() {
             </div>
 
             {selectedEmails.length === 0 && (
-              <p className="text-red-500 text-sm mt-2">
+              <p className="text-red-400 text-sm mt-2">
                 Please select at least one recipient
               </p>
             )}
           </div>
 
-          <button
+          <Button
             type="submit"
             disabled={!canSubmit || isSubmitting}
-            className={`w-full py-3 px-4 rounded-lg font-medium transition-all duration-200 ${
-              !canSubmit || isSubmitting
-                ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                : 'bg-blue-600 text-white hover:bg-blue-700 shadow-sm hover:shadow'
-            }`}>
+            className="w-full">
             {loading ? 'Sending...' : 'Send Emails'}
-          </button>
+          </Button>
         </form>
       </div>
     </main>

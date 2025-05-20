@@ -1,18 +1,18 @@
 import { NextResponse } from 'next/server';
 import dbConnect from '@/lib/mongoose';
-import Booking from '@/models/Booking';
+import Customer from '@/models/Customer';
 
 export async function GET() {
   try {
     await dbConnect();
 
-    // Fetch distinct email addresses from the bookings
-    const emails = await Booking.distinct('email');
+    // Fetch all customers with email and fullName
+    const customers = await Customer.find({}, 'email fullName');
 
-    // Format the emails as objects with value and label properties
-    const formattedEmails = emails.map((email) => ({
-      value: email,
-      label: email,
+    // Format the data as objects with value and label properties
+    const formattedEmails = customers.map((customer) => ({
+      value: customer.email,
+      label: `${customer.fullName} (${customer.email})`,
     }));
 
     return NextResponse.json({ emails: formattedEmails });
