@@ -298,6 +298,10 @@ function TermsAndConditions() {
                 <li>72-hour return window for procured items only</li>
                 <li>Self-bought goods cannot be returned</li>
               </ul>
+
+              <p className="text-sm text-gray-500 mt-8">
+                Last Updated: {new Date().toLocaleDateString()}
+              </p>
             </div>
           </div>
         </Container>
