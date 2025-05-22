@@ -2,7 +2,7 @@ import React from 'react';
 import Container from '../shared/container';
 import SectionHeader from '../shared/section-header';
 import Image from 'next/image';
-import CEOImage from '@/public/ceo.jpeg';
+import CEOImage from '@/public/godday.jpeg';
 import { Button } from '../ui/button';
 import Link from 'next/link';
 import { Icon } from '../ui/icon';
@@ -30,7 +30,7 @@ function CEO() {
               <Image
                 src={CEOImage}
                 alt="Company CEO"
-                className="w-full h-[400px] md:h-[500px] object-cover"
+                className="w-full h-[400px] md:h-[500px] object-cover object-top"
                 priority
               />
             </div>
