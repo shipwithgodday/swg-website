@@ -15,3 +15,15 @@ export default function BookingPage() {
     </main>
   );
 }
+
+export const metadata = {
+  title: 'Schedule a Call | Ship With Godday',
+  description:
+    'Schedule a call with Godday for any inquiries or assistance.',
+  openGraph: {
+    title: 'Schedule a Call | Ship With Godday',
+    description:
+      'Schedule a call with Godday for any inquiries or assistance.',
+    images: ['/logo.png'],
+  },
+};

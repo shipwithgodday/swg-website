@@ -11,3 +11,15 @@ function Shipping() {
 }
 
 export default Shipping;
+
+export const metadata = {
+  title: 'Shipping | Ship With Godday',
+  description:
+    'We offer shipping services from China to Ghana at Ship With Godday.',
+  openGraph: {
+    title: 'Shipping | Ship With Godday',
+    description:
+      'We offer shipping services from China to Ghana at Ship With Godday.',
+    images: ['/logo.png'],
+  },
+};

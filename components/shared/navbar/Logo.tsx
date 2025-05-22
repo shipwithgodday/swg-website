@@ -11,7 +11,8 @@ const Logo = () => (
         src={logo}
         width={484}
         height={137}
-        alt="Alabaster Car Rentals Logo"
+        alt="Ship With Godday - Your Trusted Shipping Partner"
+        priority
       />
     </Link>
   </div>

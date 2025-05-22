@@ -1,3 +1,4 @@
+'use client';
 import Image from 'next/image';
 import img from '@/public/LooperGroup.svg';
 import SectionHeader from '../shared/section-header';

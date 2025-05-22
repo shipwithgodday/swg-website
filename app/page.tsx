@@ -1,3 +1,4 @@
+import InternationalPartnerships from '@/components/about/InternationalPartnerships';
 import AboutBanner from '@/components/home/AboutBanner';
 import CTA from '@/components/home/CTA';
 import Hero from '@/components/home/Hero';
@@ -12,6 +13,7 @@ export default function Home() {
       <Services id="services" />
       <AboutBanner />
       <WhyUs />
+      <InternationalPartnerships />
       <SocialProof />
       <CTA />
     </main>

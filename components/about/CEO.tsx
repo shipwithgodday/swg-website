@@ -1,4 +1,4 @@
-import React from 'react';
+'use client';
 import Container from '../shared/container';
 import SectionHeader from '../shared/section-header';
 import Image from 'next/image';
@@ -6,10 +6,16 @@ import CEOImage from '@/public/godday.jpeg';
 import { Button } from '../ui/button';
 import Link from 'next/link';
 import { Icon } from '../ui/icon';
+import { motion } from 'framer-motion';
 
 function CEO() {
   return (
-    <section className="py-12 md:py-20">
+    <motion.section
+      className="py-12 md:py-20"
+      initial={{ opacity: 0, y: 30 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.6, delay: 0.4 }}>
       <Container>
         <div className="hidden md:block">
           <SectionHeader highlightedWord={'CEO'}>
@@ -77,7 +83,7 @@ function CEO() {
           </div>
         </div>
       </Container>
-    </section>
+    </motion.section>
   );
 }
 

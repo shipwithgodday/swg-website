@@ -28,7 +28,7 @@ export default function ProcurementServices() {
         'Comprehensive sourcing services to find the exact products you need',
         'Supplier verification and quality control',
         'Price negotiation and order management',
-        'Product inspection before shipping',
+        'Product inspection for special goods before shipping',
         'Regular updates throughout the procurement process',
       ],
     },

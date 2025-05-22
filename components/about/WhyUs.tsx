@@ -1,12 +1,19 @@
+'use client';
 import React from 'react';
 import Container from '../shared/container';
 import SectionHeader from '../shared/section-header';
 import Image from 'next/image';
 import img from '@/public/LooperGroup.svg';
+import { motion } from 'framer-motion';
 
 function WhyUs() {
   return (
-    <section className="bg-gradient-to-r from-[#00254F] to-[#00365D] py-8 md:py-16 relative">
+    <motion.section
+      className="bg-gradient-to-r from-[#00254F] to-[#00365D] py-8 md:py-16 relative"
+      initial={{ opacity: 0, y: 30 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.6, delay: 0.3 }}>
       <Container className="relative z-10">
         <div className="hidden md:block text-white">
           <SectionHeader highlightedWord={'Us'}>Why Us</SectionHeader>
@@ -31,7 +38,7 @@ function WhyUs() {
             {
               title: 'Quality Assurance',
               description:
-                'Rigorous supplier verification and product inspection process before shipping.',
+                'Rigorous supplier verification and product inspection for special goods process before shipping.',
             },
             {
               title: 'Growth Focused',
@@ -61,7 +68,7 @@ function WhyUs() {
           />
         </div>
       </div>
-    </section>
+    </motion.section>
   );
 }
 
