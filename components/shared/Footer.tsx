@@ -94,7 +94,7 @@ function Footer() {
                 </li>
                 <li>
                   <Link
-                    href="/terms"
+                    href="/terms-and-conditions"
                     className="hover:text-primary transition-colors">
                     Terms &amp; Conditions
                   </Link>
