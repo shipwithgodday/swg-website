@@ -65,7 +65,7 @@ export default function PaymentServices() {
   const carouselImages = [
     '/payment/3.webp',
     '/payment/1.jpg',
-    '/payment/2.webp',
+    '/payment/2.png',
   ];
 
   return (
