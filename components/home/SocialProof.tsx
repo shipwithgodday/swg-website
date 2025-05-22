@@ -3,7 +3,7 @@ import React, { useRef } from 'react';
 import Container from '../shared/container';
 import SectionHeader from '../shared/section-header';
 import Image from 'next/image';
-import img from '@/public/woman-wrehse.jpg';
+import img from '@/public/social-proof.jpeg';
 import { motion, useInView } from 'framer-motion';
 
 function SocialProof() {

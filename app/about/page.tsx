@@ -4,6 +4,7 @@ import Achievements from '@/components/about/Achievements';
 import WhyUs from '@/components/about/WhyUs';
 import CEO from '@/components/about/CEO';
 import GhanaTeam from '@/components/about/GhanaTeam';
+import HandsOnSourcing from '@/components/about/HandsOnSourcing';
 
 export default function About() {
   return (
@@ -20,6 +21,9 @@ export default function About() {
 
       {/* Why Choose Us */}
       <WhyUs />
+
+      {/* Hands-On Sourcing */}
+      <HandsOnSourcing />
 
       {/* Meet the Teams */}
       <CEO />
