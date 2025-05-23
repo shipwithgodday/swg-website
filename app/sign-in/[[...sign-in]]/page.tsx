@@ -25,6 +25,9 @@ export default function SignInPage() {
               formFieldInput:
                 'rounded-lg border-gray-200 focus:border-blue-500 focus:ring-blue-500',
               footerActionLink: 'text-blue-600 hover:text-blue-700',
+              footer: {
+                display: 'none',
+              },
             },
           }}
           routing="path"
