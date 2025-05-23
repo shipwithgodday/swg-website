@@ -20,29 +20,85 @@ interface BookingDetails {
   time: string;
   fullName: string;
   phoneNumber: string;
+  email?: string;
+  organization?: string;
+  desiredService?: string;
   meetingType?: string;
-}
-
-interface CalendarLinks {
-  google: string;
-  outlook?: string;
-  ical?: string;
-  apple?: string;
 }
 
 interface EmailTemplateProps {
   firstName: string;
   bookingDetails: BookingDetails;
-  clientCalendarLinks: CalendarLinks;
+  clientCalendarLinks: {
+    google?: string;
+    outlook?: string;
+  };
+  isOwnerNotification?: boolean;
 }
 
 // Generate a Google Meet link (this would ideally come from your API or environment variables)
 const GOOGLE_MEET_LINK = 'https://meet.google.com/wio-bcev-gmk';
 
+// Email template styles
+const main = {
+  backgroundColor: '#ffffff',
+  fontFamily:
+    '-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif',
+};
+
+const container = {
+  margin: '0 auto',
+  padding: '20px 0 48px',
+  maxWidth: '580px',
+};
+
+const logo = {
+  margin: '0 auto',
+};
+
+const logoImage = {
+  margin: '0 auto',
+};
+
+const sectionsBorders = {
+  width: '100%',
+  borderBottom: '1px solid #e6ebf1',
+  borderLeft: '1px solid #e6ebf1',
+  borderRight: '1px solid #e6ebf1',
+};
+
+const sectionBorder = {
+  borderBottom: '1px solid #e6ebf1',
+  borderLeft: '1px solid #e6ebf1',
+  borderRight: '1px solid #e6ebf1',
+};
+
+const sectionCenter = {
+  borderBottom: '1px solid #e6ebf1',
+  borderLeft: '1px solid #e6ebf1',
+  borderRight: '1px solid #e6ebf1',
+};
+
+const content = {
+  padding: '0 40px',
+};
+
+const paragraph = {
+  fontSize: '16px',
+  lineHeight: '26px',
+  color: '#333333',
+};
+
+const link = {
+  color: '#2754C5',
+  textDecoration: 'underline',
+};
+
 export const EmailTemplate = ({
   firstName,
   bookingDetails,
   clientCalendarLinks,
+  isOwnerNotification = false,
 }: EmailTemplateProps) => {
   // Parse the date string to a Date object
   const bookingDate = parse(
@@ -61,8 +117,9 @@ export const EmailTemplate = ({
     <Html>
       <Head />
       <Preview>
-        Your consultation with Lucky Godday Business Services is
-        confirmed
+        {isOwnerNotification
+          ? 'New Booking Notification'
+          : 'Your consultation with Lucky Godday Business Services is confirmed'}
       </Preview>
       <Body style={main}>
         <Container style={container}>
@@ -80,217 +137,180 @@ export const EmailTemplate = ({
               <Column style={sectionBorder} />
             </Row>
           </Section>
+
           <Section style={content}>
-            <Text style={paragraph}>Hi {firstName},</Text>
+            {isOwnerNotification ? (
+              <>
+                <Text style={paragraph}>
+                  <strong>New Booking Notification</strong>
+                </Text>
+                <Text style={paragraph}>
+                  A new booking has been made with the following
+                  details:
+                </Text>
+                <Text style={paragraph}>
+                  <strong>Client Information:</strong>
+                  <br />
+                  Name: {bookingDetails.fullName}
+                  <br />
+                  Email: {bookingDetails.email}
+                  <br />
+                  Phone: {bookingDetails.phoneNumber}
+                  {bookingDetails.organization && (
+                    <>
+                      <br />
+                      Organization: {bookingDetails.organization}
+                    </>
+                  )}
+                </Text>
+                <Text style={paragraph}>
+                  <strong>Booking Details:</strong>
+                  <br />
+                  Date: {formattedDate}
+                  <br />
+                  Time: {bookingDetails.time}
+                  <br />
+                  Service: {bookingDetails.desiredService}
+                  <br />
+                  Meeting Type: {bookingDetails.meetingType}
+                </Text>
+                <Text style={paragraph}>
+                  <strong>Calendar Links:</strong>
+                </Text>
+                {clientCalendarLinks.google && (
+                  <Button
+                    style={{
+                      color: '#000000',
+                      fontSize: '14px',
+                      fontWeight: 'bold',
+                      textAlign: 'center',
+                      borderBottom: '1px solid #000000',
+                      textDecoration: 'underline',
+                    }}
+                    href={clientCalendarLinks.google}>
+                    Add to Google Calendar
+                  </Button>
+                )}
+                {clientCalendarLinks.outlook && (
+                  <Button
+                    style={{
+                      color: '#000000',
+                      fontSize: '14px',
+                      fontWeight: 'bold',
+                      textAlign: 'center',
+                      borderBottom: '1px solid #000000',
+                      textDecoration: 'underline',
+                    }}
+                    href={clientCalendarLinks.outlook}>
+                    Add to Outlook
+                  </Button>
+                )}
+              </>
+            ) : (
+              <>
+                <Text style={paragraph}>Hi {firstName},</Text>
+                <Text style={paragraph}>
+                  Your consultation with Lucky Godday Business
+                  Services has been confirmed for {formattedDate} at{' '}
+                  {bookingDetails.time}.
+                </Text>
 
-            {/* Calendar-style event summary */}
-            <Section style={calendarSection}>
-              <Text style={eventTitle}>
-                Consultation Call - Lucky Godday Business Services
-              </Text>
-              <Text style={eventTime}>
-                {formattedDate} at {bookingDetails.time} (GMT)
-              </Text>
+                <Text style={paragraph}>
+                  <strong>Meeting Details:</strong>
+                  <br />
+                  Date: {formattedDate}
+                  <br />
+                  Time: {bookingDetails.time}
+                  <br />
+                  Type: {bookingDetails.meetingType}
+                </Text>
 
-              <Section style={eventDetails}>
                 {isOnlineMeeting && (
-                  <Text style={eventDetailItem}>
+                  <Text style={paragraph}>
                     <strong>Google Meet Link:</strong>{' '}
-                    <Link
-                      href={GOOGLE_MEET_LINK}
-                      style={linkHighlight}>
+                    <Link href={GOOGLE_MEET_LINK} style={link}>
                       {GOOGLE_MEET_LINK}
                     </Link>
                   </Text>
                 )}
-                <Text style={eventDetailItem}>
-                  <strong>Meeting Type:</strong>{' '}
-                  {bookingDetails.meetingType || 'Consultation'}
+
+                <Text style={paragraph}>
+                  <strong>Add to your calendar:</strong>
                 </Text>
-                <Text style={eventDetailItem}>
-                  <strong>Organizer:</strong> Lucky Godday Business
-                  Services
+
+                {clientCalendarLinks.google && (
+                  <Button
+                    style={{
+                      color: '#000000',
+                      fontSize: '14px',
+                      fontWeight: 'bold',
+                      textAlign: 'center',
+                      borderBottom: '1px solid #000000',
+                      textDecoration: 'underline',
+                    }}
+                    href={clientCalendarLinks.google}>
+                    Add to Google Calendar
+                  </Button>
+                )}
+
+                {clientCalendarLinks.outlook && (
+                  <Button
+                    style={{
+                      color: '#000000',
+                      fontSize: '14px',
+                      fontWeight: 'bold',
+                      textAlign: 'center',
+                      borderBottom: '1px solid #000000',
+                      textDecoration: 'underline',
+                    }}
+                    href={clientCalendarLinks.outlook}>
+                    Add to Outlook
+                  </Button>
+                )}
+
+                <Text style={paragraph}>
+                  This consultation is to discuss the next steps to
+                  help you with your logistics needs from China to
+                  Ghana.
                 </Text>
-              </Section>
 
-              <Button
-                style={{
-                  color: '#000000',
-                  fontSize: '14px',
-                  fontWeight: 'bold',
-                  textAlign: 'center',
-                  marginRight: '10px',
-                  textDecoration: 'underline',
-                  borderBottom: '1px solid #000000',
-                }}
-                href={clientCalendarLinks.google}>
-                Add to Google Calendar
-              </Button>
-              {clientCalendarLinks.outlook && (
-                <Button
-                  style={{
-                    color: '#000000',
-                    fontSize: '14px',
-                    fontWeight: 'bold',
-                    textAlign: 'center',
-                    borderBottom: '1px solid #000000',
-                    textDecoration: 'underline',
-                  }}
-                  href={clientCalendarLinks.outlook}>
-                  Add to Outlook
-                </Button>
-              )}
-            </Section>
+                {isOnlineMeeting ? (
+                  <Text style={paragraph}>
+                    <strong>How to join:</strong> Click the Google
+                    Meet link above at the scheduled time, or use the
+                    calendar invite after adding it to your calendar.
+                  </Text>
+                ) : (
+                  <Text style={paragraph}>
+                    <strong>In-person meeting:</strong> Please arrive
+                    5 minutes before your scheduled appointment. You
+                    will be contacted to agree on a location.
+                  </Text>
+                )}
 
-            <Text style={paragraph}>
-              This consultation is to discuss the next steps to help
-              you with your logistics needs from China to Ghana.
-            </Text>
+                <Text style={paragraph}>
+                  If you need to reschedule or have any questions,
+                  please contact us at{' '}
+                  <Link
+                    href="mailto:info@shipwithgodday.com"
+                    style={link}>
+                    info@shipwithgodday.com
+                  </Link>
+                  .
+                </Text>
 
-            {isOnlineMeeting ? (
-              <Text style={paragraph}>
-                <strong>How to join:</strong> Click the Google Meet
-                link above at the scheduled time, or use the calendar
-                invite after adding it to your calendar.
-              </Text>
-            ) : (
-              <Text style={paragraph}>
-                <strong>In-person meeting:</strong> Please arrive 5
-                minutes before your scheduled appointment. You will be
-                contacted to agree on a location.
-              </Text>
+                <Text style={paragraph}>
+                  Thanks,
+                  <br />
+                  Lucky Godday Business Services
+                </Text>
+              </>
             )}
-
-            <Text style={paragraph}>
-              If you need to reschedule or have any questions, please
-              contact us at{' '}
-              <Link
-                href="mailto:info@shipwithgodday.com"
-                style={link}>
-                info@shipwithgodday.com
-              </Link>
-              .
-            </Text>
-
-            <Text style={paragraph}>
-              Thanks,
-              <br />
-              Lucky Godday Business Services
-            </Text>
           </Section>
         </Container>
-
-        <Section style={footer}>
-          <Row>
-            <Text style={{ textAlign: 'center', color: '#706a7b' }}>
-              © 2025 Lucky Godday Business Services, All Rights
-              Reserved <br />
-            </Text>
-          </Row>
-        </Section>
       </Body>
     </Html>
   );
 };
 
 export default EmailTemplate;
-
-const fontFamily = 'HelveticaNeue,Helvetica,Arial,sans-serif';
-
-const main = {
-  backgroundColor: '#f5f5f5',
-  fontFamily,
-} as React.CSSProperties;
-
-const paragraph = {
-  lineHeight: 1.5,
-  fontSize: 14,
-  marginBottom: 16,
-} as React.CSSProperties;
-
-const container = {
-  maxWidth: '580px',
-  margin: '30px auto',
-  backgroundColor: '#ffffff',
-  borderRadius: '8px',
-  overflow: 'hidden',
-  boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
-} as React.CSSProperties;
-
-const footer = {
-  maxWidth: '580px',
-  margin: '0 auto',
-  padding: '20px 0',
-} as React.CSSProperties;
-
-const content = {
-  padding: '20px 30px',
-} as React.CSSProperties;
-
-const logo = {
-  padding: 30,
-  width: '100%',
-  textAlign: 'center',
-  backgroundColor: '#ffffff',
-} as React.CSSProperties;
-
-const logoImage = {
-  display: 'inline-block',
-} as React.CSSProperties;
-
-const sectionsBorders = {
-  width: '100%',
-  display: 'flex',
-} as React.CSSProperties;
-
-const sectionBorder = {
-  borderBottom: '1px solid rgb(238,238,238)',
-  width: '249px',
-} as React.CSSProperties;
-
-const sectionCenter = {
-  borderBottom: '1px solid #e4bb25',
-  width: '102px',
-} as React.CSSProperties;
-
-const link = {
-  textDecoration: 'underline',
-  color: '#2563eb',
-} as React.CSSProperties;
-
-const linkHighlight = {
-  textDecoration: 'underline',
-  color: '#2563eb',
-  fontWeight: 'bold',
-} as React.CSSProperties;
-
-const calendarSection = {
-  // backgroundColor: '#f8f9fa',
-  // padding: '15px',
-  borderRadius: '8px',
-  marginBottom: '20px',
-  // border: '1px solid #e5e7eb',
-} as React.CSSProperties;
-
-const eventTitle = {
-  fontSize: '16px',
-  fontWeight: 'bold',
-  marginBottom: '8px',
-  color: '#111827',
-} as React.CSSProperties;
-
-const eventTime = {
-  fontSize: '14px',
-  color: '#374151',
-  marginBottom: '12px',
-} as React.CSSProperties;
-
-const eventDetails = {
-  marginBottom: '15px',
-} as React.CSSProperties;
-
-const eventDetailItem = {
-  fontSize: '14px',
-  marginBottom: '6px',
-  color: '#374151',
-} as React.CSSProperties;

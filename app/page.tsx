@@ -6,6 +6,7 @@ import Services from '@/components/home/services';
 import SocialProof from '@/components/home/SocialProof';
 import WhyUs from '@/components/home/WhyUs';
 import WeeklyContainerBanner from '@/components/home/WeeklyContainerBanner';
+import SignUp from '@/components/home/SignUp';
 
 export default function Home() {
   return (
@@ -16,6 +17,7 @@ export default function Home() {
       <WhyUs />
       <WeeklyContainerBanner />
       <InternationalPartnerships />
+      <SignUp />
       <SocialProof />
       <CTA />
     </main>

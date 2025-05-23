@@ -6,7 +6,6 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { createBooking } from '@/app/actions/createBooking';
 import { getClientCalendarLinks } from '@/lib/ClientCalendarUtils';
-import { getCalendarLinks } from '@/lib/calendarUtils';
 import { useBooking } from '@/lib/booking-context';
 import DatePicker from './DatePicker';
 import TimeSlotSelector from './TimeSlotSelector';
@@ -97,56 +96,10 @@ export default function BookingForm() {
       const dateOnly = values.date.toISOString().split('T')[0];
       const formattedDateTime = `${dateOnly}T${values.time}:00`;
 
-      // Prepare the calendar links with both date and time
-      const calendarLinks = getCalendarLinks({
-        ...values,
-        formattedDateTime,
-      });
       const clientCalendarLinks = getClientCalendarLinks({
         ...values,
         formattedDateTime,
       });
-
-      // Prepare form data for Web3Forms
-      const formData = new FormData();
-      Object.entries(values).forEach(([key, value]) => {
-        if (value instanceof Date) {
-          formData.append(key, value.toISOString().split('T')[0]);
-        } else if (value !== null && value !== undefined) {
-          formData.append(key, value.toString());
-        }
-      });
-
-      formData.append(
-        'access_key',
-        process.env.NEXT_PUBLIC_WEB3FORMS_ACCESS_KEY || ''
-      );
-      formData.append('subject', 'New Consultation Call Booking');
-
-      const emailContent = `
-      Add to your Google calendar: ${calendarLinks.google}
-      `;
-
-      formData.append('Calendar', emailContent);
-
-      // Submit to Web3Forms
-      const web3FormsResponse = await fetch(
-        'https://api.web3forms.com/submit',
-        {
-          method: 'POST',
-          body: formData,
-        }
-      );
-
-      const web3FormsResult = await web3FormsResponse.json();
-
-      if (!web3FormsResponse.ok || !web3FormsResult.success) {
-        throw new Error(
-          `Web3Forms submission failed: ${
-            web3FormsResult.message || 'Unknown error'
-          }`
-        );
-      }
 
       // Submit booking to your API
       const result = await createBooking({
@@ -162,8 +115,8 @@ export default function BookingForm() {
 
       if (!result.success) throw new Error(result.error);
 
-      // Send confirmation email
-      const emailResponse = await fetch('/api/send', {
+      // Send confirmation email to the client
+      const clientEmailResponse = await fetch('/api/send', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -180,12 +133,44 @@ export default function BookingForm() {
         }),
       });
 
-      const emailResult = await emailResponse.json();
+      const clientEmailResult = await clientEmailResponse.json();
 
-      if (!emailResponse.ok) {
+      if (!clientEmailResponse.ok) {
         throw new Error(
           `Failed to send confirmation email: ${
-            emailResult.error || 'Unknown error'
+            clientEmailResult.error || 'Unknown error'
+          }`
+        );
+      }
+
+      // Send notification email to the site owner
+      const ownerEmailResponse = await fetch('/api/send', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          to: 'info@shipwithgodday.com',
+          firstName: 'Admin',
+          bookingDetails: {
+            date: dateOnly,
+            time: values.time,
+            fullName: values.fullName,
+            phoneNumber: values.phoneNumber,
+            email: values.email,
+            organization: values.organization,
+            desiredService: values.desiredService,
+            meetingType: values.meetingType,
+          },
+          clientCalendarLinks,
+          isOwnerNotification: true,
+        }),
+      });
+
+      const ownerEmailResult = await ownerEmailResponse.json();
+
+      if (!ownerEmailResponse.ok) {
+        throw new Error(
+          `Failed to send owner notification email: ${
+            ownerEmailResult.error || 'Unknown error'
           }`
         );
       }

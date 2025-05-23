@@ -28,6 +28,9 @@ export default function SignInPage() {
               footer: {
                 display: 'none',
               },
+              header: {
+                display: 'none',
+              },
             },
           }}
           routing="path"
