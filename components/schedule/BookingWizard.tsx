@@ -155,12 +155,19 @@ export default function BookingForm() {
             time: values.time,
             fullName: values.fullName,
             phoneNumber: values.phoneNumber,
+            whatsappNumber: values.whatsappNumber,
             email: values.email,
             organization: values.organization,
             desiredService: values.desiredService,
             meetingType: values.meetingType,
           },
-          clientCalendarLinks,
+          clientCalendarLinks: getClientCalendarLinks(
+            {
+              ...values,
+              formattedDateTime,
+            },
+            true
+          ),
           isOwnerNotification: true,
         }),
       });
@@ -304,12 +311,13 @@ export default function BookingForm() {
               </Button>
             )}
             {currentStep === 'confirmation' && (
-              <button
+              <Button
                 type="submit"
                 disabled={isSubmitting}
-                className="px-4 py-1.5 md:px-6 md:py-2 bg-white text-black rounded-md hover:bg-[#dddddd] transition duration-300 disabled:opacity-50 text-sm md:text-base">
+                // className="px-4 py-1.5 md:px-6 md:py-2 bg-white text-black rounded-md hover:bg-[#dddddd] transition duration-300 disabled:opacity-50 text-sm md:text-base"
+              >
                 {isSubmitting ? 'Confirming...' : 'Confirm Booking'}
-              </button>
+              </Button>
             )}
           </div>
         </div>

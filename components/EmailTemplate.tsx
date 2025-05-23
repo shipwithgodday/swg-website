@@ -20,6 +20,7 @@ interface BookingDetails {
   time: string;
   fullName: string;
   phoneNumber: string;
+  whatsappNumber?: string;
   email?: string;
   organization?: string;
   desiredService?: string;
@@ -35,9 +36,6 @@ interface EmailTemplateProps {
   };
   isOwnerNotification?: boolean;
 }
-
-// Generate a Google Meet link (this would ideally come from your API or environment variables)
-const GOOGLE_MEET_LINK = 'https://meet.google.com/wio-bcev-gmk';
 
 // Email template styles
 const main = {
@@ -92,6 +90,7 @@ const paragraph = {
 const link = {
   color: '#2754C5',
   textDecoration: 'underline',
+  marginRight: '10px',
 };
 
 export const EmailTemplate = ({
@@ -153,9 +152,15 @@ export const EmailTemplate = ({
                   <br />
                   Name: {bookingDetails.fullName}
                   <br />
-                  Email: {bookingDetails.email}
+                  Email: {bookingDetails.email || 'Not provided'}
                   <br />
                   Phone: {bookingDetails.phoneNumber}
+                  {bookingDetails.whatsappNumber && (
+                    <>
+                      <br />
+                      WhatsApp: {bookingDetails.whatsappNumber}
+                    </>
+                  )}
                   {bookingDetails.organization && (
                     <>
                       <br />
@@ -170,40 +175,27 @@ export const EmailTemplate = ({
                   <br />
                   Time: {bookingDetails.time}
                   <br />
-                  Service: {bookingDetails.desiredService}
+                  Service:{' '}
+                  {bookingDetails.desiredService || 'Not specified'}
                   <br />
                   Meeting Type: {bookingDetails.meetingType}
                 </Text>
                 <Text style={paragraph}>
-                  <strong>Calendar Links:</strong>
+                  <strong>Calendar Links for Client:</strong>
                 </Text>
                 {clientCalendarLinks.google && (
-                  <Button
-                    style={{
-                      color: '#000000',
-                      fontSize: '14px',
-                      fontWeight: 'bold',
-                      textAlign: 'center',
-                      borderBottom: '1px solid #000000',
-                      textDecoration: 'underline',
-                    }}
-                    href={clientCalendarLinks.google}>
-                    Add to Google Calendar
-                  </Button>
+                  <Link
+                    href={clientCalendarLinks.google}
+                    style={link}>
+                    Google Calendar Link
+                  </Link>
                 )}
                 {clientCalendarLinks.outlook && (
-                  <Button
-                    style={{
-                      color: '#000000',
-                      fontSize: '14px',
-                      fontWeight: 'bold',
-                      textAlign: 'center',
-                      borderBottom: '1px solid #000000',
-                      textDecoration: 'underline',
-                    }}
-                    href={clientCalendarLinks.outlook}>
-                    Add to Outlook
-                  </Button>
+                  <Link
+                    href={clientCalendarLinks.outlook}
+                    style={link}>
+                    Outlook Calendar Link
+                  </Link>
                 )}
               </>
             ) : (
@@ -225,15 +217,6 @@ export const EmailTemplate = ({
                   Type: {bookingDetails.meetingType}
                 </Text>
 
-                {isOnlineMeeting && (
-                  <Text style={paragraph}>
-                    <strong>Google Meet Link:</strong>{' '}
-                    <Link href={GOOGLE_MEET_LINK} style={link}>
-                      {GOOGLE_MEET_LINK}
-                    </Link>
-                  </Text>
-                )}
-
                 <Text style={paragraph}>
                   <strong>Add to your calendar:</strong>
                 </Text>
@@ -246,6 +229,7 @@ export const EmailTemplate = ({
                       fontWeight: 'bold',
                       textAlign: 'center',
                       borderBottom: '1px solid #000000',
+                      marginRight: '10px',
                       textDecoration: 'underline',
                     }}
                     href={clientCalendarLinks.google}>

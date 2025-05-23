@@ -4,8 +4,13 @@ import resend from '@/lib/emails';
 
 export async function POST(req: Request) {
   try {
-    const { to, firstName, bookingDetails, clientCalendarLinks } =
-      await req.json();
+    const {
+      to,
+      firstName,
+      bookingDetails,
+      clientCalendarLinks,
+      isOwnerNotification,
+    } = await req.json();
 
     new Promise(async () => {
       try {
@@ -17,6 +22,7 @@ export async function POST(req: Request) {
             firstName,
             bookingDetails,
             clientCalendarLinks,
+            isOwnerNotification,
           }),
         });
       } catch (error) {

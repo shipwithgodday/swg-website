@@ -6,6 +6,7 @@ export interface IBooking extends Document {
   time: string;
   fullName: string;
   phoneNumber: string;
+  whatsappNumber?: string;
   email: string;
   organization?: string;
   desiredService: string;
@@ -21,6 +22,7 @@ const BookingSchema: Schema = new Schema(
     time: { type: String, required: true },
     fullName: { type: String, required: true },
     phoneNumber: { type: String, required: true },
+    whatsappNumber: { type: String },
     email: { type: String, required: true },
     organization: { type: String },
     desiredService: { type: String, required: true },

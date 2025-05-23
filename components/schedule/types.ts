@@ -16,6 +16,11 @@ export const formSchema = z.object({
     .string()
     .min(7, { message: 'Please enter a valid phone number' })
     .max(20, { message: 'Phone number is too long' }),
+  whatsappNumber: z
+    .string()
+    .min(7, { message: 'Please enter a valid WhatsApp number' })
+    .max(20, { message: 'WhatsApp number is too long' })
+    .optional(),
   email: z
     .string()
     .email({ message: 'Please enter a valid email address' }),
@@ -42,6 +47,7 @@ export interface BookingSubmission {
   time: string;
   fullName: string;
   phoneNumber: string;
+  whatsappNumber?: string;
   email: string;
   organization?: string;
   projectType: string;

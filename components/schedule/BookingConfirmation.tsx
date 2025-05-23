@@ -11,7 +11,7 @@ export default function BookingConfirmation() {
       <h3 className="text-xl md:text-2xl font-semibold mb-4">
         Confirm your booking
       </h3>
-      <div className="bg-black bg-opacity-70 p-4 md:p-6 rounded-lg shadow-lg mb-6 text-sm md:text-base">
+      <div className="bg-[#4b82a994] bg-opacity-30 bg-opacity-70 p-4 md:p-6 rounded-lg shadow-lg mb-6 text-sm md:text-base">
         <p className="mb-2">
           <span className="font-semibold">Date:</span>{' '}
           {watch('date')?.toDateString()}
@@ -31,6 +31,12 @@ export default function BookingConfirmation() {
           <span className="font-semibold">Phone:</span>{' '}
           {watch('phoneNumber')}
         </p>
+        {watch('whatsappNumber') && (
+          <p className="mb-2">
+            <span className="font-semibold">WhatsApp:</span>{' '}
+            {watch('whatsappNumber')}
+          </p>
+        )}
         <p className="mb-2">
           <span className="font-semibold">Desired Service:</span>{' '}
           {watch('desiredService')}

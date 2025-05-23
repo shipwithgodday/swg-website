@@ -8,6 +8,7 @@ type BookingData = {
   time: string;
   fullName: string;
   phoneNumber: string;
+  whatsappNumber?: string;
   email: string;
   organization?: string;
   desiredService: string;
@@ -20,6 +21,7 @@ export async function createBooking(data: BookingData) {
     time,
     fullName,
     phoneNumber,
+    whatsappNumber,
     email,
     organization,
     desiredService,
@@ -36,6 +38,7 @@ export async function createBooking(data: BookingData) {
       time,
       fullName,
       phoneNumber,
+      whatsappNumber,
       email,
       organization,
       desiredService,
@@ -53,6 +56,7 @@ export async function createBooking(data: BookingData) {
         time: savedBooking.time,
         fullName: savedBooking.fullName,
         phoneNumber: savedBooking.phoneNumber,
+        whatsappNumber: savedBooking.whatsappNumber,
         email: savedBooking.email,
         organization: savedBooking.organization,
         desiredService: savedBooking.desiredService,

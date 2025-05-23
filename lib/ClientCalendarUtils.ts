@@ -10,33 +10,43 @@ interface BookingCalendarData {
   meetingType?: string;
   date?: Date | string;
   time?: string;
+  whatsappNumber?: string;
 }
 
-export function getClientCalendarLinks(booking: BookingCalendarData) {
+export function getClientCalendarLinks(
+  booking: BookingCalendarData,
+  isOwner: boolean = false
+) {
   const startTime = new Date(booking.formattedDateTime);
   const endTime = new Date(startTime.getTime() + 60 * 60 * 1000); // 1 hour later
 
-  // Use the meeting type and service in the title if available
-  const meetingType = booking.meetingType
-    ? `(${booking.meetingType})`
-    : '';
-  const service = booking.desiredService
-    ? `- ${booking.desiredService}`
-    : '';
-
+  // Use different title format for owner vs client
   const title = encodeURIComponent(
-    `Lucky Godday Business Services Consultation ${meetingType} ${service}`
+    isOwner
+      ? `Meeting with ${booking.fullName || 'Client'}`
+      : `Lucky Godday Business Services Consultation ${booking.meetingType ? `(${booking.meetingType})` : ''} ${booking.desiredService ? `- ${booking.desiredService}` : ''}`
   );
 
   // Create a more detailed description
   const details = encodeURIComponent(
-    `Consultation with Lucky Godday Business Services\n` +
-      `Date: ${format(startTime, 'MMMM d, yyyy')}\n` +
-      `Time: ${format(startTime, 'h:mm a')} - ${format(endTime, 'h:mm a')} GMT\n` +
-      (booking.meetingType === 'Online'
-        ? `Meeting Link: https://meet.google.com/wio-bcev-gmk\n`
-        : `Meeting Type: In-person\n`) +
-      `For any questions, contact: support@luckygodday.com`
+    isOwner
+      ? `Meeting with ${booking.fullName || 'Client'}\n` +
+          `Date: ${format(startTime, 'MMMM d, yyyy')}\n` +
+          `Time: ${format(startTime, 'h:mm a')} - ${format(endTime, 'h:mm a')} GMT\n` +
+          `Phone: ${booking.phoneNumber || 'Not provided'}\n` +
+          (booking.whatsappNumber
+            ? `WhatsApp: ${booking.whatsappNumber}\n`
+            : '') +
+          `Email: ${booking.email || 'Not provided'}\n` +
+          `Service: ${booking.desiredService || 'Not specified'}\n` +
+          `Meeting Type: ${booking.meetingType || 'Not specified'}`
+      : `Consultation with Lucky Godday Business Services\n` +
+          `Date: ${format(startTime, 'MMMM d, yyyy')}\n` +
+          `Time: ${format(startTime, 'h:mm a')} - ${format(endTime, 'h:mm a')} GMT\n` +
+          (booking.meetingType === 'Online'
+            ? `Meeting Link: https://meet.google.com/wio-bcev-gmk\n`
+            : `Meeting Type: In-person\n`) +
+          `For any questions, contact: support@luckygodday.com`
   );
 
   return {

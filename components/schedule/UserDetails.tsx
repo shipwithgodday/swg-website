@@ -1,8 +1,9 @@
 'use client';
-import React from 'react';
+import React, { useState } from 'react';
 import { useFormContext, Controller } from 'react-hook-form';
 import { FormValues } from './types';
 import { Input } from '../ui/input';
+import { Checkbox } from '../ui/checkbox';
 import {
   Select,
   SelectContent,
@@ -18,10 +19,13 @@ interface UserDetailsFormProps {
 export default function UserDetailsForm({
   showErrors,
 }: UserDetailsFormProps) {
+  const [isSameAsPhone, setIsSameAsPhone] = useState(false);
   const {
     register,
     control,
     formState: { errors },
+    getValues,
+    setValue,
   } = useFormContext<FormValues>();
 
   return (
@@ -67,7 +71,7 @@ export default function UserDetailsForm({
         )}
       </div>
 
-      <div className="mb-4">
+      <div className="">
         <Input
           type="tel"
           {...register('phoneNumber')}
@@ -76,6 +80,41 @@ export default function UserDetailsForm({
         {showErrors && errors.phoneNumber && (
           <div className="text-red-500 mt-1 text-sm">
             {errors.phoneNumber.message}
+          </div>
+        )}
+      </div>
+
+      <div className="mb-2">
+        <div className="flex items-center gap-2 p-2 rounded-md">
+          <Checkbox
+            id="sameAsPhone"
+            checked={isSameAsPhone}
+            onCheckedChange={(checked) => {
+              setIsSameAsPhone(checked as boolean);
+              if (checked) {
+                const phoneNumber = getValues('phoneNumber');
+                setValue('whatsappNumber', phoneNumber);
+              } else {
+                setValue('whatsappNumber', '');
+              }
+            }}
+          />
+          <label
+            htmlFor="sameAsPhone"
+            className="text-xs text-white font-light leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+            This is also my WhatsApp number
+          </label>
+        </div>
+        {!isSameAsPhone && (
+          <Input
+            type="tel"
+            {...register('whatsappNumber')}
+            placeholder="WhatsApp Number (if different)"
+          />
+        )}
+        {showErrors && errors.whatsappNumber && (
+          <div className="text-red-500 mt-1 text-sm">
+            {errors.whatsappNumber.message}
           </div>
         )}
       </div>
