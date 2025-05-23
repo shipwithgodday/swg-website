@@ -18,11 +18,17 @@ export default function WeeklyContainerBanner() {
             transition={{ duration: 0.6, delay: 0.2 }}
             className="space-y-4">
             <div className="flex items-center justify-center gap-3">
-              <Icon name="Ship" className="w-8 h-8 text-primary" />
+              <Icon
+                name="Ship"
+                className="w-8 h-8 text-primary hidden md:block"
+              />
               <h2 className="text-2xl md:text-3xl font-bold tracking-tight">
                 Weekly Containers From from China to Ghana
               </h2>
-              <Icon name="Ship" className="w-8 h-8 text-primary" />
+              <Icon
+                name="Ship"
+                className="w-8 h-8 text-primary hidden md:block"
+              />
             </div>
             <p className="text-lg md:text-xl font-semibold text-primary">
               We load containers{' '}
