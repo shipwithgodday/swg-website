@@ -111,7 +111,7 @@ function Footer() {
           </span>
           <div className="flex mt-4 sm:justify-center sm:mt-0 space-x-6">
             <Link
-              href="https://instagram.com/shipwithgodday"
+              href="https://www.instagram.com/shipwithgodday1?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw=="
               target="_blank"
               rel="noopener noreferrer"
               className="text-gray-400 hover:text-primary transition-colors">
