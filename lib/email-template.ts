@@ -42,7 +42,7 @@ export const getEmailTemplate = (content: string) => `
 <body>
     <div class="container">
         <div class="header">
-            <img src="https://godday.joelak.dev/_next/static/media/logo.07141797.svg" alt="Godday Logo" class="logo">
+            <img src="https://joels-pic-bucket.s3.us-east-2.amazonaws.com/logo.png" alt="Godday Logo" class="logo">
         </div>
         <div class="content">
             ${content}

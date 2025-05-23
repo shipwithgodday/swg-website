@@ -10,7 +10,7 @@ export async function POST(req: Request) {
     new Promise(async () => {
       try {
         await resend.emails.send({
-          from: 'Avond Interiors <onboarding@avondinteriors.com>',
+          from: 'Ship With Godday <info@shipwithgodday.com>',
           to: [to],
           subject: 'Booking Confirmation',
           react: EmailTemplate({

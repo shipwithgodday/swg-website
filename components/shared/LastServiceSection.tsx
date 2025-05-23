@@ -3,14 +3,15 @@ import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import SectionHeader from '../shared/section-header';
 import { ServiceItem } from './ServiceItem';
-import img from '@/public/shipping/port.jpg';
 import { motion, useInView } from 'framer-motion';
+import { StaticImageData } from 'next/image';
 
 interface ServiceSectionProps {
   title: string;
   subtitle: string;
   highlightedWord: string;
   items: string[];
+  imgUrl: string | StaticImageData;
 }
 
 export function LastServiceSection({
@@ -18,6 +19,7 @@ export function LastServiceSection({
   subtitle,
   highlightedWord,
   items,
+  imgUrl,
 }: ServiceSectionProps) {
   const leftColumnRef = useRef<HTMLDivElement>(null);
   const rightColumnRef = useRef<HTMLDivElement>(null);
@@ -101,7 +103,7 @@ export function LastServiceSection({
           className="relative flex-grow mt-4"
           style={{ height: imageHeight }}>
           <Image
-            src={img}
+            src={imgUrl}
             alt="Why choose our services"
             className="rounded-2xl object-cover object-top"
             fill

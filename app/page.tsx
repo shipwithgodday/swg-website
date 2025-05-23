@@ -5,6 +5,7 @@ import Hero from '@/components/home/Hero';
 import Services from '@/components/home/services';
 import SocialProof from '@/components/home/SocialProof';
 import WhyUs from '@/components/home/WhyUs';
+import WeeklyContainerBanner from '@/components/home/WeeklyContainerBanner';
 
 export default function Home() {
   return (
@@ -13,6 +14,7 @@ export default function Home() {
       <Services id="services" />
       <AboutBanner />
       <WhyUs />
+      <WeeklyContainerBanner />
       <InternationalPartnerships />
       <SocialProof />
       <CTA />

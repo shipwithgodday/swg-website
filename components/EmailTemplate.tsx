@@ -70,7 +70,7 @@ export const EmailTemplate = ({
             <Img
               style={logoImage}
               width={114}
-              src="https://joels-pic-bucket.s3.us-east-2.amazonaws.com/icon.png"
+              src="https://joels-pic-bucket.s3.us-east-2.amazonaws.com/logo.png"
             />
           </Section>
           <Section style={sectionsBorders}>
@@ -114,29 +114,30 @@ export const EmailTemplate = ({
               </Section>
 
               <Button
-                style={calendarButton}
+                style={{
+                  color: '#000000',
+                  fontSize: '14px',
+                  fontWeight: 'bold',
+                  textAlign: 'center',
+                  marginRight: '10px',
+                  textDecoration: 'underline',
+                  borderBottom: '1px solid #000000',
+                }}
                 href={clientCalendarLinks.google}>
                 Add to Google Calendar
               </Button>
               {clientCalendarLinks.outlook && (
                 <Button
-                  style={calendarButton}
+                  style={{
+                    color: '#000000',
+                    fontSize: '14px',
+                    fontWeight: 'bold',
+                    textAlign: 'center',
+                    borderBottom: '1px solid #000000',
+                    textDecoration: 'underline',
+                  }}
                   href={clientCalendarLinks.outlook}>
                   Add to Outlook
-                </Button>
-              )}
-              {clientCalendarLinks.apple && (
-                <Button
-                  style={calendarButton}
-                  href={clientCalendarLinks.apple}>
-                  Add to Apple Calendar
-                </Button>
-              )}
-              {clientCalendarLinks.ical && (
-                <Button
-                  style={calendarButton}
-                  href={clientCalendarLinks.ical}>
-                  Download iCal File
                 </Button>
               )}
             </Section>
@@ -155,7 +156,8 @@ export const EmailTemplate = ({
             ) : (
               <Text style={paragraph}>
                 <strong>In-person meeting:</strong> Please arrive 5
-                minutes before your scheduled appointment.
+                minutes before your scheduled appointment. You will be
+                contacted to agree on a location.
               </Text>
             )}
 
@@ -163,9 +165,9 @@ export const EmailTemplate = ({
               If you need to reschedule or have any questions, please
               contact us at{' '}
               <Link
-                href="mailto:support@luckygodday.com"
+                href="mailto:info@shipwithgodday.com"
                 style={link}>
-                support@luckygodday.com
+                info@shipwithgodday.com
               </Link>
               .
             </Text>
@@ -247,7 +249,7 @@ const sectionBorder = {
 } as React.CSSProperties;
 
 const sectionCenter = {
-  borderBottom: '1px solid rgb(145,71,255)',
+  borderBottom: '1px solid #e4bb25',
   width: '102px',
 } as React.CSSProperties;
 
@@ -263,11 +265,11 @@ const linkHighlight = {
 } as React.CSSProperties;
 
 const calendarSection = {
-  backgroundColor: '#f8f9fa',
-  padding: '15px',
+  // backgroundColor: '#f8f9fa',
+  // padding: '15px',
   borderRadius: '8px',
   marginBottom: '20px',
-  border: '1px solid #e5e7eb',
+  // border: '1px solid #e5e7eb',
 } as React.CSSProperties;
 
 const eventTitle = {
@@ -291,17 +293,4 @@ const eventDetailItem = {
   fontSize: '14px',
   marginBottom: '6px',
   color: '#374151',
-} as React.CSSProperties;
-
-const calendarButton = {
-  backgroundColor: '#2563eb',
-  color: '#ffffff',
-  padding: '8px 16px',
-  borderRadius: '4px',
-  textDecoration: 'none',
-  fontSize: '14px',
-  fontWeight: 'bold',
-  marginRight: '8px',
-  marginBottom: '8px',
-  display: 'inline-block',
 } as React.CSSProperties;

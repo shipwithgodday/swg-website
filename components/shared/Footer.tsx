@@ -133,7 +133,7 @@ function Footer() {
               <span className="sr-only">TikTok page</span>
             </Link>
             <Link
-              href="https://wa.me/+233302768899"
+              href="https://wa.me/233544074578"
               target="_blank"
               rel="noopener noreferrer"
               className="text-gray-400 hover:text-primary transition-colors">

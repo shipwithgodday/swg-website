@@ -111,9 +111,7 @@ function TermsAndConditions() {
               <ul className="list-disc list-inside mt-2">
                 <li>Bank transfers</li>
                 <li>Cash payments (in designated locations)</li>
-                <li>
-                  Mobile money (MTN, Vodafone, AirtelTigo, etc.)
-                </li>
+                <li>Mobile money (MTN, Telecel, AirtelTigo, etc.)</li>
               </ul>
 
               <p className="mt-5">

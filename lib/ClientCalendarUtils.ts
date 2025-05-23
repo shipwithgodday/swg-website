@@ -39,31 +39,11 @@ export function getClientCalendarLinks(booking: BookingCalendarData) {
       `For any questions, contact: support@luckygodday.com`
   );
 
-  // Create the iCalendar content
-  const icsContent = `BEGIN:VCALENDAR
-VERSION:2.0
-PRODID:-//Lucky Godday Business Services//Booking System//EN
-BEGIN:VEVENT
-SUMMARY:${title}
-DTSTART:${format(startTime, "yyyyMMdd'T'HHmmss'Z'")}
-DTEND:${format(endTime, "yyyyMMdd'T'HHmmss'Z'")}
-DESCRIPTION:${details}
-LOCATION:${booking.meetingType === 'Online' ? 'Google Meet' : 'Lucky Godday Office'}
-STATUS:CONFIRMED
-SEQUENCE:0
-END:VEVENT
-END:VCALENDAR`;
-
-  // Create a data URL for the iCalendar file - this works for both Apple Calendar and other iCal clients
-  const icsDataUrl = `data:text/calendar;charset=utf8,${encodeURIComponent(icsContent)}`;
-
   return {
     google: `https://www.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${format(
       startTime,
       "yyyyMMdd'T'HHmmss'Z'"
     )}/${format(endTime, "yyyyMMdd'T'HHmmss'Z'")}&details=${details}`,
     outlook: `https://outlook.live.com/calendar/0/deeplink/compose?subject=${title}&startdt=${startTime.toISOString()}&enddt=${endTime.toISOString()}&body=${details}`,
-    apple: icsDataUrl,
-    ical: icsDataUrl,
   };
 }

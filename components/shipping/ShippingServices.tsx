@@ -2,6 +2,7 @@ import Container from '../shared/container';
 import { ServiceSection } from '../shared/ServiceSection';
 import { CarouselSection } from '../shared/CarouselSection';
 import { LastServiceSection } from '../shared/LastServiceSection';
+import img from '@/public/shipping/port.jpg';
 
 interface ServiceCategory {
   title: string;
@@ -87,6 +88,7 @@ function ShippingServices() {
         highlightedWord={serviceData.why.highlightedWord}
         subtitle={serviceData.why.subtitle}
         items={serviceData.why.items}
+        imgUrl={img}
       />
     </Container>
   );

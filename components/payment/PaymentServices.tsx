@@ -2,6 +2,7 @@ import { CarouselSection } from '../shared/CarouselSection';
 import Container from '../shared/container';
 import { ServiceSection } from '../shared/ServiceSection';
 import { LastServiceSection } from '../shared/LastServiceSection';
+import img from '@/public/payment/gh-china.webp';
 
 interface ServiceCategory {
   title: string;
@@ -91,6 +92,7 @@ export default function PaymentServices() {
         highlightedWord={serviceData.why.highlightedWord}
         subtitle={serviceData.why.subtitle}
         items={serviceData.why.items}
+        imgUrl={img}
       />
     </Container>
   );
