@@ -520,7 +520,7 @@ export default function EmailPage() {
           <div className="bg-[#00365D] bg-opacity-70 shadow-lg rounded-lg p-6">
             <div className="flex justify-between items-center mb-2">
               <label className="text-sm font-medium text-gray-200">
-                Recipients
+                Recipients ({emails.length})
               </label>
               <button
                 type="button"
