@@ -13,6 +13,7 @@ import StarterKit from '@tiptap/starter-kit';
 import Color from '@tiptap/extension-color';
 import TextStyle from '@tiptap/extension-text-style';
 import { Link as LinkTiptap } from '@tiptap/extension-link';
+import { Input } from '@/components/ui/input';
 
 // Define the form schema
 const emailFormSchema = z.object({
@@ -89,6 +90,7 @@ export default function EmailPage() {
   >([]);
   const [selectedEmails, setSelectedEmails] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
   const [status, setStatus] = useState<{
     success?: boolean;
     message?: string;
@@ -530,6 +532,16 @@ export default function EmailPage() {
               </button>
             </div>
 
+            <div className="mb-4">
+              <Input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search recipients..."
+                className="w-full p-2 bg-white/15 backdrop-blur-sm text-white placeholder:text-gray-300 border border-white/20 rounded-lg "
+              />
+            </div>
+
             <div className="border border-white/20 rounded-lg p-4 max-h-[300px] overflow-y-auto bg-[#00365D] bg-opacity-70">
               {emails.length === 0 ? (
                 <p className="text-gray-400 text-sm">
@@ -537,24 +549,36 @@ export default function EmailPage() {
                 </p>
               ) : (
                 <div className="space-y-2">
-                  {emails.map((email) => (
-                    <div
-                      key={email.value}
-                      className="flex items-center">
-                      <input
-                        type="checkbox"
-                        id={`email-${email.value}`}
-                        checked={selectedEmails.includes(email.value)}
-                        onChange={() => toggleEmail(email.value)}
-                        className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-                      />
-                      <label
-                        htmlFor={`email-${email.value}`}
-                        className="ml-2 text-sm text-gray-200">
-                        {email.label}
-                      </label>
-                    </div>
-                  ))}
+                  {emails
+                    .filter(
+                      (email) =>
+                        email.label
+                          .toLowerCase()
+                          .includes(searchQuery.toLowerCase()) ||
+                        email.value
+                          .toLowerCase()
+                          .includes(searchQuery.toLowerCase())
+                    )
+                    .map((email) => (
+                      <div
+                        key={email.value}
+                        className="flex items-center">
+                        <input
+                          type="checkbox"
+                          id={`email-${email.value}`}
+                          checked={selectedEmails.includes(
+                            email.value
+                          )}
+                          onChange={() => toggleEmail(email.value)}
+                          className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                        />
+                        <label
+                          htmlFor={`email-${email.value}`}
+                          className="ml-2 text-sm text-gray-200">
+                          {email.label}
+                        </label>
+                      </div>
+                    ))}
                 </div>
               )}
             </div>
