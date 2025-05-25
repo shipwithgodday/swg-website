@@ -92,9 +92,9 @@ function Services({ id }: { id: string }) {
           ref={descriptionRef}
           inView={isDescriptionInView}>
           <p className="mt-3.5 text-lg font-light w-full lg:w-2/3 mb-12">
-            We always put our customers first, ensuring your needs are
-            met from the very beginning of our process till you have
-            your desired goods in hand.
+            We offer a comprehensive range of services to meet your
+            shipping and logistics needs, from procurement to
+            international shipping and payment facilitation.
           </p>
         </AnimatedSection>
 

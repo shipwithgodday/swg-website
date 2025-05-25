@@ -40,9 +40,10 @@ function WhyUs() {
             animate={isHeaderInView ? { opacity: 1 } : { opacity: 0 }}
             transition={{ duration: 0.6, delay: 0.1 }}
             className="mt-3.5 text-lg font-light w-full lg:w-2/3 mb-12">
-            We always put our customers first, ensuring your needs are
-            met from the very beginning of our process till you have
-            your desired goods in hand.
+            We prioritize our customers at every step, providing
+            personalized service and expert guidance from initial
+            consultation through delivery of your shipping and
+            logistics needs.
           </motion.p>
         </motion.div>
 
