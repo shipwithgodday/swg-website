@@ -37,6 +37,9 @@ export const metadata = {
   title: 'About Us | Ship With Godday',
   description:
     'Learn about Ship With Godday - bridging Ghanaian retailers with Chinese manufacturers through seamless logistics, procurement and payment solutions since 2021.',
+  alternates: {
+    canonical: '/about',
+  },
   openGraph: {
     title: 'About Us | Ship With Godday',
     description:

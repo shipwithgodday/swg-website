@@ -16,6 +16,9 @@ export const metadata = {
   title: 'Procurement | Ship With Godday',
   description:
     'We source and procure the best materials from China for your business at Ship With Godday.',
+  alternates: {
+    canonical: '/procurement',
+  },
   openGraph: {
     title: 'Procurement | Ship With Godday',
     description:

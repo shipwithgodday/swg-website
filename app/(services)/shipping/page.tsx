@@ -16,6 +16,9 @@ export const metadata = {
   title: 'Shipping | Ship With Godday',
   description:
     'We offer shipping services from China to Ghana at Ship With Godday.',
+  alternates: {
+    canonical: '/shipping',
+  },
   openGraph: {
     title: 'Shipping | Ship With Godday',
     description:

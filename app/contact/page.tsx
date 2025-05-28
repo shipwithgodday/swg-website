@@ -18,6 +18,9 @@ export const metadata = {
   title: 'Contact Us | Ship With Godday',
   description:
     'Get in touch with Godday for any inquiries or assistance.',
+  alternates: {
+    canonical: '/contact',
+  },
   openGraph: {
     title: 'Contact Us | Ship With Godday',
     description:
