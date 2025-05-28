@@ -8,31 +8,8 @@ import { Icon } from '@/components/ui/icon';
 function Info() {
   const contactItems = [
     {
-      icon: <Phone className="w-5 h-5" />,
-      title: 'Tel:',
-      lines: ['+233 (0) 544 074 578'],
-    },
-    {
-      icon: <Mail className="w-5 h-5" />,
-      title: 'Email:',
-      lines: ['ShipWithGodday@gmail.com'],
-    },
-    {
-      icon: <Clock className="w-5 h-5" />,
-      title: 'Business Hours:',
-      lines: [
-        'Monday - Friday: 8:00 AM - 5:00 PM',
-        'Weekends: Closed',
-      ],
-    },
-    {
-      icon: <Globe className="w-5 h-5" />,
-      title: 'We Operate:',
-      lines: ['Worldwide with virtual offices'],
-    },
-    {
       icon: <Share2 className="w-5 h-5" />,
-      title: 'Follow Us:',
+      title: 'Follow Us On Social Media:',
       lines: [
         <div key="social-links" className="flex space-x-6 mt-1">
           <Link
@@ -89,6 +66,29 @@ function Info() {
           </Link>
         </div>,
       ],
+    },
+    {
+      icon: <Phone className="w-5 h-5" />,
+      title: 'Tel:',
+      lines: ['+233 (0) 544 074 578'],
+    },
+    {
+      icon: <Mail className="w-5 h-5" />,
+      title: 'Email:',
+      lines: ['ShipWithGodday@gmail.com'],
+    },
+    {
+      icon: <Clock className="w-5 h-5" />,
+      title: 'Business Hours:',
+      lines: [
+        'Monday - Friday: 8:00 AM - 5:00 PM',
+        'Weekends: Closed',
+      ],
+    },
+    {
+      icon: <Globe className="w-5 h-5" />,
+      title: 'We Operate:',
+      lines: ['Worldwide with virtual offices'],
     },
   ];
 
