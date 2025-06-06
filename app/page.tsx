@@ -9,14 +9,14 @@ import WeeklyContainerBanner from '@/components/home/WeeklyContainerBanner';
 import SignUp from '@/components/home/SignUp';
 
 export const metadata = {
-  title: 'Ship With Godday | Your Trusted Shipping Partner',
+  title: 'Home | Ship With Godday',
   description:
     'Your trusted partner for seamless shipping solutions between China and Ghana. Experience reliable logistics, procurement, and payment services tailored to your business needs.',
   alternates: {
     canonical: '/',
   },
   openGraph: {
-    title: 'Ship With Godday | Your Trusted Shipping Partner',
+    title: 'Home | Ship With Godday',
     description:
       'Your trusted partner for seamless shipping solutions between China and Ghana. Experience reliable logistics, procurement, and payment services tailored to your business needs.',
     images: ['/logo.png'],

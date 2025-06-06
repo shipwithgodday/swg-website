@@ -4,6 +4,8 @@ import { ServiceSection } from '../shared/ServiceSection';
 import { LastServiceSection } from '../shared/LastServiceSection';
 import img from '@/public/shipping/port.jpg';
 
+import ProcurementProcess from './ProcurementProcess';
+
 interface ServiceCategory {
   title: string;
   highlightedWord: string;
@@ -70,22 +72,21 @@ export default function ProcurementServices() {
 
   return (
     <Container className="my-16 md:my-24 lg:my-32">
+      {/* <ProcurementProcess /> */}
+      <ProcurementProcess />
       <ServiceSection
         title={serviceData.remote.title}
         highlightedWord={serviceData.remote.highlightedWord}
         subtitle={serviceData.remote.subtitle}
         items={serviceData.remote.items}
       />
-
       <ServiceSection
         title={serviceData.onsite.title}
         highlightedWord={serviceData.onsite.highlightedWord}
         subtitle={serviceData.onsite.subtitle}
         items={serviceData.onsite.items}
       />
-
       <CarouselSection images={carouselImages} />
-
       <LastServiceSection
         title={serviceData.why.title}
         highlightedWord={serviceData.why.highlightedWord}

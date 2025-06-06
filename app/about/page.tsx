@@ -5,6 +5,7 @@ import WhyUs from '@/components/about/WhyUs';
 import CEO from '@/components/about/CEO';
 import GhanaTeam from '@/components/about/GhanaTeam';
 import HandsOnSourcing from '@/components/about/HandsOnSourcing';
+import CMO from '@/components/about/CMO';
 
 export default function About() {
   return (
@@ -27,6 +28,9 @@ export default function About() {
 
       {/* Meet the Teams */}
       <CEO />
+
+      {/* Chief Marketing Officer */}
+      <CMO />
 
       {/* Ghana Warehouse Team */}
       <GhanaTeam />

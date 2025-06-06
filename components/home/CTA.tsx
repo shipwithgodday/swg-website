@@ -16,6 +16,23 @@ function CTA() {
 
   return (
     <Container className=" my-8 sm:my-12 md:my-24 lg:my-32 relative">
+      <div className="py-8 sm:py-12 md:py-16 px-4 sm:px-8 md:px-12 mb-8 rounded-2xl overflow-hidden bg-gradient-to-r from-primary/80 to-primary/60 flex flex-col md:flex-row items-center gap-8">
+        <div className="flex-1">
+          <SectionHeader
+            highlightedWord="Procurement"
+            size="md"
+            className="text-white mb-2">
+            Need help procuring something?
+          </SectionHeader>
+          <p className="text-white text-lg mb-4">
+            Let us handle the hassle. See how easy it is to get
+            started with our simple procurement process.
+          </p>
+          <Button asChild size="lg" variant="secondary">
+            <a href="/procurement#process">See Procurement Process</a>
+          </Button>
+        </div>
+      </div>
       <motion.div
         initial={{ opacity: 0 }}
         animate={isContentInView ? { opacity: 1 } : { opacity: 0 }}
