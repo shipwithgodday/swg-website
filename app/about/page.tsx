@@ -6,6 +6,7 @@ import CEO from '@/components/about/CEO';
 import GhanaTeam from '@/components/about/GhanaTeam';
 import HandsOnSourcing from '@/components/about/HandsOnSourcing';
 import CMO from '@/components/about/CMO';
+import CFO from '@/components/about/CFO';
 
 export default function About() {
   return (
@@ -31,6 +32,9 @@ export default function About() {
 
       {/* Chief Marketing Officer */}
       <CMO />
+
+      {/* Chief Financial Officer */}
+      <CFO />
 
       {/* Ghana Warehouse Team */}
       <GhanaTeam />
