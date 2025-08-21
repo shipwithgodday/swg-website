@@ -31,14 +31,14 @@ export default function About() {
       {/* Meet the Teams */}
       <CEO />
 
+      {/* Chief Operating Officer */}
+      <COO />
+
       {/* Chief Marketing Officer */}
       <CMO />
 
       {/* Chief Financial Officer */}
       <CFO />
-
-      {/* Chief Operating Officer */}
-      <COO />
 
       {/* Ghana Warehouse Team */}
       <GhanaTeam />
