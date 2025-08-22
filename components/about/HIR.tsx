@@ -60,14 +60,12 @@ function HIR() {
               cost-effective trade outcomes for our customers.
             </p>
             <p className="text-gray-700 leading-relaxed">
-              Grace leads cross-border partner onboarding, due
-              diligence, and documentation, coordinating KYC (Customer
-              Identity Verification) and AML (Anti-Money Laundering)
-              requirements alongside broader regulatory needs. Her
-              market insight and cross-cultural communication
-              strengthens procurement, shipping, and payments,
-              ensuring predictable timelines, transparency, and
-              exceptional client care.
+              Miss Grace is fluent in both Mandarin Chinese and
+              English, and this positions her as the strategic force
+              behind Ship with Godday&apos;s global footprint. As the
+              Head of International Relations, Grace charts the course
+              for our international strategy, ensuring smooth passage
+              for every container and parcel we ship.
             </p>
           </div>
         </div>

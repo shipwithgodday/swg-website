@@ -60,7 +60,8 @@ function CEO() {
               logistics and supply chain management, Godday has
               revolutionized how businesses approach global
               procurement and shipping. His innovative vision has
-              established our company as a leader in the industry.
+              established our company as a leader in the industry. He
+              is also fluent in both Mandarin Chinese and English.
             </p>
             <p className="text-gray-700 leading-relaxed">
               Godday oversees both our China and Ghana operations,
