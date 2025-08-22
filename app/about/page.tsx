@@ -8,6 +8,7 @@ import HandsOnSourcing from '@/components/about/HandsOnSourcing';
 import CMO from '@/components/about/CMO';
 import CFO from '@/components/about/CFO';
 import COO from '@/components/about/COO';
+import HIR from '@/components/about/HIR';
 
 export default function About() {
   return (
@@ -39,6 +40,9 @@ export default function About() {
 
       {/* Chief Financial Officer */}
       <CFO />
+
+      {/* Head of International Relations */}
+      <HIR />
 
       {/* Ghana Warehouse Team */}
       <GhanaTeam />
