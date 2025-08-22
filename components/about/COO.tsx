@@ -40,7 +40,7 @@ function COO() {
             <div className="hidden md:block absolute -bottom-6 -right-6 w-24 h-24 bg-primary rounded-full z-0"></div>
           </div>
 
-          {/* CMO Information */}
+          {/* COO Information */}
           <div className="w-full md:w-3/5 space-y-6">
             <div>
               <h3 className="text-3xl md:text-4xl font-bold ">
@@ -52,14 +52,21 @@ function COO() {
             </div>
             <div className="w-20 h-1.5 bg-primary rounded-full"></div>
             <p className="text-gray-700 leading-relaxed">
-              The Chief Operations Officer (COO) oversees the
-              end-to-end operations of our procurement and shipping
-              company, ensuring efficient, cost-effective, and timely
-              movement of goods from China to Ghana, optimizes supply
-              chain processes, manage vendor relationships, ensure
-              compliance with international trade regulations, and
-              drive operational excellence to enhance customer
-              satisfaction and business growth.
+              As Chief Operations Officer, Clara Mawena Anator
+              orchestrates end-to-end operations across the
+              Ghana–China corridor, ensuring efficient,
+              cost-effective, and on-time movement of goods. She
+              optimizes supply chain processes, drives vendor
+              performance, and turns strategy into predictable
+              execution that customers can trust.
+            </p>
+            <p className="text-gray-700 leading-relaxed">
+              Clara enforces trade compliance and documentation
+              standards, balancing cost, speed, and risk across
+              procurement and shipping. By aligning partners to SLAs
+              and leveraging data for continuous improvement, she
+              elevates service quality, transparency, and sustainable
+              growth.
             </p>
           </div>
         </div>
