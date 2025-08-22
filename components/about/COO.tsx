@@ -64,9 +64,9 @@ function COO() {
               Clara enforces trade compliance and documentation
               standards, balancing cost, speed, and risk across
               procurement and shipping. By aligning partners to SLAs
-              and leveraging data for continuous improvement, she
-              elevates service quality, transparency, and sustainable
-              growth.
+              (Service Level Agreements) and leveraging data for
+              continuous improvement, she elevates service quality,
+              transparency, and sustainable growth.
             </p>
           </div>
         </div>
