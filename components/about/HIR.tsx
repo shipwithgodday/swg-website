@@ -55,9 +55,9 @@ function HIR() {
               As Head of International Relations, Ewedanu Grace Selase
               Abra builds and sustains high-trust partnerships between
               us and our Chinese partners. She aligns suppliers,
-              aligns suppliers, logistics providers, and financial
-              institutions to deliver reliable, compliant, and
-              cost-effective trade outcomes for our customers.
+              logistics providers, and financial institutions to
+              deliver reliable, compliant, and cost-effective trade
+              outcomes for our customers.
             </p>
             <p className="text-gray-700 leading-relaxed">
               Miss Grace is fluent in both Mandarin Chinese and
