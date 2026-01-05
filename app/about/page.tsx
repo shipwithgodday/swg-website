@@ -5,7 +5,7 @@ import WhyUs from '@/components/about/WhyUs';
 import CEO from '@/components/about/CEO';
 import GhanaTeam from '@/components/about/GhanaTeam';
 import HandsOnSourcing from '@/components/about/HandsOnSourcing';
-import CMO from '@/components/about/CMO';
+// import CMO from '@/components/about/CMO';
 import CFO from '@/components/about/CFO';
 import COO from '@/components/about/COO';
 import HIR from '@/components/about/HIR';
@@ -36,7 +36,7 @@ export default function About() {
       <COO />
 
       {/* Chief Marketing Officer */}
-      <CMO />
+      {/* <CMO /> */}
 
       {/* Chief Financial Officer */}
       <CFO />
