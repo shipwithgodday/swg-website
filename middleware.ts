@@ -1,20 +1,26 @@
-import {
-  clerkMiddleware,
-  createRouteMatcher,
-} from '@clerk/nextjs/server';
+import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server';
 import { NextResponse } from 'next/server';
 
-const isProtectedRoute = createRouteMatcher([
-  '/email',
-  '/api/send-bulk', // Add any other public API routes here
-]);
+const isProtectedRoute = createRouteMatcher(['/email', '/api/send-bulk']);
+const isAdminRoute = createRouteMatcher(['/admin(.*)']);
 
 export default clerkMiddleware(async (auth, request) => {
   if (isProtectedRoute(request)) {
     const session = await auth();
     if (!session.userId) {
-      const signInUrl = new URL('/sign-in', request.url);
-      return NextResponse.redirect(signInUrl);
+      return NextResponse.redirect(new URL('/sign-in', request.url));
+    }
+  }
+
+  if (isAdminRoute(request)) {
+    const session = await auth();
+    if (!session.userId) {
+      return NextResponse.redirect(new URL('/sign-in', request.url));
+    }
+    const role = (session.sessionClaims as { metadata?: { role?: string } })
+      ?.metadata?.role;
+    if (role !== 'admin') {
+      return NextResponse.redirect(new URL('/', request.url));
     }
   }
 });
