@@ -208,6 +208,28 @@ Runs inside the checkout transaction, before order insert:
 - None required beyond Phase 1; Paystack is called over HTTP via `fetch`.
   (An official Paystack SDK may be used if it simplifies init/verify.)
 
+## Database transaction constraint (carried over from Phase 1)
+
+Phase 1 established that the Drizzle client uses the **`neon-http`** driver,
+which does **not** support `db.transaction()` (it throws "No transactions
+support in neon-http driver"). Phase 1's product actions use `db.batch([...])`
+instead — an array of statements run atomically in one round-trip.
+
+This matters for Phase 2: the payment webhook needs to **read** an order's
+status and **conditionally** update it + decrement stock atomically — true
+interactive transaction logic that `db.batch()` cannot express. Before Phase 2
+is implemented, decide one of:
+
+1. **Switch the db client to `drizzle-orm/neon-serverless`** (WebSocket `Pool`
+   driver) — supports full interactive `db.transaction()`. Works on Vercel
+   Fluid Compute (Node.js). This is the recommended path for Phase 2.
+2. **SQL-level atomic operations** — perform the order state transition and
+   stock decrement as guarded single statements (e.g. `UPDATE ... WHERE status
+   = 'pending'` returning affected rows; `UPDATE ... SET stock = stock - n
+   WHERE stock >= n`) so no multi-statement transaction is needed.
+
+The Phase 2 plan must resolve this before writing the webhook.
+
 ## Open questions
 
 None blocking. Abandoned `pending` orders are left as-is in Phase 2; a cleanup
