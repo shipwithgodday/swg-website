@@ -5,6 +5,7 @@ import { ClerkProvider } from '@clerk/nextjs';
 import Footer from '@/components/shared/Footer';
 import { GoogleAnalytics } from '@next/third-parties/google';
 import { WebVitals } from '@/components/analytics/WebVitals';
+import { Toaster } from '@/components/ui/sonner';
 
 export const metadata: Metadata = {
   title: {
@@ -90,6 +91,7 @@ export default function RootLayout({
           {children}
           <Footer />
           <WebVitals />
+          <Toaster />
         </body>
         <GoogleAnalytics gaId="G-GHJH5C564E" />
       </html>
