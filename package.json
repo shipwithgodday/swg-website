@@ -8,7 +8,11 @@
     "start": "next start",
     "lint": "next lint",
     "test": "jest",
-    "test:watch": "jest --watch"
+    "test:watch": "jest --watch",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
+    "db:studio": "drizzle-kit studio",
+    "import:customers": "tsx scripts/import-customers.ts"
   },
   "dependencies": {
     "@clerk/nextjs": "6.19.4",
@@ -70,6 +74,7 @@
     "node-mocks-http": "^1.17.2",
     "tailwindcss": "^4",
     "ts-jest": "^29.3.4",
+    "tsx": "^4.22.2",
     "tw-animate-css": "^1.2.9",
     "typescript": "^5",
     "xlsx": "^0.18.5"
