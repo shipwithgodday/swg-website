@@ -215,20 +215,27 @@ which does **not** support `db.transaction()` (it throws "No transactions
 support in neon-http driver"). Phase 1's product actions use `db.batch([...])`
 instead — an array of statements run atomically in one round-trip.
 
-This matters for Phase 2: the payment webhook needs to **read** an order's
-status and **conditionally** update it + decrement stock atomically — true
-interactive transaction logic that `db.batch()` cannot express. Before Phase 2
-is implemented, decide one of:
+**Resolved approach — keep `neon-http`, use `db.batch()` + guarded SQL.**
+Switching to the `neon-serverless` (WebSocket) driver would gain interactive
+transactions but would *break* Phase 1's `db.batch()` calls (batch is a
+neon-http feature, unsupported on neon-serverless) and add connection-pool
+management. Instead, Phase 2 expresses every atomic write as either a
+`db.batch([...])` (a fixed set of statements run atomically in one round-trip)
+or a single guarded statement:
 
-1. **Switch the db client to `drizzle-orm/neon-serverless`** (WebSocket `Pool`
-   driver) — supports full interactive `db.transaction()`. Works on Vercel
-   Fluid Compute (Node.js). This is the recommended path for Phase 2.
-2. **SQL-level atomic operations** — perform the order state transition and
-   stock decrement as guarded single statements (e.g. `UPDATE ... WHERE status
-   = 'pending'` returning affected rows; `UPDATE ... SET stock = stock - n
-   WHERE stock >= n`) so no multi-statement transaction is needed.
+- **Order creation (checkout):** `db.batch([insert order, insert order_items])`
+  with a pre-generated order UUID.
+- **Payment confirmation (webhook):** read the order + its items, then
+  `db.batch([` guarded `UPDATE orders SET status='paid' WHERE id=? AND
+  status='pending'`, plus one guarded `UPDATE product_variants SET
+  stock_quantity = stock_quantity - qty WHERE id=? AND stock_quantity >= qty`
+  per line item `])`. The guarded `WHERE status='pending'` makes the webhook
+  idempotent (a replay updates 0 rows); the guarded stock `WHERE` prevents
+  overselling.
+- **Shipping-mark allocation:** `nextval('shipping_mark_seq')` is already
+  atomic on its own.
 
-The Phase 2 plan must resolve this before writing the webhook.
+This keeps the data layer consistent with Phase 1 and requires no driver change.
 
 ## Open questions
 
