@@ -1,7 +1,9 @@
+import { CartProvider } from '@/lib/cart-context';
+
 export default function ShopLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  return <>{children}</>;
+  return <CartProvider>{children}</CartProvider>;
 }
