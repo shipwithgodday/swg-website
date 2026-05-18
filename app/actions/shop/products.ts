@@ -1,6 +1,7 @@
 'use server';
 import { revalidatePath } from 'next/cache';
 import { eq } from 'drizzle-orm';
+import { randomUUID } from 'crypto';
 import { db } from '@/lib/db';
 import { products, productVariants } from '@/lib/db/schema';
 import { requireAdmin } from '@/lib/shop/auth';
@@ -15,22 +16,21 @@ export async function createProduct(raw: unknown): Promise<ActionResult> {
     return { ok: false, error: parsed.error.issues[0].message };
   }
   const p = parsed.data;
+  const productId = randomUUID();
   try {
-    await db.transaction(async (tx) => {
-      const [created] = await tx
-        .insert(products)
-        .values({
-          name: p.name,
-          slug: slugify(p.name),
-          description: p.description ?? null,
-          categoryId: p.categoryId ?? null,
-          status: p.status,
-          featured: p.featured,
-        })
-        .returning({ id: products.id });
-      await tx.insert(productVariants).values(
+    await db.batch([
+      db.insert(products).values({
+        id: productId,
+        name: p.name,
+        slug: slugify(p.name),
+        description: p.description ?? null,
+        categoryId: p.categoryId ?? null,
+        status: p.status,
+        featured: p.featured,
+      }),
+      db.insert(productVariants).values(
         p.variants.map((v, i) => ({
-          productId: created.id,
+          productId,
           name: v.name,
           sku: v.sku ?? null,
           price: v.price,
@@ -38,9 +38,10 @@ export async function createProduct(raw: unknown): Promise<ActionResult> {
           stockQuantity: v.stockQuantity,
           position: i,
         }))
-      );
-    });
-  } catch {
+      ),
+    ]);
+  } catch (error) {
+    console.error('createProduct failed:', error);
     return {
       ok: false,
       error: 'Could not save — a product or SKU with this name may exist.',
@@ -61,8 +62,8 @@ export async function updateProduct(
   }
   const p = parsed.data;
   try {
-    await db.transaction(async (tx) => {
-      await tx
+    await db.batch([
+      db
         .update(products)
         .set({
           name: p.name,
@@ -73,11 +74,9 @@ export async function updateProduct(
           featured: p.featured,
           updatedAt: new Date(),
         })
-        .where(eq(products.id, id));
-      await tx
-        .delete(productVariants)
-        .where(eq(productVariants.productId, id));
-      await tx.insert(productVariants).values(
+        .where(eq(products.id, id)),
+      db.delete(productVariants).where(eq(productVariants.productId, id)),
+      db.insert(productVariants).values(
         p.variants.map((v, i) => ({
           productId: id,
           name: v.name,
@@ -87,9 +86,10 @@ export async function updateProduct(
           stockQuantity: v.stockQuantity,
           position: i,
         }))
-      );
-    });
-  } catch {
+      ),
+    ]);
+  } catch (error) {
+    console.error('updateProduct failed:', error);
     return { ok: false, error: 'Could not save the product.' };
   }
   revalidatePath('/admin/products');
