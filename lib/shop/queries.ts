@@ -1,3 +1,4 @@
+import { cache } from 'react';
 import { asc } from 'drizzle-orm';
 import { db } from '@/lib/db';
 
@@ -28,7 +29,9 @@ export async function getFeaturedProducts() {
   });
 }
 
-export async function getProductBySlug(slug: string) {
+// Wrapped in React.cache so the product detail page and its
+// generateMetadata share a single DB fetch per request.
+export const getProductBySlug = cache(async (slug: string) => {
   return db.query.products.findFirst({
     where: (p, { eq, and }) =>
       and(eq(p.slug, slug), eq(p.status, 'active')),
@@ -38,7 +41,7 @@ export async function getProductBySlug(slug: string) {
       category: true,
     },
   });
-}
+});
 
 export async function getCategories() {
   return db.query.categories.findMany({
