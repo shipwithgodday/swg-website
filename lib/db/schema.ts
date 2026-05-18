@@ -15,7 +15,8 @@ const timestamps = {
     .defaultNow(),
   updatedAt: timestamp('updated_at', { withTimezone: true })
     .notNull()
-    .defaultNow(),
+    .defaultNow()
+    .$onUpdateFn(() => new Date()),
 };
 
 export const categories = pgTable('categories', {
@@ -148,11 +149,23 @@ export const productImagesRelations = relations(productImages, ({ one }) => ({
 
 export const productVariantsRelations = relations(
   productVariants,
-  ({ one }) => ({
+  ({ one, many }) => ({
     product: one(products, {
       fields: [productVariants.productId],
       references: [products.id],
     }),
+    orderItems: many(orderItems),
+  })
+);
+
+export const customersRelations = relations(customers, ({ many }) => ({
+  orders: many(orders),
+}));
+
+export const deliveryZonesRelations = relations(
+  deliveryZones,
+  ({ many }) => ({
+    orders: many(orders),
   })
 );
 
@@ -161,6 +174,10 @@ export const ordersRelations = relations(orders, ({ one, many }) => ({
     fields: [orders.customerId],
     references: [customers.id],
   }),
+  deliveryZone: one(deliveryZones, {
+    fields: [orders.deliveryZoneId],
+    references: [deliveryZones.id],
+  }),
   items: many(orderItems),
 }));
 
@@ -168,6 +185,10 @@ export const orderItemsRelations = relations(orderItems, ({ one }) => ({
   order: one(orders, {
     fields: [orderItems.orderId],
     references: [orders.id],
+  }),
+  variant: one(productVariants, {
+    fields: [orderItems.variantId],
+    references: [productVariants.id],
   }),
 }));
 
