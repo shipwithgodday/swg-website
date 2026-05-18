@@ -5,6 +5,7 @@ import { FiMenu, FiX } from 'react-icons/fi';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { Icon } from '@/components/ui/icon';
+import { CartLink } from './CartLink';
 
 const Buttons = ({
   menuOpen,
@@ -14,6 +15,7 @@ const Buttons = ({
   setMenuOpen: Dispatch<SetStateAction<boolean>>;
 }) => (
   <div className="flex items-center gap-4">
+    <CartLink />
     <div className="hidden md:block">
       <Button className="hover:scale-105 transition-all duration-300">
         <Link className="flex items-center gap-1" href={'/schedule'}>
