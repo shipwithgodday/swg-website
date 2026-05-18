@@ -12,7 +12,7 @@
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:studio": "drizzle-kit studio",
-    "import:customers": "tsx scripts/import-customers.ts"
+    "import:customers": "tsx --env-file .env.local scripts/import-customers.ts"
   },
   "dependencies": {
     "@clerk/nextjs": "6.19.4",
