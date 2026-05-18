@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import Container from '@/components/shared/container';
 import { ProductGallery } from '@/components/shop/ProductGallery';
-import { VariantList } from '@/components/shop/VariantList';
+import { AddToCartButton } from '@/components/shop/AddToCartButton';
 import { getProductBySlug, inStock } from '@/lib/shop/queries';
 
 export async function generateMetadata({
@@ -57,7 +57,10 @@ export default async function ProductDetailPage({
           )}
           <div className="mt-6">
             <h2 className="mb-2 text-sm font-medium">Options</h2>
-            <VariantList
+            <AddToCartButton
+              productSlug={product.slug}
+              productName={product.name}
+              imageUrl={product.images[0]?.url ?? null}
               variants={product.variants.map((v) => ({
                 id: v.id,
                 name: v.name,
@@ -66,9 +69,6 @@ export default async function ProductDetailPage({
               }))}
             />
           </div>
-          <p className="mt-6 text-sm text-muted-foreground">
-            Online checkout is coming soon.
-          </p>
         </div>
       </div>
     </Container>
