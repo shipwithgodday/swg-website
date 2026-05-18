@@ -18,6 +18,7 @@ export const navItems: NavItem[] = [
       { text: 'Payment Facilitation', url: '/payment' },
     ],
   },
+  { text: 'Shop', url: '/shop' },
   { text: 'Contact', url: '/contact' },
   // { text: 'Email', url: '/email' },
 ];
