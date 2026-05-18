@@ -1,6 +1,3 @@
-import { config } from 'dotenv';
-config({ path: '.env.local' });
-
 import path from 'path';
 import * as XLSX from 'xlsx';
 import { sql, eq } from 'drizzle-orm';
