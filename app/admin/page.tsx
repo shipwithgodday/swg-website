@@ -1,95 +1,130 @@
 import Link from 'next/link';
 import { format } from 'date-fns';
-import { getDashboardMetrics } from '@/lib/shop/admin-dashboard';
-import { formatCedis } from '@/lib/shop/money';
-import { StatCard } from '@/components/admin/StatCard';
-import { OrderStatusBadge } from '@/components/shop/OrderStatusBadge';
+import { Banknote, ShoppingBag, Receipt, AlertCircle } from 'lucide-react';
 
-export default async function AdminDashboardPage() {
-  const m = await getDashboardMetrics();
+import {
+  getDashboardMetrics,
+  getRevenueSeries,
+  getTopProducts,
+} from '@/lib/shop/admin-dashboard';
+import { parseRange } from '@/lib/shop/date-range';
+import { formatCedis } from '@/lib/shop/money';
+import { AdminPageHeader } from '@/components/admin/AdminPageHeader';
+import { DateRangeTabs } from '@/components/admin/DateRangeTabs';
+import { StatCard } from '@/components/admin/StatCard';
+import { StatusBadge } from '@/components/admin/StatusBadge';
+import { RevenueChart } from '@/components/admin/RevenueChart';
+import { TopProducts } from '@/components/admin/TopProducts';
+
+export default async function AdminDashboardPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ range?: string }>;
+}) {
+  const range = parseRange((await searchParams).range);
+  const [metrics, series, topProducts] = await Promise.all([
+    getDashboardMetrics(range),
+    getRevenueSeries(range),
+    getTopProducts(range, 5),
+  ]);
 
   return (
     <div className="space-y-8">
-      <h1 className="text-2xl font-semibold">Dashboard</h1>
+      <AdminPageHeader
+        title="Dashboard"
+        description="Sales performance and what needs attention.">
+        <DateRangeTabs />
+      </AdminPageHeader>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard
-          label="Revenue (24h)"
-          value={formatCedis(m.today.revenue)}
-          hint={`${m.today.count} orders`}
+          label="Revenue"
+          value={formatCedis(metrics.revenue.value)}
+          delta={metrics.revenue.delta}
+          icon={Banknote}
+          accent
         />
         <StatCard
-          label="Revenue (7d)"
-          value={formatCedis(m.week.revenue)}
-          hint={`${m.week.count} orders`}
+          label="Orders"
+          value={String(metrics.orders.value)}
+          delta={metrics.orders.delta}
+          icon={ShoppingBag}
         />
         <StatCard
-          label="Revenue (30d)"
-          value={formatCedis(m.month.revenue)}
-          hint={`${m.month.count} orders`}
+          label="Avg order value"
+          value={formatCedis(metrics.aov.value)}
+          delta={metrics.aov.delta}
+          icon={Receipt}
         />
         <StatCard
           label="Needs attention"
-          value={String(m.ordersNeedingAttention)}
-          hint="paid / processing orders"
+          value={String(metrics.ordersNeedingAttention)}
+          hint="paid / processing"
+          icon={AlertCircle}
         />
       </div>
 
+      <RevenueChart data={series} />
+
       <div className="grid gap-6 lg:grid-cols-2">
-        <div>
-          <h2 className="mb-3 text-sm font-medium">Recent orders</h2>
-          <div className="space-y-2">
-            {m.recentOrders.length === 0 && (
-              <p className="text-sm text-muted-foreground">
-                No orders yet.
-              </p>
+        <TopProducts products={topProducts} />
+
+        <div className="rounded-2xl border border-zinc-200/70 bg-white p-5 shadow-sm">
+          <h2 className="text-sm font-semibold text-zinc-900">
+            Recent orders
+          </h2>
+          <div className="mt-4 space-y-1">
+            {metrics.recentOrders.length === 0 && (
+              <p className="text-sm text-zinc-400">No orders yet.</p>
             )}
-            {m.recentOrders.map((o) => (
+            {metrics.recentOrders.map((o) => (
               <Link
                 key={o.id}
                 href={`/admin/orders/${o.id}`}
-                className="flex items-center justify-between rounded-lg border border-border p-3 hover:bg-accent">
-                <span className="font-medium">{o.orderNumber}</span>
-                <span className="text-xs text-muted-foreground">
+                className="flex items-center gap-3 rounded-lg px-2 py-2 transition-colors hover:bg-zinc-50">
+                <span className="font-medium text-zinc-900">
+                  {o.orderNumber}
+                </span>
+                <span className="text-xs text-zinc-400">
                   {format(new Date(o.createdAt), 'd MMM')}
                 </span>
-                <OrderStatusBadge status={o.status} />
-                <span className="font-medium">
+                <span className="ml-auto">
+                  <StatusBadge status={o.status} kind="order" />
+                </span>
+                <span className="w-24 text-right font-medium text-zinc-900 tabular-nums">
                   {formatCedis(o.total)}
                 </span>
               </Link>
             ))}
           </div>
         </div>
+      </div>
 
-        <div>
-          <h2 className="mb-3 text-sm font-medium">Low stock</h2>
-          <div className="space-y-2">
-            {m.lowStock.length === 0 && (
-              <p className="text-sm text-muted-foreground">
-                Nothing low on stock.
-              </p>
-            )}
-            {m.lowStock.map((v) => (
-              <Link
-                key={v.id}
-                href={`/admin/products/${v.productId}`}
-                className="flex items-center justify-between rounded-lg border border-border p-3 hover:bg-accent">
-                <span>
-                  {v.productName}{' '}
-                  <span className="text-muted-foreground">
-                    ({v.variantName})
-                  </span>
-                </span>
-                <span className="font-medium">{v.stock} left</span>
-              </Link>
-            ))}
-          </div>
+      <div className="rounded-2xl border border-zinc-200/70 bg-white p-5 shadow-sm">
+        <h2 className="text-sm font-semibold text-zinc-900">Low stock</h2>
+        <div className="mt-4 space-y-1">
+          {metrics.lowStock.length === 0 && (
+            <p className="text-sm text-zinc-400">Nothing low on stock.</p>
+          )}
+          {metrics.lowStock.map((v) => (
+            <Link
+              key={v.id}
+              href={`/admin/products?edit=${v.productId}`}
+              className="flex items-center gap-3 rounded-lg px-2 py-2 transition-colors hover:bg-zinc-50">
+              <span className="text-sm text-zinc-800">
+                {v.productName}{' '}
+                <span className="text-zinc-400">({v.variantName})</span>
+              </span>
+              <span className="ml-auto text-sm font-medium text-zinc-900 tabular-nums">
+                {v.stock} left
+              </span>
+            </Link>
+          ))}
         </div>
       </div>
 
-      <p className="text-sm text-muted-foreground">
-        {m.customerCount} customers total.
+      <p className="text-sm text-zinc-400">
+        {metrics.customerCount} customers total.
       </p>
     </div>
   );
