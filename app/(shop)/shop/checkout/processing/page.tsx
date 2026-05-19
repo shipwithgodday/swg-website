@@ -1,4 +1,5 @@
 import { redirect } from 'next/navigation';
+import Link from 'next/link';
 import Container from '@/components/shared/container';
 import { verifyTransaction } from '@/lib/shop/paystack';
 import { getOrderByNumber } from '@/lib/shop/orders';
@@ -30,9 +31,9 @@ export default async function ProcessingPage({
       <h1 className="text-2xl font-semibold">Confirming your payment…</h1>
       <p className="mt-3 text-muted-foreground">
         This can take a moment. Your order will appear under{' '}
-        <a href="/shop/orders" className="text-primary underline">
+        <Link href="/shop/orders" className="text-primary underline">
           My orders
-        </a>{' '}
+        </Link>{' '}
         once payment is confirmed.
       </p>
     </Container>

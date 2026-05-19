@@ -3,6 +3,10 @@ import { NextResponse } from 'next/server';
 
 const isProtectedRoute = createRouteMatcher(['/email', '/api/send-bulk']);
 const isAdminRoute = createRouteMatcher(['/admin(.*)']);
+const isShopAuthRoute = createRouteMatcher([
+  '/shop/checkout(.*)',
+  '/shop/orders(.*)',
+]);
 
 export default clerkMiddleware(async (auth, request) => {
   if (isProtectedRoute(request)) {
@@ -21,6 +25,13 @@ export default clerkMiddleware(async (auth, request) => {
       ?.metadata?.role;
     if (role !== 'admin') {
       return NextResponse.redirect(new URL('/', request.url));
+    }
+  }
+
+  if (isShopAuthRoute(request)) {
+    const session = await auth();
+    if (!session.userId) {
+      return NextResponse.redirect(new URL('/sign-in', request.url));
     }
   }
 });
