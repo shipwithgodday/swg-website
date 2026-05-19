@@ -13,7 +13,8 @@
     "db:migrate": "drizzle-kit migrate",
     "db:studio": "drizzle-kit studio",
     "import:customers": "tsx --env-file .env.local scripts/import-customers.ts",
-    "seed:zones": "tsx --env-file .env.local scripts/seed-delivery-zones.ts"
+    "seed:zones": "tsx --env-file .env.local scripts/seed-delivery-zones.ts",
+    "seed:products": "tsx --env-file .env.local scripts/seed-products.ts"
   },
   "dependencies": {
     "@clerk/nextjs": "6.19.4",
@@ -27,6 +28,7 @@
     "@radix-ui/react-slot": "^1.2.2",
     "@react-email/components": "^0.0.41",
     "@tanstack/react-query": "^5.76.1",
+    "@tanstack/react-table": "^8.21.3",
     "@tiptap/extension-color": "^2.12.0",
     "@tiptap/extension-link": "^2.12.0",
     "@tiptap/extension-text-style": "^2.12.0",
@@ -58,6 +60,7 @@
     "react-icons": "^5.5.0",
     "react-quill": "^2.0.0",
     "react-use-measure": "^2.1.7",
+    "recharts": "^3.8.1",
     "resend": "^4.5.1",
     "server-only": "^0.0.1",
     "sonner": "^2.0.7",
