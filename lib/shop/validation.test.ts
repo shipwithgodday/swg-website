@@ -1,4 +1,4 @@
-import { categoryInputSchema, productInputSchema, customerEditSchema } from './validation';
+import { categoryInputSchema, productInputSchema, customerEditSchema, deliveryZoneSchema } from './validation';
 
 describe('categoryInputSchema', () => {
   it('accepts a valid category', () => {
@@ -71,6 +71,33 @@ describe('customerEditSchema', () => {
   it('rejects a malformed email', () => {
     expect(
       customerEditSchema.safeParse({ email: 'not-an-email' }).success
+    ).toBe(false);
+  });
+});
+
+describe('deliveryZoneSchema', () => {
+  it('accepts a valid zone', () => {
+    expect(
+      deliveryZoneSchema.safeParse({
+        name: 'Greater Accra',
+        fee: 3000,
+        active: true,
+      }).success
+    ).toBe(true);
+  });
+  it('rejects a negative fee', () => {
+    expect(
+      deliveryZoneSchema.safeParse({
+        name: 'X',
+        fee: -1,
+        active: true,
+      }).success
+    ).toBe(false);
+  });
+  it('rejects an empty name', () => {
+    expect(
+      deliveryZoneSchema.safeParse({ name: '', fee: 0, active: true })
+        .success
     ).toBe(false);
   });
 });

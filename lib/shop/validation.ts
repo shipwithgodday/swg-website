@@ -37,3 +37,11 @@ export const customerEditSchema = z.object({
 });
 
 export type CustomerEditInput = z.infer<typeof customerEditSchema>;
+
+export const deliveryZoneSchema = z.object({
+  name: z.string().trim().min(1, 'Name is required'),
+  fee: z.number().int().nonnegative('Fee must be 0 or more'),
+  active: z.boolean(),
+});
+
+export type DeliveryZoneInput = z.infer<typeof deliveryZoneSchema>;
