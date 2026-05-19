@@ -1,5 +1,5 @@
 import { cache } from 'react';
-import { and, desc, eq, ilike, or, count } from 'drizzle-orm';
+import { desc, eq, ilike, or, count } from 'drizzle-orm';
 import { db } from '@/lib/db';
 import { customers, orders } from '@/lib/db/schema';
 
