@@ -1,34 +1,27 @@
 import { cache } from 'react';
-import { desc, eq, ilike, or, count } from 'drizzle-orm';
+import { asc, desc, eq, count } from 'drizzle-orm';
 import { db } from '@/lib/db';
 import { customers, orders } from '@/lib/db/schema';
 
-/** Customers for the admin list, with order counts, optional search. */
-export async function listCustomers(search?: string) {
-  const where = search
-    ? or(
-        ilike(customers.name, `%${search}%`),
-        ilike(customers.shippingMark, `%${search}%`),
-        ilike(customers.email, `%${search}%`),
-        ilike(customers.phone, `%${search}%`)
-      )
-    : undefined;
-
+/**
+ * Customers for the admin list, with order counts, ordered by shipping
+ * mark (smallest/oldest first).
+ */
+export async function listCustomers() {
   const rows = await db
     .select({
       id: customers.id,
       shippingMark: customers.shippingMark,
+      shippingMarkNo: customers.shippingMarkNo,
       name: customers.name,
       email: customers.email,
       phone: customers.phone,
-      source: customers.source,
       orderCount: count(orders.id),
     })
     .from(customers)
     .leftJoin(orders, eq(orders.customerId, customers.id))
-    .where(where)
     .groupBy(customers.id)
-    .orderBy(desc(customers.createdAt));
+    .orderBy(asc(customers.shippingMarkNo));
   return rows;
 }
 

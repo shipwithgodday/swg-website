@@ -1,73 +1,49 @@
-import Link from 'next/link';
+import { Suspense } from 'react';
 import { db } from '@/lib/db';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
+import { ProductsTable, type AdminProduct } from '@/components/admin/ProductsTable';
 
 export default async function ProductsPage() {
-  const rows = await db.query.products.findMany({
-    with: { variants: true, category: true },
-    orderBy: (p, { desc }) => desc(p.createdAt),
-  });
+  const [rows, categories] = await Promise.all([
+    db.query.products.findMany({
+      with: {
+        category: { columns: { name: true } },
+        variants: { orderBy: (v, { asc }) => asc(v.position) },
+        images: { orderBy: (i, { asc }) => asc(i.position) },
+      },
+      orderBy: (p, { desc }) => desc(p.createdAt),
+    }),
+    db.query.categories.findMany({
+      columns: { id: true, name: true },
+      orderBy: (c, { asc }) => asc(c.name),
+    }),
+  ]);
+
+  const products: AdminProduct[] = rows.map((p) => ({
+    id: p.id,
+    name: p.name,
+    description: p.description,
+    categoryId: p.categoryId,
+    categoryName: p.category?.name ?? null,
+    status: p.status as AdminProduct['status'],
+    featured: p.featured,
+    variants: p.variants.map((v) => ({
+      id: v.id,
+      name: v.name,
+      sku: v.sku ?? '',
+      priceCedis: (v.price / 100).toFixed(2),
+      stockQuantity: String(v.stockQuantity),
+    })),
+    images: p.images.map((i) => ({
+      id: i.id,
+      url: i.url,
+      publicId: i.publicId,
+    })),
+  }));
+
+  // Suspense boundary required: ProductsTable reads useSearchParams.
   return (
-    <div>
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-semibold">Products</h1>
-        <Button asChild>
-          <Link href="/admin/products/new">New product</Link>
-        </Button>
-      </div>
-      <Table className="mt-6">
-        <TableHeader>
-          <TableRow>
-            <TableHead>Name</TableHead>
-            <TableHead>Category</TableHead>
-            <TableHead>Status</TableHead>
-            <TableHead>Variants</TableHead>
-            <TableHead />
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {rows.map((p) => (
-            <TableRow key={p.id}>
-              <TableCell>{p.name}</TableCell>
-              <TableCell className="text-muted-foreground">
-                {p.category?.name ?? '—'}
-              </TableCell>
-              <TableCell>
-                <Badge
-                  variant={
-                    p.status === 'active' ? 'default' : 'secondary'
-                  }>
-                  {p.status}
-                </Badge>
-              </TableCell>
-              <TableCell>{p.variants.length}</TableCell>
-              <TableCell className="text-right">
-                <Link
-                  href={`/admin/products/${p.id}`}
-                  className="text-primary underline-offset-4 hover:underline">
-                  Edit
-                </Link>
-              </TableCell>
-            </TableRow>
-          ))}
-          {rows.length === 0 && (
-            <TableRow>
-              <TableCell colSpan={5} className="text-muted-foreground">
-                No products yet.
-              </TableCell>
-            </TableRow>
-          )}
-        </TableBody>
-      </Table>
-    </div>
+    <Suspense>
+      <ProductsTable products={products} categories={categories} />
+    </Suspense>
   );
 }

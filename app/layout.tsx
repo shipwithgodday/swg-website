@@ -1,8 +1,7 @@
 import type { Metadata } from 'next';
 import './globals.css';
-import Navbar from '@/components/shared/navbar';
 import { ClerkProvider } from '@clerk/nextjs';
-import Footer from '@/components/shared/Footer';
+import { SiteNavbar, SiteFooter } from '@/components/shared/SiteChrome';
 import { GoogleAnalytics } from '@next/third-parties/google';
 import { WebVitals } from '@/components/analytics/WebVitals';
 import { Toaster } from '@/components/ui/sonner';
@@ -87,9 +86,9 @@ export default function RootLayout({
     <ClerkProvider>
       <html lang="en">
         <body>
-          <Navbar />
+          <SiteNavbar />
           {children}
-          <Footer />
+          <SiteFooter />
           <WebVitals />
           <Toaster />
         </body>

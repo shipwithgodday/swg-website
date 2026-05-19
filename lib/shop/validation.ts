@@ -17,6 +17,12 @@ export const variantInputSchema = z.object({
   stockQuantity: z.number().int().nonnegative('Stock must be 0 or more'),
 });
 
+export const productImageInputSchema = z.object({
+  id: z.string().uuid().optional(),
+  url: z.string().url(),
+  publicId: z.string().min(1),
+});
+
 export const productInputSchema = z.object({
   name: z.string().trim().min(1, 'Name is required'),
   description: z.string().trim().optional().nullable(),
@@ -26,7 +32,10 @@ export const productInputSchema = z.object({
   variants: z
     .array(variantInputSchema)
     .min(1, 'A product needs at least one variant'),
+  images: z.array(productImageInputSchema).default([]),
 });
+
+export type ProductImageInput = z.infer<typeof productImageInputSchema>;
 
 export type VariantInput = z.infer<typeof variantInputSchema>;
 export type ProductInput = z.infer<typeof productInputSchema>;
@@ -38,6 +47,19 @@ export const customerEditSchema = z.object({
 });
 
 export type CustomerEditInput = z.infer<typeof customerEditSchema>;
+
+export const customerCreateSchema = z.object({
+  name: z.string().trim().min(1, 'Name is required'),
+  email: z
+    .string()
+    .trim()
+    .email('Enter a valid email')
+    .optional()
+    .nullable(),
+  phone: z.string().trim().min(1).optional().nullable(),
+});
+
+export type CustomerCreateInput = z.infer<typeof customerCreateSchema>;
 
 export const deliveryZoneSchema = z.object({
   name: z.string().trim().min(1, 'Name is required'),

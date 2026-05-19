@@ -3,8 +3,14 @@ import { revalidatePath } from 'next/cache';
 import { eq, inArray } from 'drizzle-orm';
 import { randomUUID } from 'crypto';
 import { db } from '@/lib/db';
-import { products, productVariants, orderItems } from '@/lib/db/schema';
+import {
+  products,
+  productVariants,
+  productImages,
+  orderItems,
+} from '@/lib/db/schema';
 import { requireAdmin } from '@/lib/shop/auth';
+import { destroyImage } from '@/lib/cloudinary';
 import { slugify } from '@/lib/shop/slug';
 import { productInputSchema } from '@/lib/shop/validation';
 import type { ActionResult } from './categories';
@@ -18,6 +24,18 @@ export async function createProduct(raw: unknown): Promise<ActionResult> {
   const p = parsed.data;
   const productId = randomUUID();
   try {
+    const imageInsert = p.images.length
+      ? [
+          db.insert(productImages).values(
+            p.images.map((img, i) => ({
+              productId,
+              url: img.url,
+              publicId: img.publicId,
+              position: i,
+            }))
+          ),
+        ]
+      : [];
     await db.batch([
       db.insert(products).values({
         id: productId,
@@ -39,6 +57,7 @@ export async function createProduct(raw: unknown): Promise<ActionResult> {
           position: i,
         }))
       ),
+      ...imageInsert,
     ]);
   } catch (error) {
     console.error('createProduct failed:', error);
@@ -136,20 +155,72 @@ export async function updateProduct(
       }
     });
 
+    // Reconcile images: keep submitted rows, delete the rest.
+    const currentImages = await db
+      .select({ id: productImages.id, publicId: productImages.publicId })
+      .from(productImages)
+      .where(eq(productImages.productId, id));
+    const submittedImageIds = new Set(
+      p.images.map((img) => img.id).filter((v): v is string => !!v)
+    );
+    const removedImages = currentImages.filter(
+      (img) => !submittedImageIds.has(img.id)
+    );
+    for (const img of removedImages) {
+      rest.push(db.delete(productImages).where(eq(productImages.id, img.id)));
+    }
+    p.images.forEach((img, i) => {
+      if (img.id) {
+        rest.push(
+          db
+            .update(productImages)
+            .set({ position: i })
+            .where(eq(productImages.id, img.id))
+        );
+      } else {
+        rest.push(
+          db.insert(productImages).values({
+            productId: id,
+            url: img.url,
+            publicId: img.publicId,
+            position: i,
+          })
+        );
+      }
+    });
+
     await db.batch([productUpdate, ...rest]);
+
+    // Drop the Cloudinary assets for images removed from the product.
+    await Promise.all(
+      removedImages.map((img) => destroyImage(img.publicId))
+    );
   } catch (error) {
     console.error('updateProduct failed', error);
     return { ok: false, error: 'Could not save the product.' };
   }
 
   revalidatePath('/admin/products');
-  revalidatePath(`/admin/products/${id}`);
   return { ok: true };
 }
 
 export async function deleteProduct(id: string): Promise<ActionResult> {
   await requireAdmin();
-  await db.delete(products).where(eq(products.id, id));
+  const images = await db
+    .select({ publicId: productImages.publicId })
+    .from(productImages)
+    .where(eq(productImages.productId, id));
+  try {
+    await db.delete(products).where(eq(products.id, id));
+  } catch (error) {
+    console.error('deleteProduct failed', error);
+    return {
+      ok: false,
+      error:
+        'Could not delete — this product has variants used in existing orders. Archive it instead.',
+    };
+  }
+  await Promise.all(images.map((img) => destroyImage(img.publicId)));
   revalidatePath('/admin/products');
   return { ok: true };
 }
