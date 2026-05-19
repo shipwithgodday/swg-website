@@ -124,7 +124,9 @@ export async function getRevenueSeries(range: DashboardRange) {
 
   const rows = await db
     .select({
-      day: sql<string>`to_char(date_trunc('day', ${orders.createdAt}), 'YYYY-MM-DD')`,
+      // Truncate in UTC so day keys match the JS toISOString() keys below,
+      // regardless of the database session timezone.
+      day: sql<string>`to_char(date_trunc('day', ${orders.createdAt} AT TIME ZONE 'UTC'), 'YYYY-MM-DD')`,
       revenue: sql<number>`coalesce(sum(${orders.total}), 0)`,
     })
     .from(orders)
@@ -134,7 +136,7 @@ export async function getRevenueSeries(range: DashboardRange) {
         gte(orders.createdAt, since)
       )
     )
-    .groupBy(sql`date_trunc('day', ${orders.createdAt})`);
+    .groupBy(sql`date_trunc('day', ${orders.createdAt} AT TIME ZONE 'UTC')`);
 
   const byDay = new Map(rows.map((r) => [r.day, Number(r.revenue)]));
   const series: { date: string; revenue: number }[] = [];

@@ -71,7 +71,10 @@ export function OrdersTable({ orders }: { orders: AdminOrderRow[] }) {
         ),
       },
       {
-        accessorKey: 'status',
+        id: 'status',
+        // Filter/sort on the displayed label so search matches what the user
+        // sees ("Shipped", "Pending Payment"), not the raw status value.
+        accessorFn: (row) => formatOrderStatus(row.status),
         header: 'Status',
         cell: ({ row }) => (
           <StatusBadge status={row.original.status} kind="order" />

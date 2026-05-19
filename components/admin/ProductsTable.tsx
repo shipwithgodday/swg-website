@@ -7,6 +7,7 @@ import { toast } from 'sonner';
 import { Button } from '@/components/admin/ui/button';
 import { DataTable } from '@/components/admin/ui/data-table';
 import { StatusBadge } from '@/components/admin/StatusBadge';
+import { formatProductStatus } from '@/lib/shop/status-format';
 import {
   Dialog,
   DialogContent,
@@ -113,7 +114,10 @@ export function ProductsTable({
         ),
       },
       {
-        accessorKey: 'status',
+        id: 'status',
+        // Filter/sort on the displayed label so search matches what the user
+        // sees ("Active", "Archived"), not the raw status value.
+        accessorFn: (row) => formatProductStatus(row.status),
         header: ({ column }) => <SortHeader label="Status" column={column} />,
         cell: ({ row }) => (
           <StatusBadge status={row.original.status} kind="product" />

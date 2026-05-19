@@ -28,13 +28,19 @@ describe('rangeDays', () => {
 });
 
 describe('rangeToSince', () => {
-  it('returns a date `rangeDays` before now', () => {
+  it('returns a rolling window `rangeDays` before now', () => {
     const now = new Date('2026-05-19T12:00:00.000Z');
     expect(rangeToSince('7d', now).toISOString()).toBe(
       '2026-05-12T12:00:00.000Z'
     );
+    expect(rangeToSince('30d', now).toISOString()).toBe(
+      '2026-04-19T12:00:00.000Z'
+    );
+  });
+  it('treats "today" as the start of the current UTC day', () => {
+    const now = new Date('2026-05-19T12:00:00.000Z');
     expect(rangeToSince('today', now).toISOString()).toBe(
-      '2026-05-18T12:00:00.000Z'
+      '2026-05-19T00:00:00.000Z'
     );
   });
 });

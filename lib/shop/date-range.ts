@@ -32,10 +32,21 @@ export function parseRange(value: string | undefined): DashboardRange {
     : DEFAULT_RANGE;
 }
 
-/** Start `Date` for a range, relative to `now`. */
+/**
+ * Start `Date` for a range, relative to `now`.
+ *
+ * `today` is the start of the current UTC calendar day so it lines up with the
+ * day buckets in `getRevenueSeries`; the other ranges are rolling windows
+ * ending at `now`.
+ */
 export function rangeToSince(
   range: DashboardRange,
   now: Date = new Date()
 ): Date {
+  if (range === 'today') {
+    const start = new Date(now);
+    start.setUTCHours(0, 0, 0, 0);
+    return start;
+  }
   return new Date(now.getTime() - rangeDays(range) * DAY_MS);
 }
