@@ -2,8 +2,8 @@
 import { useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { Button } from '@/components/admin/ui/button';
+import { Input } from '@/components/admin/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
 import {
   createDeliveryZone,
@@ -72,7 +72,7 @@ function ZoneRow({ zone }: { zone?: Zone }) {
         />
         Active
       </label>
-      <Button size="sm" disabled={pending || !name} onClick={save}>
+      <Button size="sm" variant="gold" disabled={pending || !name} onClick={save}>
         {pending ? '…' : zone ? 'Save' : 'Add'}
       </Button>
     </div>

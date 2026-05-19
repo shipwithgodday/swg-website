@@ -2,7 +2,7 @@
 import { useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/admin/ui/button';
 import { nextStatuses } from '@/lib/shop/order-status';
 import { updateOrderStatus } from '@/app/actions/shop/admin-orders';
 
@@ -42,7 +42,7 @@ export function OrderStatusUpdater({
       {options.map((to) => (
         <Button
           key={to}
-          variant={to === 'cancelled' ? 'destructive' : 'default'}
+          variant={to === 'cancelled' ? 'destructive' : 'gold'}
           disabled={pending}
           onClick={() => move(to)}>
           Mark {to}

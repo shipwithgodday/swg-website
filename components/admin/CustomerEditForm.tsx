@@ -2,8 +2,8 @@
 import { useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { Button } from '@/components/admin/ui/button';
+import { Input } from '@/components/admin/ui/input';
 import { Label } from '@/components/ui/label';
 import { updateCustomer } from '@/app/actions/shop/admin-customers';
 
@@ -14,9 +14,11 @@ interface Props {
     email: string | null;
     phone: string | null;
   };
+  /** Called after a successful save (e.g. to close a dialog). */
+  onSaved?: () => void;
 }
 
-export function CustomerEditForm({ customer }: Props) {
+export function CustomerEditForm({ customer, onSaved }: Props) {
   const router = useRouter();
   const [name, setName] = useState(customer.name ?? '');
   const [email, setEmail] = useState(customer.email ?? '');
@@ -34,6 +36,7 @@ export function CustomerEditForm({ customer }: Props) {
       if (res.ok) {
         toast.success('Customer updated');
         router.refresh();
+        onSaved?.();
       } else {
         toast.error(res.error);
       }
@@ -46,6 +49,7 @@ export function CustomerEditForm({ customer }: Props) {
         <Label htmlFor="c-name">Name</Label>
         <Input
           id="c-name"
+          className="text-foreground"
           value={name}
           onChange={(e) => setName(e.target.value)}
         />
@@ -55,6 +59,7 @@ export function CustomerEditForm({ customer }: Props) {
         <Input
           id="c-email"
           type="email"
+          className="text-foreground"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
         />
@@ -63,11 +68,12 @@ export function CustomerEditForm({ customer }: Props) {
         <Label htmlFor="c-phone">Phone</Label>
         <Input
           id="c-phone"
+          className="text-foreground"
           value={phone}
           onChange={(e) => setPhone(e.target.value)}
         />
       </div>
-      <Button type="submit" disabled={pending}>
+      <Button type="submit" variant="gold" disabled={pending}>
         {pending ? 'Saving…' : 'Save'}
       </Button>
     </form>

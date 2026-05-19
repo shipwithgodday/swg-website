@@ -1,23 +1,29 @@
 'use client';
 import { useState, useTransition } from 'react';
-import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { Button } from '@/components/admin/ui/button';
+import { Input } from '@/components/admin/ui/input';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
+import { Textarea } from '@/components/admin/ui/textarea';
 import {
   createCategory,
   updateCategory,
   type ActionResult,
 } from '@/app/actions/shop/categories';
 
-interface Props {
-  category?: { id: string; name: string; description: string | null };
+export interface CategoryFormValue {
+  id: string;
+  name: string;
+  description: string | null;
 }
 
-export function CategoryForm({ category }: Props) {
-  const router = useRouter();
+interface Props {
+  category?: CategoryFormValue;
+  onSaved: () => void;
+  onCancel: () => void;
+}
+
+export function CategoryForm({ category, onSaved, onCancel }: Props) {
   const [name, setName] = useState(category?.name ?? '');
   const [description, setDescription] = useState(
     category?.description ?? ''
@@ -33,7 +39,7 @@ export function CategoryForm({ category }: Props) {
         : await createCategory(payload);
       if (res.ok) {
         toast.success(category ? 'Category updated' : 'Category created');
-        router.push('/admin/categories');
+        onSaved();
       } else {
         toast.error(res.error);
       }
@@ -41,27 +47,37 @@ export function CategoryForm({ category }: Props) {
   }
 
   return (
-    <form onSubmit={submit} className="max-w-lg space-y-4">
+    <form onSubmit={submit} className="space-y-4">
       <div className="space-y-2">
-        <Label htmlFor="name">Name</Label>
+        <Label htmlFor="category-name">Name</Label>
         <Input
-          id="name"
+          id="category-name"
           value={name}
           onChange={(e) => setName(e.target.value)}
           required
+          autoFocus
         />
       </div>
       <div className="space-y-2">
-        <Label htmlFor="description">Description</Label>
+        <Label htmlFor="category-description">Description</Label>
         <Textarea
-          id="description"
+          id="category-description"
           value={description}
           onChange={(e) => setDescription(e.target.value)}
         />
       </div>
-      <Button type="submit" disabled={pending}>
-        {pending ? 'Saving…' : 'Save category'}
-      </Button>
+      <div className="flex justify-end gap-2">
+        <Button
+          type="button"
+          variant="outline"
+          onClick={onCancel}
+          disabled={pending}>
+          Cancel
+        </Button>
+        <Button type="submit" variant="gold" disabled={pending || !name.trim()}>
+          {pending ? 'Saving…' : 'Save category'}
+        </Button>
+      </div>
     </form>
   );
 }
