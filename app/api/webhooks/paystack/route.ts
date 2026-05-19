@@ -41,36 +41,44 @@ export async function POST(request: Request) {
     return NextResponse.json({ received: true });
   }
 
-  // Already processed — idempotent no-op.
+  // Already processed — fast idempotent no-op.
   if (order.status !== 'pending') {
     return NextResponse.json({ received: true });
   }
 
+  // Atomically claim the order: flip pending -> paid. The guarded WHERE
+  // plus RETURNING means only ONE webhook delivery can win this, even
+  // under concurrent or replayed deliveries.
+  const claimed = await db
+    .update(orders)
+    .set({ status: 'paid', updatedAt: new Date() })
+    .where(
+      sql`${orders.id} = ${order.id} AND ${orders.status} = 'pending'`
+    )
+    .returning({ id: orders.id });
+
+  if (claimed.length === 0) {
+    // A concurrent or earlier delivery already processed this order.
+    return NextResponse.json({ received: true });
+  }
+
+  // We won the claim — decrement stock exactly once. Each decrement is
+  // guarded against overselling (WHERE stock >= quantity).
   const items = await db
     .select()
     .from(orderItems)
     .where(eq(orderItems.orderId, order.id));
 
-  // Atomically: flip status (guarded so a replay updates 0 rows) and
-  // decrement each variant's stock (guarded against overselling).
-  await db.batch([
-    db
-      .update(orders)
-      .set({ status: 'paid', updatedAt: new Date() })
+  for (const it of items) {
+    await db
+      .update(productVariants)
+      .set({
+        stockQuantity: sql`${productVariants.stockQuantity} - ${it.quantity}`,
+      })
       .where(
-        sql`${orders.id} = ${order.id} AND ${orders.status} = 'pending'`
-      ),
-    ...items.map((it) =>
-      db
-        .update(productVariants)
-        .set({
-          stockQuantity: sql`${productVariants.stockQuantity} - ${it.quantity}`,
-        })
-        .where(
-          sql`${productVariants.id} = ${it.variantId} AND ${productVariants.stockQuantity} >= ${it.quantity}`
-        )
-    ),
-  ]);
+        sql`${productVariants.id} = ${it.variantId} AND ${productVariants.stockQuantity} >= ${it.quantity}`
+      );
+  }
 
   // Best-effort confirmation email — never blocks the webhook.
   try {
