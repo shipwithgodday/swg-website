@@ -29,3 +29,11 @@ export const productInputSchema = z.object({
 
 export type VariantInput = z.infer<typeof variantInputSchema>;
 export type ProductInput = z.infer<typeof productInputSchema>;
+
+export const customerEditSchema = z.object({
+  name: z.string().trim().min(1).optional().nullable(),
+  email: z.string().trim().email().optional().nullable(),
+  phone: z.string().trim().min(1).optional().nullable(),
+});
+
+export type CustomerEditInput = z.infer<typeof customerEditSchema>;

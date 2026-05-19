@@ -1,4 +1,4 @@
-import { categoryInputSchema, productInputSchema } from './validation';
+import { categoryInputSchema, productInputSchema, customerEditSchema } from './validation';
 
 describe('categoryInputSchema', () => {
   it('accepts a valid category', () => {
@@ -45,6 +45,32 @@ describe('productInputSchema', () => {
   it('rejects an invalid status', () => {
     expect(
       productInputSchema.safeParse({ ...base, status: 'live' }).success
+    ).toBe(false);
+  });
+});
+
+describe('customerEditSchema', () => {
+  it('accepts valid edits', () => {
+    expect(
+      customerEditSchema.safeParse({
+        name: 'Ama',
+        email: 'ama@example.com',
+        phone: '0241234567',
+      }).success
+    ).toBe(true);
+  });
+  it('accepts null fields', () => {
+    expect(
+      customerEditSchema.safeParse({
+        name: null,
+        email: null,
+        phone: null,
+      }).success
+    ).toBe(true);
+  });
+  it('rejects a malformed email', () => {
+    expect(
+      customerEditSchema.safeParse({ email: 'not-an-email' }).success
     ).toBe(false);
   });
 });
