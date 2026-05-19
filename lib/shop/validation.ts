@@ -9,6 +9,7 @@ export const categoryInputSchema = z.object({
 export type CategoryInput = z.infer<typeof categoryInputSchema>;
 
 export const variantInputSchema = z.object({
+  id: z.string().uuid().optional(),
   name: z.string().trim().min(1, 'Variant name is required'),
   sku: z.string().trim().optional().nullable(),
   price: z.number().int().nonnegative('Price must be 0 or more'),

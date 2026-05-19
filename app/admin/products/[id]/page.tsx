@@ -36,6 +36,7 @@ export default async function EditProductPage({
           status: product.status as 'draft' | 'active' | 'archived',
           featured: product.featured,
           variants: product.variants.map((v) => ({
+            id: v.id,
             name: v.name,
             sku: v.sku ?? '',
             priceCedis: (v.price / 100).toFixed(2),

@@ -64,6 +64,7 @@ export function ProductForm({ categories, product }: Props) {
       status,
       featured,
       variants: variants.map((v) => ({
+        id: v.id,
         name: v.name,
         sku: v.sku || null,
         price: Math.round(parseFloat(v.priceCedis || '0') * 100),

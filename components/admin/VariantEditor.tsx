@@ -5,6 +5,7 @@ import { Label } from '@/components/ui/label';
 import { Trash2 } from 'lucide-react';
 
 export interface VariantRow {
+  id?: string;
   name: string;
   sku: string;
   priceCedis: string;
