@@ -2,12 +2,26 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
-import { LayoutDashboard, Package, FolderTree } from 'lucide-react';
+import {
+  LayoutDashboard,
+  Package,
+  FolderTree,
+  ShoppingCart,
+  Users,
+  Settings,
+} from 'lucide-react';
 
 const links = [
   { href: '/admin', label: 'Dashboard', icon: LayoutDashboard },
+  { href: '/admin/orders', label: 'Orders', icon: ShoppingCart },
   { href: '/admin/products', label: 'Products', icon: Package },
   { href: '/admin/categories', label: 'Categories', icon: FolderTree },
+  { href: '/admin/customers', label: 'Customers', icon: Users },
+  {
+    href: '/admin/settings/delivery-zones',
+    label: 'Delivery zones',
+    icon: Settings,
+  },
 ];
 
 export function AdminSidebar() {
