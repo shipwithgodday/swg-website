@@ -18,7 +18,10 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'bad signature' }, { status: 401 });
   }
 
-  let event: { event?: string; data?: { reference?: string } };
+  let event: {
+    event?: string;
+    data?: { reference?: string; amount?: number };
+  };
   try {
     event = JSON.parse(rawBody);
   } catch {
@@ -38,6 +41,18 @@ export async function POST(request: Request) {
 
   if (!order) {
     console.warn(`paystack webhook: unknown reference ${reference}`);
+    return NextResponse.json({ received: true });
+  }
+
+  // Verify Paystack charged the amount we expect before trusting it.
+  if (
+    typeof event.data.amount === 'number' &&
+    event.data.amount !== order.total
+  ) {
+    console.error(
+      `paystack webhook: amount mismatch for ${reference} — ` +
+        `charged ${event.data.amount}, expected ${order.total}`
+    );
     return NextResponse.json({ received: true });
   }
 

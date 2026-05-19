@@ -166,13 +166,22 @@ export async function createCheckout(
     return { ok: false, error: 'Could not create your order.' };
   }
 
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL;
+  if (!siteUrl) {
+    console.error('createCheckout: NEXT_PUBLIC_SITE_URL is not set');
+    return {
+      ok: false,
+      error: 'Checkout is not configured. Please contact support.',
+    };
+  }
+
   // Initialize Paystack.
   try {
     const init = await initializeTransaction({
       email,
       amount: total,
       reference: orderNumber,
-      callbackUrl: `${process.env.NEXT_PUBLIC_SITE_URL ?? ''}/shop/checkout/processing`,
+      callbackUrl: `${siteUrl}/shop/checkout/processing`,
     });
     return { ok: true, authorizationUrl: init.authorizationUrl };
   } catch (error) {
