@@ -2,7 +2,7 @@
 import { useEffect, useMemo, useState, useTransition } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { type ColumnDef } from '@tanstack/react-table';
-import { ArrowUpDown, Pencil, Plus, Trash2 } from 'lucide-react';
+import { ArrowUpDown, ImageOff, Pencil, Plus, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@/components/admin/ui/button';
 import { DataTable } from '@/components/admin/ui/data-table';
@@ -95,14 +95,31 @@ export function ProductsTable({
       {
         accessorKey: 'name',
         header: ({ column }) => <SortHeader label="Name" column={column} />,
-        cell: ({ row }) => (
-          <button
-            type="button"
-            onClick={() => startEdit(row.original)}
-            className="text-primary underline-offset-4 hover:underline">
-            {row.original.name}
-          </button>
-        ),
+        cell: ({ row }) => {
+          const thumb = row.original.images[0]?.url;
+          return (
+            <button
+              type="button"
+              onClick={() => startEdit(row.original)}
+              className="group flex items-center gap-3 text-left">
+              {thumb ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={thumb}
+                  alt=""
+                  className="size-9 shrink-0 rounded-lg object-cover ring-1 ring-zinc-200"
+                />
+              ) : (
+                <span className="grid size-9 shrink-0 place-items-center rounded-lg bg-zinc-100 text-zinc-400 ring-1 ring-zinc-200">
+                  <ImageOff className="size-4" />
+                </span>
+              )}
+              <span className="font-medium text-zinc-900 underline-offset-4 group-hover:text-zinc-500 group-hover:underline">
+                {row.original.name}
+              </span>
+            </button>
+          );
+        },
       },
       {
         accessorKey: 'categoryName',

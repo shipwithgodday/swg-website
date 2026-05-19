@@ -58,7 +58,7 @@ export function CategoriesTable({
           <button
             type="button"
             onClick={() => startEdit(row.original)}
-            className="text-primary underline-offset-4 hover:underline">
+            className="font-medium text-zinc-900 underline-offset-4 hover:text-zinc-500 hover:underline">
             {row.original.name}
           </button>
         ),
