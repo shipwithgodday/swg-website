@@ -1,9 +1,11 @@
 import type { Metadata } from 'next';
 import { asc, eq } from 'drizzle-orm';
 import Container from '@/components/shared/container';
+import SectionHeader from '@/components/shared/section-header';
 import { db } from '@/lib/db';
 import { deliveryZones } from '@/lib/db/schema';
 import { CheckoutForm } from '@/components/shop/CheckoutForm';
+import { MotionReveal } from '@/components/shop/MotionReveal';
 
 export const metadata: Metadata = { title: 'Checkout' };
 
@@ -19,11 +21,18 @@ export default async function CheckoutPage() {
     .orderBy(asc(deliveryZones.name));
 
   return (
-    <Container className="py-12">
-      <h1 className="text-3xl font-semibold">Checkout</h1>
-      <div className="mt-8">
+    <Container className="py-12 md:py-16">
+      <MotionReveal className="max-w-3xl">
+        <SectionHeader highlightedWord="there" size="lg">
+          Almost there
+        </SectionHeader>
+        <p className="mt-3 text-lg font-light text-muted-foreground">
+          A few details and we&apos;ll get your order on its way.
+        </p>
+      </MotionReveal>
+      <MotionReveal className="mt-10" delay={0.1}>
         <CheckoutForm zones={zones} />
-      </div>
+      </MotionReveal>
     </Container>
   );
 }
