@@ -1,7 +1,11 @@
 import Link from 'next/link';
 import type { Metadata } from 'next';
+import { ArrowRight } from 'lucide-react';
 import Container from '@/components/shared/container';
+import SectionHeader from '@/components/shared/section-header';
 import { ProductGrid } from '@/components/shop/ProductGrid';
+import { CategoryFilter } from '@/components/shop/CategoryFilter';
+import { MotionReveal } from '@/components/shop/MotionReveal';
 import {
   getFeaturedProducts,
   getActiveProducts,
@@ -13,17 +17,21 @@ export const metadata: Metadata = {
   description: 'Browse products from Ship With Godday.',
 };
 
-function toCard(p: {
-  slug: string;
-  name: string;
-  images: { url: string }[];
-  variants: { price: number; stockQuantity: number }[];
-}) {
+function toCard(
+  p: {
+    slug: string;
+    name: string;
+    images: { url: string }[];
+    variants: { price: number; stockQuantity: number }[];
+  },
+  featured = false
+) {
   return {
     slug: p.slug,
     name: p.name,
     imageUrl: p.images[0]?.url ?? null,
     variants: p.variants,
+    featured,
   };
 }
 
@@ -35,42 +43,51 @@ export default async function ShopPage() {
   ]);
 
   return (
-    <Container className="py-12">
-      <h1 className="text-3xl font-semibold">Shop</h1>
+    <Container className="py-12 md:py-16">
+      <MotionReveal as="section" className="max-w-3xl">
+        <SectionHeader highlightedWord="Godday" size="lg">
+          Shop with Godday
+        </SectionHeader>
+        <p className="mt-3 text-lg font-light text-muted-foreground">
+          Curated essentials sourced and shipped from China to Ghana.
+          Browse, pick your variant, and pay in cedis.
+        </p>
+      </MotionReveal>
 
       {categories.length > 0 && (
-        <div className="mt-4 flex flex-wrap gap-2">
-          {categories.map((c) => (
-            <Link
-              key={c.id}
-              href={`/shop/products?category=${c.slug}`}
-              className="rounded-full border border-border px-4 py-1.5 text-sm hover:bg-accent">
-              {c.name}
-            </Link>
-          ))}
-        </div>
+        <MotionReveal className="mt-8" delay={0.05}>
+          <CategoryFilter categories={categories} />
+        </MotionReveal>
       )}
 
       {featured.length > 0 && (
-        <section className="mt-10">
-          <h2 className="text-xl font-medium">Featured</h2>
-          <div className="mt-4">
-            <ProductGrid products={featured.map(toCard)} />
+        <section className="mt-16">
+          <MotionReveal>
+            <SectionHeader highlightedWord="products" size="base">
+              Featured products
+            </SectionHeader>
+          </MotionReveal>
+          <div className="mt-6">
+            <ProductGrid products={featured.map((p) => toCard(p, true))} />
           </div>
         </section>
       )}
 
-      <section className="mt-10">
-        <div className="flex items-center justify-between">
-          <h2 className="text-xl font-medium">All products</h2>
+      <section className="mt-16">
+        <div className="flex flex-wrap items-end justify-between gap-3">
+          <MotionReveal>
+            <SectionHeader highlightedWord="products" size="base">
+              All products
+            </SectionHeader>
+          </MotionReveal>
           <Link
             href="/shop/products"
-            className="text-sm text-primary underline-offset-4 hover:underline">
-            View all
+            className="inline-flex items-center gap-1 text-sm font-medium text-primary underline-offset-4 hover:underline">
+            View all <ArrowRight className="size-4" />
           </Link>
         </div>
-        <div className="mt-4">
-          <ProductGrid products={all.slice(0, 8).map(toCard)} />
+        <div className="mt-6">
+          <ProductGrid products={all.slice(0, 8).map((p) => toCard(p))} />
         </div>
       </section>
     </Container>
