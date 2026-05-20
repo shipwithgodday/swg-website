@@ -113,6 +113,7 @@ export function CategoriesTable({
           searchable
           searchPlaceholder="Search by name or slug"
           initialSorting={[{ id: 'name', desc: false }]}
+          onRowClick={(c) => startEdit(c)}
         />
       </div>
 

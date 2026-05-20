@@ -1,6 +1,7 @@
 'use client';
 import { useMemo, useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { format } from 'date-fns';
 import { type ColumnDef } from '@tanstack/react-table';
 
@@ -24,6 +25,7 @@ export type AdminOrderRow = {
 const FILTERS = ['all', ...ORDER_STATUSES] as const;
 
 export function OrdersTable({ orders }: { orders: AdminOrderRow[] }) {
+  const router = useRouter();
   const [statusFilter, setStatusFilter] = useState<string>('all');
 
   const rows = useMemo(
@@ -117,6 +119,7 @@ export function OrdersTable({ orders }: { orders: AdminOrderRow[] }) {
         searchable
         searchPlaceholder="Search order #, customer, or mark"
         initialSorting={[{ id: 'createdAt', desc: true }]}
+        onRowClick={(o) => router.push(`/admin/orders/${o.id}`)}
       />
     </div>
   );

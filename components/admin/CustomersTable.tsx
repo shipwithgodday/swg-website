@@ -193,6 +193,7 @@ export function CustomersTable({
         searchable
         searchPlaceholder="Search name, mark, email, or phone"
         initialSorting={[{ id: 'shippingMark', desc: false }]}
+        onRowClick={(c) => setEditing(c)}
       />
 
       <CustomerDetailDialog

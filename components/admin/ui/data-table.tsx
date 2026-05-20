@@ -42,7 +42,18 @@ interface DataTableProps<TData, TValue> {
   /** Show a search box that filters across all columns. */
   searchable?: boolean;
   searchPlaceholder?: string;
+  /**
+   * Fired when the user clicks anywhere on a row that isn't itself an
+   * interactive element (button, anchor, input, label). Lets the whole
+   * row act as the primary action while keeping in-cell controls (Edit,
+   * Delete, the first-column link) working on their own.
+   */
+  onRowClick?: (row: TData) => void;
 }
+
+/** Closest-ancestor selector for elements that should swallow row clicks. */
+const INTERACTIVE_SELECTOR =
+  'a, button, input, label, select, textarea, [role="button"], [role="checkbox"], [data-stop-row-click]';
 
 export function DataTable<TData, TValue>({
   columns,
@@ -50,6 +61,7 @@ export function DataTable<TData, TValue>({
   initialSorting = [],
   searchable = false,
   searchPlaceholder = 'Search…',
+  onRowClick,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>(initialSorting);
   const [globalFilter, setGlobalFilter] = useState('');
@@ -140,20 +152,53 @@ export function DataTable<TData, TValue>({
           </TableHeader>
           <TableBody>
             {table.getRowModel().rows.length ? (
-              table.getRowModel().rows.map((row) => (
-                <TableRow
-                  key={row.id}
-                  className="border-zinc-100 transition-colors hover:bg-zinc-50/70">
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id} className="py-3.5 text-zinc-700">
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext()
-                      )}
-                    </TableCell>
-                  ))}
-                </TableRow>
-              ))
+              table.getRowModel().rows.map((row) => {
+                const clickable = !!onRowClick;
+                return (
+                  <TableRow
+                    key={row.id}
+                    tabIndex={clickable ? 0 : undefined}
+                    onClick={
+                      clickable
+                        ? (e) => {
+                            // Don't fire the row action when the user
+                            // clicked something interactive inside the
+                            // row (the first-cell link, Edit, Delete).
+                            const t = e.target as HTMLElement;
+                            if (t.closest(INTERACTIVE_SELECTOR)) return;
+                            onRowClick(row.original);
+                          }
+                        : undefined
+                    }
+                    onKeyDown={
+                      clickable
+                        ? (e) => {
+                            if (e.key !== 'Enter' && e.key !== ' ') return;
+                            const t = e.target as HTMLElement;
+                            if (t.closest(INTERACTIVE_SELECTOR)) return;
+                            e.preventDefault();
+                            onRowClick(row.original);
+                          }
+                        : undefined
+                    }
+                    className={
+                      clickable
+                        ? 'cursor-pointer border-zinc-100 transition-colors hover:bg-zinc-50/70 focus-visible:bg-zinc-50/70 focus-visible:outline-none'
+                        : 'border-zinc-100 transition-colors hover:bg-zinc-50/70'
+                    }>
+                    {row.getVisibleCells().map((cell) => (
+                      <TableCell
+                        key={cell.id}
+                        className="py-3.5 text-zinc-700">
+                        {flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext()
+                        )}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                );
+              })
             ) : (
               <TableRow>
                 <TableCell

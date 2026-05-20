@@ -197,6 +197,7 @@ export function ProductsTable({
           searchable
           searchPlaceholder="Search by name, category, or status"
           initialSorting={[{ id: 'name', desc: false }]}
+          onRowClick={(p) => startEdit(p)}
         />
       </div>
 
