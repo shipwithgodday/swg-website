@@ -5,6 +5,7 @@ import { SiteNavbar, SiteFooter } from '@/components/shared/SiteChrome';
 import { GoogleAnalytics } from '@next/third-parties/google';
 import { WebVitals } from '@/components/analytics/WebVitals';
 import { Toaster } from '@/components/ui/sonner';
+import { CartProvider } from '@/lib/cart-context';
 
 export const metadata: Metadata = {
   title: {
@@ -86,9 +87,11 @@ export default function RootLayout({
     <ClerkProvider>
       <html lang="en">
         <body>
-          <SiteNavbar />
-          {children}
-          <SiteFooter />
+          <CartProvider>
+            <SiteNavbar />
+            {children}
+            <SiteFooter />
+          </CartProvider>
           <WebVitals />
           <Toaster />
         </body>
