@@ -3,6 +3,7 @@ import type { Metadata } from 'next';
 import { ArrowRight } from 'lucide-react';
 import Container from '@/components/shared/container';
 import SectionHeader from '@/components/shared/section-header';
+import { PageHero } from '@/components/shared/PageHero';
 import { ProductGrid } from '@/components/shop/ProductGrid';
 import { CategoryFilter } from '@/components/shop/CategoryFilter';
 import { MotionReveal } from '@/components/shop/MotionReveal';
@@ -43,53 +44,53 @@ export default async function ShopPage() {
   ]);
 
   return (
-    <Container className="py-12 md:py-16">
-      <MotionReveal as="section" className="max-w-3xl">
-        <SectionHeader highlightedWord="Godday" size="lg">
-          Shop with Godday
-        </SectionHeader>
-        <p className="mt-3 text-lg font-light text-muted-foreground">
-          Curated essentials sourced and shipped from China to Ghana.
-          Browse, pick your variant, and pay in cedis.
-        </p>
-      </MotionReveal>
+    <>
+      <PageHero
+        title="Shop with Godday"
+        highlightedWord="Godday"
+        subtitle="Curated essentials sourced and shipped from China to Ghana — browse, pick your variant, and pay in cedis."
+      />
 
-      {categories.length > 0 && (
-        <MotionReveal className="mt-8" delay={0.05}>
-          <CategoryFilter categories={categories} />
-        </MotionReveal>
-      )}
-
-      {featured.length > 0 && (
-        <section className="mt-16">
+      <Container className="py-12 md:py-16">
+        {categories.length > 0 && (
           <MotionReveal>
-            <SectionHeader highlightedWord="products" size="base">
-              Featured products
-            </SectionHeader>
+            <CategoryFilter categories={categories} />
           </MotionReveal>
+        )}
+
+        {featured.length > 0 && (
+          <section className="mt-12">
+            <MotionReveal>
+              <SectionHeader highlightedWord="products" size="base">
+                Featured products
+              </SectionHeader>
+            </MotionReveal>
+            <div className="mt-6">
+              <ProductGrid
+                products={featured.map((p) => toCard(p, true))}
+              />
+            </div>
+          </section>
+        )}
+
+        <section className="mt-16">
+          <div className="flex flex-wrap items-end justify-between gap-3">
+            <MotionReveal>
+              <SectionHeader highlightedWord="products" size="base">
+                All products
+              </SectionHeader>
+            </MotionReveal>
+            <Link
+              href="/shop/products"
+              className="inline-flex items-center gap-1 text-sm font-medium text-primary underline-offset-4 hover:underline">
+              View all <ArrowRight className="size-4" />
+            </Link>
+          </div>
           <div className="mt-6">
-            <ProductGrid products={featured.map((p) => toCard(p, true))} />
+            <ProductGrid products={all.slice(0, 8).map((p) => toCard(p))} />
           </div>
         </section>
-      )}
-
-      <section className="mt-16">
-        <div className="flex flex-wrap items-end justify-between gap-3">
-          <MotionReveal>
-            <SectionHeader highlightedWord="products" size="base">
-              All products
-            </SectionHeader>
-          </MotionReveal>
-          <Link
-            href="/shop/products"
-            className="inline-flex items-center gap-1 text-sm font-medium text-primary underline-offset-4 hover:underline">
-            View all <ArrowRight className="size-4" />
-          </Link>
-        </div>
-        <div className="mt-6">
-          <ProductGrid products={all.slice(0, 8).map((p) => toCard(p))} />
-        </div>
-      </section>
-    </Container>
+      </Container>
+    </>
   );
 }

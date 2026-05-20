@@ -2,6 +2,12 @@
 
 import { motion } from 'framer-motion';
 import useMeasure from 'react-use-measure';
+import {
+  SignedIn,
+  SignedOut,
+  SignInButton,
+  UserButton,
+} from '@clerk/nextjs';
 import MobileNavItem from './MobileNavItem';
 import { Button } from '@/components/ui/button';
 import { navItems } from './navItems';
@@ -37,10 +43,26 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
             setMenuOpen={setMenuOpen}
           />
         ))}
-        <div className="mt-2">
+        <div className="mt-2 flex flex-wrap items-center gap-3">
           <Button onClick={handleButtonClick}>
             <Link href={'/schedule'}>Schedule a Call</Link>
           </Button>
+          <SignedOut>
+            <SignInButton mode="modal">
+              <button
+                type="button"
+                className="text-sm font-medium text-black hover:text-black/60"
+                onClick={handleButtonClick}>
+                Sign in
+              </button>
+            </SignInButton>
+          </SignedOut>
+          <SignedIn>
+            <UserButton
+              afterSignOutUrl="/"
+              appearance={{ elements: { avatarBox: 'size-8' } }}
+            />
+          </SignedIn>
         </div>
       </div>
     </motion.div>
