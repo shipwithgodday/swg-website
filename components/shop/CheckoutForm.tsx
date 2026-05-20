@@ -3,15 +3,18 @@ import { useState, useTransition } from 'react';
 import { toast } from 'sonner';
 import { SignInButton, SignUpButton } from '@clerk/nextjs';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+// The storefront Input/Select are styled for dark hero panels (white text,
+// bottom-only border, navy popover). The checkout form sits on a light
+// background, so we use the neutral primitives instead.
+import { Input } from '@/components/admin/ui/input';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
+} from '@/components/admin/ui/select';
 import { useCart } from '@/lib/cart-context';
 import { formatCedis } from '@/lib/shop/money';
 import { createCheckout } from '@/app/actions/shop/checkout';
