@@ -5,21 +5,45 @@ import { orders, orderItems, customers } from '@/lib/db/schema';
 import { formatCedis } from '@/lib/shop/money';
 import resend from '@/lib/emails';
 
-/** Builds and sends the order confirmation email. Best-effort. */
+const FROM = 'Ship With Godday <info@shipwithgodday.com>';
+
+/**
+ * Builds and sends the order confirmation email. Best-effort: every
+ * failure mode is logged so we can see what happened next time, but
+ * nothing throws — the caller (webhook / callback page) must never be
+ * blocked by an email problem.
+ */
 export async function sendOrderConfirmationEmail(
   orderId: string
 ): Promise<void> {
+  if (!process.env.RESEND_API_KEY) {
+    console.error(
+      `sendOrderConfirmationEmail: RESEND_API_KEY not set; skipping order ${orderId}`
+    );
+    return;
+  }
+
   const [order] = await db
     .select()
     .from(orders)
     .where(eq(orders.id, orderId));
-  if (!order) return;
+  if (!order) {
+    console.error(
+      `sendOrderConfirmationEmail: order ${orderId} not found`
+    );
+    return;
+  }
 
   const [customer] = await db
     .select()
     .from(customers)
     .where(eq(customers.id, order.customerId));
-  if (!customer?.email) return;
+  if (!customer?.email) {
+    console.warn(
+      `sendOrderConfirmationEmail: no email on customer for ${order.orderNumber}; skipping`
+    );
+    return;
+  }
 
   const items = await db
     .select()
@@ -57,10 +81,25 @@ export async function sendOrderConfirmationEmail(
     <p>Deliver to: ${order.shipName}, ${order.shipAddress}, ${order.shipCity}, ${order.shipRegion}</p>
   `;
 
-  await resend.emails.send({
-    from: 'Ship With Godday <info@shipwithgodday.com>',
+  // Resend doesn't throw on send failures by default; it resolves with
+  // `{ data: null, error: ResendError }`. We have to inspect the result
+  // explicitly or failures slip past silently.
+  const result = await resend.emails.send({
+    from: FROM,
     to: [customer.email],
     subject: `Order ${order.orderNumber} confirmed`,
     html,
   });
+
+  if (result.error) {
+    console.error(
+      `sendOrderConfirmationEmail: Resend rejected order ${order.orderNumber} ` +
+        `(to ${customer.email}): ${result.error.name} — ${result.error.message}`
+    );
+    return;
+  }
+
+  console.log(
+    `sendOrderConfirmationEmail: sent ${order.orderNumber} to ${customer.email} (id ${result.data?.id})`
+  );
 }
