@@ -3,10 +3,12 @@ import { NextResponse } from 'next/server';
 
 const isProtectedRoute = createRouteMatcher(['/email', '/api/send-bulk']);
 const isAdminRoute = createRouteMatcher(['/admin(.*)']);
-const isShopAuthRoute = createRouteMatcher([
-  '/shop/checkout(.*)',
-  '/shop/orders(.*)',
-]);
+
+// NOTE: /shop/checkout, /shop/orders and /account are intentionally NOT
+// gated here. Each page renders an in-page SignInCard (with Clerk's
+// modal) for signed-out visitors, and sensitive server actions on those
+// pages re-check auth themselves. This avoids the jarring redirect to
+// the standalone /sign-in route mid-checkout.
 
 export default clerkMiddleware(async (auth, request) => {
   if (isProtectedRoute(request)) {
@@ -25,13 +27,6 @@ export default clerkMiddleware(async (auth, request) => {
       ?.metadata?.role;
     if (role !== 'admin') {
       return NextResponse.redirect(new URL('/', request.url));
-    }
-  }
-
-  if (isShopAuthRoute(request)) {
-    const session = await auth();
-    if (!session.userId) {
-      return NextResponse.redirect(new URL('/sign-in', request.url));
     }
   }
 });
