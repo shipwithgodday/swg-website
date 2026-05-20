@@ -89,11 +89,12 @@ export default async function AccountPage() {
     ? (await getOrdersForCustomer(customer.id)).slice(0, RECENT_LIMIT)
     : [];
 
-  const displayName =
+  const displayName = (
     customer?.name ??
     [user?.firstName, user?.lastName].filter(Boolean).join(' ') ??
-    'there';
-  const firstName = displayName.split(' ')[0] || displayName;
+    ''
+  ).trim();
+  const firstName = displayName.split(' ')[0] || '';
   const email =
     customer?.email ??
     user?.primaryEmailAddress?.emailAddress ??
@@ -108,8 +109,8 @@ export default async function AccountPage() {
   return (
     <>
       <PageHero
-        title={`Hi, ${firstName}`}
-        highlightedWord={firstName}
+        title={firstName ? `Hi, ${firstName}` : 'Your account'}
+        highlightedWord={firstName || 'account'}
         subtitle={
           customer ? (
             <>
@@ -199,14 +200,30 @@ export default async function AccountPage() {
                     value={customer.shippingMark}
                   />
                 )}
-                <InfoRow
-                  icon={User}
-                  label="Name"
-                  value={displayName || '—'}
-                />
-                <InfoRow icon={Mail} label="Email" value={email ?? '—'} />
-                <InfoRow icon={Phone} label="Phone" value={phone ?? '—'} />
+                {email && (
+                  <InfoRow icon={Mail} label="Email" value={email} />
+                )}
+                {displayName && (
+                  <InfoRow
+                    icon={User}
+                    label="Name"
+                    value={displayName}
+                  />
+                )}
+                {phone && (
+                  <InfoRow icon={Phone} label="Phone" value={phone} />
+                )}
               </div>
+
+              {(!displayName || !phone) && (
+                <p className="mt-4 text-xs text-muted-foreground">
+                  {!displayName && !phone
+                    ? 'Your delivery name and phone are captured at checkout.'
+                    : !displayName
+                      ? 'Your delivery name is captured at checkout.'
+                      : 'Your delivery phone is captured at checkout.'}
+                </p>
+              )}
 
               <div className="mt-5 rounded-xl bg-muted/50 p-4 text-sm">
                 <p className="flex items-center gap-2 font-medium">
@@ -214,8 +231,8 @@ export default async function AccountPage() {
                   Manage your sign-in
                 </p>
                 <p className="mt-1 text-muted-foreground">
-                  Update your name, email, password and connected
-                  accounts from the avatar menu in the navbar.
+                  Update your email and password from the avatar menu
+                  in the navbar.
                 </p>
               </div>
             </section>
