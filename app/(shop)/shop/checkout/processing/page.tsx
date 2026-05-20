@@ -8,6 +8,7 @@ import { PageHero } from '@/components/shared/PageHero';
 import { OrderSummary } from '@/components/shop/OrderSummary';
 import { SignUpForOrders } from '@/components/shop/SignUpForOrders';
 import { verifyTransaction } from '@/lib/shop/paystack';
+import { completeOrder } from '@/lib/shop/complete-order';
 import { getOrderByNumber } from '@/lib/shop/orders';
 
 export const metadata = { title: 'Processing payment' };
@@ -39,8 +40,14 @@ export default async function ProcessingPage({
   let result: Awaited<ReturnType<typeof getOrderByNumber>> | null = null;
   try {
     const v = await verifyTransaction(reference);
-    const r = await getOrderByNumber(reference);
-    if (r && v.status === 'success') result = r;
+    if (v.status === 'success') {
+      // Claim the order now — the Paystack webhook also does this, and
+      // whichever arrives first wins via the idempotent guard in
+      // `completeOrder`. Doing it here too means the admin sees 'paid'
+      // even if the webhook is slow or hasn't been configured yet.
+      await completeOrder(reference, v.amount);
+      result = await getOrderByNumber(reference);
+    }
   } catch {
     result = null;
   }

@@ -1,10 +1,7 @@
 import { NextResponse } from 'next/server';
-import { sql, eq } from 'drizzle-orm';
 import { z } from 'zod';
-import { db } from '@/lib/db';
-import { orders, orderItems, productVariants } from '@/lib/db/schema';
 import { verifyPaystackSignature } from '@/lib/shop/paystack';
-import { sendOrderConfirmationEmail } from '@/lib/shop/order-email';
+import { completeOrder } from '@/lib/shop/complete-order';
 
 // Paystack delivers many event shapes; we only act on `charge.success`,
 // which always carries `data.reference` and `data.amount`. We parse with
@@ -48,70 +45,10 @@ export async function POST(request: Request) {
     return NextResponse.json({ received: true });
   }
   const { reference, amount } = parsed.data.data;
-  const [order] = await db
-    .select()
-    .from(orders)
-    .where(eq(orders.orderNumber, reference));
 
-  if (!order) {
+  const result = await completeOrder(reference, amount);
+  if (result.status === 'not_found') {
     console.warn(`paystack webhook: unknown reference ${reference}`);
-    return NextResponse.json({ received: true });
   }
-
-  // Verify Paystack charged the amount we expect before trusting it.
-  if (amount !== order.total) {
-    console.error(
-      `paystack webhook: amount mismatch for ${reference} — ` +
-        `charged ${amount}, expected ${order.total}`
-    );
-    return NextResponse.json({ received: true });
-  }
-
-  // Already processed — fast idempotent no-op.
-  if (order.status !== 'pending') {
-    return NextResponse.json({ received: true });
-  }
-
-  // Atomically claim the order: flip pending -> paid. The guarded WHERE
-  // plus RETURNING means only ONE webhook delivery can win this, even
-  // under concurrent or replayed deliveries.
-  const claimed = await db
-    .update(orders)
-    .set({ status: 'paid', updatedAt: new Date() })
-    .where(
-      sql`${orders.id} = ${order.id} AND ${orders.status} = 'pending'`
-    )
-    .returning({ id: orders.id });
-
-  if (claimed.length === 0) {
-    // A concurrent or earlier delivery already processed this order.
-    return NextResponse.json({ received: true });
-  }
-
-  // We won the claim — decrement stock exactly once. Each decrement is
-  // guarded against overselling (WHERE stock >= quantity).
-  const items = await db
-    .select()
-    .from(orderItems)
-    .where(eq(orderItems.orderId, order.id));
-
-  for (const it of items) {
-    await db
-      .update(productVariants)
-      .set({
-        stockQuantity: sql`${productVariants.stockQuantity} - ${it.quantity}`,
-      })
-      .where(
-        sql`${productVariants.id} = ${it.variantId} AND ${productVariants.stockQuantity} >= ${it.quantity}`
-      );
-  }
-
-  // Best-effort confirmation email — never blocks the webhook.
-  try {
-    await sendOrderConfirmationEmail(order.id);
-  } catch (error) {
-    console.error('paystack webhook: email send failed', error);
-  }
-
   return NextResponse.json({ received: true });
 }
