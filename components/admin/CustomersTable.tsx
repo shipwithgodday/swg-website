@@ -16,6 +16,7 @@ export interface CustomerRow {
   name: string | null;
   email: string | null;
   phone: string | null;
+  source: string;
   createdAt: Date;
   orderCount: number;
   lifetimeSpend: number;
@@ -81,7 +82,14 @@ export function CustomersTable({
           if (!bn) return -1;
           return an.localeCompare(bn);
         },
-        cell: ({ row }) => row.original.name ?? '—',
+        cell: ({ row }) =>
+          row.original.source === 'deleted' ? (
+            <span className="inline-flex items-center rounded-full bg-zinc-100 px-2 py-0.5 text-xs font-medium text-zinc-500 ring-1 ring-inset ring-zinc-200">
+              Deleted customer
+            </span>
+          ) : (
+            (row.original.name ?? '—')
+          ),
       },
       {
         accessorKey: 'email',

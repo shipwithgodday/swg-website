@@ -78,17 +78,22 @@ export function CustomerDetailDialog({
   function doDelete() {
     if (!customer) return;
     const label = customer.name ?? customer.shippingMark;
-    if (
-      !confirm(
-        `Delete ${label}? This cannot be undone. If they had the most recent shipping mark, it will be freed up for the next new customer.`
-      )
-    ) {
-      return;
-    }
+    const orderCount = detail?.orders.length ?? 0;
+    const prompt =
+      orderCount > 0
+        ? `Delete ${label}? Their personal details (name, email, phone) will be cleared, but their ${orderCount} ${
+            orderCount === 1 ? 'order stays' : 'orders stay'
+          } on the books for revenue records. This cannot be undone.`
+        : `Delete ${label}? This cannot be undone. If they had the most recent shipping mark, it will be freed up for the next new customer.`;
+    if (!confirm(prompt)) return;
     startDelete(async () => {
       const res = await deleteCustomer(customer.id);
       if (res.ok) {
-        toast.success(`${label} deleted`);
+        toast.success(
+          res.mode === 'anonymized'
+            ? `${label} anonymized — orders kept on record`
+            : `${label} deleted`
+        );
         onClose();
         router.refresh();
       } else {
@@ -201,29 +206,18 @@ export function CustomerDetailDialog({
               <h3 className="text-sm font-semibold text-destructive">
                 Delete customer
               </h3>
-              {detail && detail.orders.length > 0 ? (
-                <p className="mt-1 text-sm text-muted-foreground">
-                  This customer has {detail.orders.length}{' '}
-                  {detail.orders.length === 1 ? 'order' : 'orders'} and
-                  can&apos;t be deleted. Cancel or reassign their
-                  orders first.
-                </p>
-              ) : (
-                <>
-                  <p className="mt-1 text-sm text-muted-foreground">
-                    Permanently removes this record. If this is the
-                    most recent shipping mark, it&apos;ll be freed up
-                    for the next new customer.
-                  </p>
-                  <Button
-                    variant="destructive"
-                    className="mt-3"
-                    disabled={deleting || loading}
-                    onClick={doDelete}>
-                    {deleting ? 'Deleting…' : 'Delete customer'}
-                  </Button>
-                </>
-              )}
+              <p className="mt-1 text-sm text-muted-foreground">
+                {detail && detail.orders.length > 0
+                  ? `Clears their personal details (name, email, phone) but keeps their ${detail.orders.length} ${detail.orders.length === 1 ? 'order' : 'orders'} on the books for revenue records. The shipping mark stays on the anonymized row.`
+                  : "Permanently removes this record. If this is the most recent shipping mark, it'll be freed up for the next new customer."}
+              </p>
+              <Button
+                variant="destructive"
+                className="mt-3"
+                disabled={deleting || loading}
+                onClick={doDelete}>
+                {deleting ? 'Deleting…' : 'Delete customer'}
+              </Button>
             </section>
           </div>
         )}

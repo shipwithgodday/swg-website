@@ -18,6 +18,7 @@ export async function listCustomers() {
       name: customers.name,
       email: customers.email,
       phone: customers.phone,
+      source: customers.source,
       createdAt: customers.createdAt,
       orderCount: count(orders.id),
       // Pending/cancelled orders don't count as real revenue.

@@ -199,16 +199,34 @@ export async function mergeCustomers(
   return { ok: true };
 }
 
+export type DeleteCustomerResult =
+  | { ok: true; mode: 'deleted' }
+  | { ok: true; mode: 'anonymized'; orderCount: number }
+  | { ok: false; error: string };
+
 /**
- * Deletes a customer that has no orders. If the deleted customer held
- * the highest `shippingMarkNo`, rewinds the `shipping_mark_seq` so the
- * next new customer reuses that mark (no permanent gap at the top).
+ * Removes a customer. The behaviour depends on whether they have orders:
  *
- * Customers with orders are protected — those orders carry historical
- * value and a hanging FK would break the orders view. The admin should
- * cancel/handle the orders first, or merge into another customer.
+ * - **No orders:** the row is hard-deleted and, if it held the
+ *   highest `shippingMarkNo`, the `shipping_mark_seq` is rewound so
+ *   the next new customer reuses that mark (no permanent gap at the
+ *   top).
+ *
+ * - **Has orders:** the row is *anonymized* — name, email, phone and
+ *   clerkUserId are cleared and `source` is set to `'deleted'`. The
+ *   shipping mark and the orders stay attached for revenue history,
+ *   but no PII is left. This is the standard right answer when a
+ *   customer asks to be forgotten without taking down financial
+ *   records, and it's also what 'delete' should do for any customer
+ *   you simply don't want to see in the active list any more.
+ *
+ * Either way the email-by-email and phone-by-phone match logic stops
+ * resolving to this row (the columns are null), so a returning user
+ * with the same email/phone will get a fresh record + shipping mark.
  */
-export async function deleteCustomer(id: string): Promise<ActionResult> {
+export async function deleteCustomer(
+  id: string
+): Promise<DeleteCustomerResult> {
   await requireAdmin();
 
   const [c] = await db
@@ -225,14 +243,22 @@ export async function deleteCustomer(id: string): Promise<ActionResult> {
     .from(orders)
     .where(eq(orders.customerId, id));
   const orderCount = Number(oc?.n ?? 0);
+
   if (orderCount > 0) {
-    return {
-      ok: false,
-      error:
-        orderCount === 1
-          ? 'This customer has 1 order. Delete or reassign it first.'
-          : `This customer has ${orderCount} orders. Delete or reassign them first.`,
-    };
+    // Anonymize — keep the row + shipping mark + orders, strip PII.
+    await db
+      .update(customers)
+      .set({
+        name: null,
+        email: null,
+        phone: null,
+        clerkUserId: null,
+        source: 'deleted',
+        updatedAt: new Date(),
+      })
+      .where(eq(customers.id, id));
+    revalidatePath('/admin/customers');
+    return { ok: true, mode: 'anonymized', orderCount };
   }
 
   await db.delete(customers).where(eq(customers.id, id));
@@ -254,5 +280,5 @@ export async function deleteCustomer(id: string): Promise<ActionResult> {
   }
 
   revalidatePath('/admin/customers');
-  return { ok: true };
+  return { ok: true, mode: 'deleted' };
 }
