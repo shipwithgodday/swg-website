@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import Image from 'next/image';
-import { Sparkles } from 'lucide-react';
+// import { Sparkles } from 'lucide-react';
 import { formatCedis } from '@/lib/shop/money';
 import { displayPrice, inStock } from '@/lib/shop/queries';
 
@@ -13,7 +13,11 @@ export interface ProductCardData {
   featured?: boolean;
 }
 
-export function ProductCard({ product }: { product: ProductCardData }) {
+export function ProductCard({
+  product,
+}: {
+  product: ProductCardData;
+}) {
   const available = inStock(product.variants);
   return (
     <Link
@@ -35,7 +39,7 @@ export function ProductCard({ product }: { product: ProductCardData }) {
         )}
         {product.featured && (
           <span className="absolute top-3 left-3 inline-flex items-center gap-1 rounded-full bg-primary px-2.5 py-1 text-[11px] font-semibold text-black shadow-sm">
-            <Sparkles className="size-3" />
+            {/* <Sparkles className="size-3" /> */}
             Featured
           </span>
         )}
