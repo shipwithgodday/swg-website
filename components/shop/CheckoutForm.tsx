@@ -1,7 +1,7 @@
 'use client';
 import { useState, useTransition } from 'react';
 import { toast } from 'sonner';
-import { SignInButton } from '@clerk/nextjs';
+import { SignInButton, SignUpButton } from '@clerk/nextjs';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -87,20 +87,38 @@ export function CheckoutForm({ zones, signedIn }: CheckoutFormProps) {
       className="grid gap-8 lg:grid-cols-[1fr_360px] lg:gap-12">
       <div className="space-y-8">
         {!signedIn && (
-          <p className="rounded-xl border border-border bg-muted/30 px-4 py-3 text-sm text-muted-foreground">
-            Checking out as a guest — no account needed. Already have one?{' '}
-            <SignInButton
-              mode="modal"
-              forceRedirectUrl="/shop/checkout"
-              signUpForceRedirectUrl="/shop/checkout">
-              <button
-                type="button"
-                className="font-medium text-primary underline-offset-4 hover:underline">
-                Sign in
-              </button>
-            </SignInButton>{' '}
-            to attach this order to your profile.
-          </p>
+          <div className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-border bg-muted/40 px-5 py-4">
+            <div className="min-w-0 max-w-sm">
+              <p className="text-sm font-semibold text-foreground">
+                Create an account to track your orders
+              </p>
+              <p className="mt-0.5 text-xs text-muted-foreground">
+                See your purchase history, get your shipping mark, and
+                skip filling in your details next time.
+              </p>
+            </div>
+            <div className="flex shrink-0 gap-2">
+              <SignInButton
+                mode="modal"
+                forceRedirectUrl="/shop/checkout"
+                signUpForceRedirectUrl="/shop/checkout">
+                <button
+                  type="button"
+                  className="rounded-full border border-border bg-white px-4 py-1.5 text-sm font-medium text-foreground transition-colors hover:bg-accent">
+                  Sign in
+                </button>
+              </SignInButton>
+              <SignUpButton
+                mode="modal"
+                forceRedirectUrl="/shop/checkout">
+                <button
+                  type="button"
+                  className="rounded-full bg-primary px-4 py-1.5 text-sm font-medium text-black transition-transform hover:scale-105">
+                  Create account
+                </button>
+              </SignUpButton>
+            </div>
+          </div>
         )}
 
         <section className="space-y-4 rounded-2xl border border-border bg-white p-5 shadow-sm sm:p-6">

@@ -8,6 +8,64 @@ export function normalizePhone(raw: string | null | undefined): string {
   return digits.length > 9 ? digits.slice(-9) : digits;
 }
 
+export interface ViewerClerkUser {
+  emailAddresses: { emailAddress: string }[];
+  phoneNumbers?: { phoneNumber: string }[];
+}
+
+/**
+ * Returns the customer row that belongs to a Clerk user, claiming an
+ * unlinked guest/imported row by email or phone if one matches. Unlike
+ * `resolveCustomerId`, this never creates a new customer — it's safe to call
+ * on every page-view of /shop/orders or /account.
+ *
+ * The claim step is what lets a guest who later signs up with the same
+ * email inherit their existing orders and shipping mark.
+ */
+export async function claimCustomerByClerkId(
+  clerkUserId: string,
+  user: ViewerClerkUser
+) {
+  // 1. Already linked.
+  const [linked] = await db
+    .select()
+    .from(customers)
+    .where(eq(customers.clerkUserId, clerkUserId))
+    .limit(1);
+  if (linked) return linked;
+
+  // 2. Try to claim an unlinked row by email or phone.
+  const emails = user.emailAddresses
+    .map((e) => e.emailAddress.trim().toLowerCase())
+    .filter(Boolean);
+  const phones = (user.phoneNumbers ?? [])
+    .map((p) => normalizePhone(p.phoneNumber))
+    .filter(Boolean);
+
+  const candidates = await db
+    .select()
+    .from(customers)
+    .where(sql`${customers.clerkUserId} is null`);
+
+  let match = emails.length
+    ? candidates.find(
+        (c) => c.email && emails.includes(c.email.toLowerCase())
+      )
+    : undefined;
+  if (!match && phones.length) {
+    match = candidates.find((c) =>
+      phones.includes(normalizePhone(c.phone))
+    );
+  }
+  if (!match) return null;
+
+  await db
+    .update(customers)
+    .set({ clerkUserId, updatedAt: new Date() })
+    .where(eq(customers.id, match.id));
+  return { ...match, clerkUserId };
+}
+
 export interface ResolveGuestInput {
   email: string;
   phone: string | null;

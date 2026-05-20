@@ -18,10 +18,8 @@ import { MotionReveal } from '@/components/shop/MotionReveal';
 import { OrderStatusBadge } from '@/components/shop/OrderStatusBadge';
 import { SignInCard } from '@/components/shop/SignInCard';
 import { formatCedis } from '@/lib/shop/money';
-import {
-  getCustomerByClerkId,
-  getOrdersForCustomer,
-} from '@/lib/shop/orders';
+import { claimCustomerByClerkId } from '@/lib/shop/customer';
+import { getOrdersForCustomer } from '@/lib/shop/orders';
 
 export const metadata: Metadata = {
   title: 'Your Account',
@@ -80,10 +78,12 @@ export default async function AccountPage() {
     );
   }
 
-  const [customer, user] = await Promise.all([
-    getCustomerByClerkId(userId),
-    currentUser(),
-  ]);
+  const user = await currentUser();
+  // claimCustomerByClerkId links a previous guest customer row to this
+  // Clerk account by email or phone, so guest history follows them in.
+  const customer = user
+    ? await claimCustomerByClerkId(userId, user)
+    : null;
 
   const orders = customer
     ? (await getOrdersForCustomer(customer.id)).slice(0, RECENT_LIMIT)

@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { auth } from '@clerk/nextjs/server';
+import { auth, currentUser } from '@clerk/nextjs/server';
 import { format } from 'date-fns';
 import { ArrowRight, Package } from 'lucide-react';
 import Container from '@/components/shared/container';
@@ -9,16 +9,18 @@ import { formatCedis } from '@/lib/shop/money';
 import { OrderStatusBadge } from '@/components/shop/OrderStatusBadge';
 import { SignInCard } from '@/components/shop/SignInCard';
 import { MotionReveal } from '@/components/shop/MotionReveal';
-import {
-  getCustomerByClerkId,
-  getOrdersForCustomer,
-} from '@/lib/shop/orders';
+import { claimCustomerByClerkId } from '@/lib/shop/customer';
+import { getOrdersForCustomer } from '@/lib/shop/orders';
 
 export const metadata: Metadata = { title: 'My Orders' };
 
 export default async function OrdersPage() {
   const { userId } = await auth();
-  const customer = userId ? await getCustomerByClerkId(userId) : null;
+  const user = userId ? await currentUser() : null;
+  // claimCustomerByClerkId also links an existing guest customer row by
+  // email/phone so prior guest orders show up after they sign up.
+  const customer =
+    userId && user ? await claimCustomerByClerkId(userId, user) : null;
   const orders = customer
     ? await getOrdersForCustomer(customer.id)
     : [];
