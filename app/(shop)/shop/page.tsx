@@ -25,7 +25,7 @@ function toCard(
     images: { url: string }[];
     variants: { price: number; stockQuantity: number }[];
   },
-  featured = false
+  featured = false,
 ) {
   return {
     slug: p.slug,
@@ -48,7 +48,7 @@ export default async function ShopPage() {
       <PageHero
         title="Shop with Godday"
         highlightedWord="Godday"
-        subtitle="Curated essentials sourced and shipped from China to Ghana — browse, pick your variant, and pay in cedis."
+        subtitle="Curated essentials sourced and shipped from China to Ghana. Browse, pick your variant, and pay in cedis."
       />
 
       <Container className="py-12 md:py-16">
@@ -87,7 +87,9 @@ export default async function ShopPage() {
             </Link>
           </div>
           <div className="mt-6">
-            <ProductGrid products={all.slice(0, 8).map((p) => toCard(p))} />
+            <ProductGrid
+              products={all.slice(0, 8).map((p) => toCard(p))}
+            />
           </div>
         </section>
       </Container>
