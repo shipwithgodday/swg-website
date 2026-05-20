@@ -1,9 +1,13 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { format } from 'date-fns';
+
 import { getAdminOrder } from '@/lib/shop/admin-orders';
-import { OrderStatusBadge } from '@/components/shop/OrderStatusBadge';
+import { formatOrderStatus } from '@/lib/shop/status-format';
+import { AdminPageHeader } from '@/components/admin/AdminPageHeader';
+import { StatusBadge } from '@/components/admin/StatusBadge';
 import { OrderSummary } from '@/components/shop/OrderSummary';
+import { OrderStatusTimeline } from '@/components/shop/OrderStatusTimeline';
 import { OrderStatusUpdater } from '@/components/admin/OrderStatusUpdater';
 
 export default async function AdminOrderDetailPage({
@@ -17,63 +21,79 @@ export default async function AdminOrderDetailPage({
   const { order, customer, items } = data;
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-semibold">
-          Order {order.orderNumber}
-        </h1>
-        <OrderStatusBadge status={order.status} />
-      </div>
-      <p className="text-sm text-muted-foreground">
-        Placed {format(new Date(order.createdAt), 'd MMM yyyy, HH:mm')}
-        {order.paystackReference &&
-          ` · Paystack ref ${order.paystackReference}`}
-      </p>
+    <div className="space-y-8">
+      <AdminPageHeader
+        title={`Order ${order.orderNumber}`}
+        description={[
+          `Placed ${format(new Date(order.createdAt), 'd MMM yyyy, HH:mm')}`,
+          order.paystackReference
+            ? `Paystack ${order.paystackReference}`
+            : null,
+        ]
+          .filter(Boolean)
+          .join(' · ')}>
+        <StatusBadge status={order.status} kind="order" />
+      </AdminPageHeader>
 
-      <div className="grid gap-6 md:grid-cols-2">
-        <div className="space-y-4">
-          <OrderSummary order={order} items={items} />
+      <section className="rounded-2xl border border-zinc-200/70 bg-white p-5 shadow-sm sm:p-6">
+        <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
-            <h2 className="mb-2 text-sm font-medium">Update status</h2>
-            <OrderStatusUpdater
-              orderId={order.id}
-              status={order.status}
-            />
-          </div>
-        </div>
-        <div className="space-y-4 text-sm">
-          <div className="rounded-lg border border-border p-4">
-            <p className="font-medium">Customer</p>
-            {customer ? (
-              <p className="text-muted-foreground">
-                <Link
-                  href={`/admin/customers/${customer.id}`}
-                  className="text-primary hover:underline">
-                  {customer.name ?? customer.shippingMark}
-                </Link>
-                <br />
-                Mark: {customer.shippingMark}
-                <br />
-                {customer.email ?? '—'}
-                <br />
-                {customer.phone ?? '—'}
-              </p>
-            ) : (
-              <p className="text-muted-foreground">Unknown</p>
-            )}
-          </div>
-          <div className="rounded-lg border border-border p-4">
-            <p className="font-medium">Delivery</p>
-            <p className="text-muted-foreground">
-              {order.shipName}
-              <br />
-              {order.shipAddress}, {order.shipCity}
-              <br />
-              {order.shipRegion}
-              <br />
-              {order.shipPhone}
+            <p className="text-xs font-semibold tracking-wide text-zinc-500 uppercase">
+              Current status
+            </p>
+            <p className="mt-1 text-lg font-semibold text-zinc-900">
+              {formatOrderStatus(order.status)}
             </p>
           </div>
+          <OrderStatusUpdater orderId={order.id} status={order.status} />
+        </div>
+        <div className="mt-6 border-t border-zinc-100 pt-6">
+          <OrderStatusTimeline status={order.status} />
+        </div>
+      </section>
+
+      <div className="grid gap-6 md:grid-cols-[1fr_360px]">
+        <OrderSummary order={order} items={items} />
+
+        <div className="space-y-6">
+          <section className="rounded-2xl border border-zinc-200/70 bg-white p-5 shadow-sm">
+            <p className="text-xs font-semibold tracking-wide text-zinc-500 uppercase">
+              Customer
+            </p>
+            {customer ? (
+              <div className="mt-3 space-y-1 text-sm">
+                <Link
+                  href={`/admin/customers/${customer.id}`}
+                  className="font-semibold text-zinc-900 underline-offset-4 hover:underline">
+                  {customer.name ?? customer.shippingMark}
+                </Link>
+                <p className="text-zinc-500">
+                  Mark{' '}
+                  <span className="font-medium text-zinc-700 tabular-nums">
+                    {customer.shippingMark}
+                  </span>
+                </p>
+                <p className="text-zinc-500">{customer.email ?? '—'}</p>
+                <p className="text-zinc-500">{customer.phone ?? '—'}</p>
+              </div>
+            ) : (
+              <p className="mt-3 text-sm text-zinc-400">Unknown</p>
+            )}
+          </section>
+
+          <section className="rounded-2xl border border-zinc-200/70 bg-white p-5 shadow-sm">
+            <p className="text-xs font-semibold tracking-wide text-zinc-500 uppercase">
+              Delivery
+            </p>
+            <div className="mt-3 space-y-0.5 text-sm">
+              <p className="font-medium text-zinc-900">{order.shipName}</p>
+              <p className="text-zinc-500">{order.shipAddress}</p>
+              <p className="text-zinc-500">
+                {order.shipCity}, {order.shipRegion}
+              </p>
+              <p className="text-zinc-500">{order.shipPhone}</p>
+            </div>
+          </section>
         </div>
       </div>
     </div>
