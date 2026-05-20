@@ -8,6 +8,7 @@ import {
   SignInButton,
   UserButton,
 } from '@clerk/nextjs';
+import { Package, User } from 'lucide-react';
 import MobileNavItem from './MobileNavItem';
 import { Button } from '@/components/ui/button';
 import { Icon } from '@/components/ui/icon';
@@ -57,8 +58,20 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
           <SignedIn>
             <UserButton
               afterSignOutUrl="/"
-              appearance={{ elements: { avatarBox: 'size-8' } }}
-            />
+              appearance={{ elements: { avatarBox: 'size-8' } }}>
+              <UserButton.MenuItems>
+                <UserButton.Link
+                  label="My account"
+                  labelIcon={<User className="size-4" />}
+                  href="/account"
+                />
+                <UserButton.Link
+                  label="My orders"
+                  labelIcon={<Package className="size-4" />}
+                  href="/shop/orders"
+                />
+              </UserButton.MenuItems>
+            </UserButton>
           </SignedIn>
         </div>
       </div>

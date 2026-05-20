@@ -8,6 +8,7 @@ import {
   SignInButton,
   UserButton,
 } from '@clerk/nextjs';
+import { Package, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Icon } from '@/components/ui/icon';
 import { CartLink } from './CartLink';
@@ -36,8 +37,27 @@ const Buttons = ({
       <SignedIn>
         <UserButton
           afterSignOutUrl="/"
-          appearance={{ elements: { avatarBox: 'size-9' } }}
-        />
+          appearance={{
+            elements: {
+              avatarBox: 'size-9',
+              footer: {
+                display: 'none',
+              },
+            },
+          }}>
+          <UserButton.MenuItems>
+            <UserButton.Link
+              label="My account"
+              labelIcon={<User className="size-4" />}
+              href="/account"
+            />
+            <UserButton.Link
+              label="My orders"
+              labelIcon={<Package className="size-4" />}
+              href="/shop/orders"
+            />
+          </UserButton.MenuItems>
+        </UserButton>
       </SignedIn>
     </div>
 
