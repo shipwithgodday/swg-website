@@ -2,10 +2,12 @@
 
 import { useMemo, useState } from 'react';
 import { type ColumnDef } from '@tanstack/react-table';
+import { format } from 'date-fns';
 import { ArrowUpDown, Pencil } from 'lucide-react';
 import { Button } from '@/components/admin/ui/button';
 import { DataTable } from '@/components/admin/ui/data-table';
 import { CustomerDetailDialog } from '@/components/admin/CustomerDetailDialog';
+import { formatCedis } from '@/lib/shop/money';
 
 export interface CustomerRow {
   id: string;
@@ -14,7 +16,10 @@ export interface CustomerRow {
   name: string | null;
   email: string | null;
   phone: string | null;
+  createdAt: Date;
   orderCount: number;
+  lifetimeSpend: number;
+  lastOrderAt: Date | null;
 }
 
 function SortHeader({
@@ -63,7 +68,19 @@ export function CustomersTable({
       },
       {
         accessorKey: 'name',
-        header: 'Name',
+        header: ({ column }) => (
+          <SortHeader label="Name" column={column} />
+        ),
+        // Treat empty names as a separate bucket at the end instead of
+        // sorting them alphabetically among real values.
+        sortingFn: (a, b) => {
+          const an = a.original.name?.trim() ?? '';
+          const bn = b.original.name?.trim() ?? '';
+          if (!an && !bn) return 0;
+          if (!an) return 1;
+          if (!bn) return -1;
+          return an.localeCompare(bn);
+        },
         cell: ({ row }) => row.original.name ?? '—',
       },
       {
@@ -85,10 +102,68 @@ export function CustomersTable({
         ),
       },
       {
+        accessorKey: 'createdAt',
+        header: ({ column }) => (
+          <SortHeader label="Joined" column={column} />
+        ),
+        sortingFn: (a, b) =>
+          a.original.createdAt.getTime() - b.original.createdAt.getTime(),
+        enableGlobalFilter: false,
+        cell: ({ row }) => (
+          <span className="text-muted-foreground tabular-nums">
+            {format(row.original.createdAt, 'd MMM yyyy')}
+          </span>
+        ),
+      },
+      {
         accessorKey: 'orderCount',
         header: ({ column }) => (
           <SortHeader label="Orders" column={column} />
         ),
+        enableGlobalFilter: false,
+        cell: ({ row }) => (
+          <span className="tabular-nums">{row.original.orderCount}</span>
+        ),
+      },
+      {
+        accessorKey: 'lifetimeSpend',
+        header: ({ column }) => (
+          <SortHeader label="Spend" column={column} />
+        ),
+        enableGlobalFilter: false,
+        cell: ({ row }) => (
+          <span
+            className={
+              row.original.lifetimeSpend > 0
+                ? 'font-medium text-zinc-900 tabular-nums'
+                : 'text-muted-foreground tabular-nums'
+            }>
+            {formatCedis(row.original.lifetimeSpend)}
+          </span>
+        ),
+      },
+      {
+        accessorKey: 'lastOrderAt',
+        header: ({ column }) => (
+          <SortHeader label="Last order" column={column} />
+        ),
+        // Customers with no orders sort to the bottom on ascending and
+        // top on descending (TanStack does this via undefined/null
+        // handling when we feed numbers).
+        sortingFn: (a, b) => {
+          const at = a.original.lastOrderAt?.getTime() ?? -Infinity;
+          const bt = b.original.lastOrderAt?.getTime() ?? -Infinity;
+          return at - bt;
+        },
+        enableGlobalFilter: false,
+        cell: ({ row }) =>
+          row.original.lastOrderAt ? (
+            <span className="text-muted-foreground tabular-nums">
+              {format(row.original.lastOrderAt, 'd MMM yyyy')}
+            </span>
+          ) : (
+            <span className="text-muted-foreground">—</span>
+          ),
       },
       {
         id: 'actions',

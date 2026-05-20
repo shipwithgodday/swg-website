@@ -1,11 +1,13 @@
 import { cache } from 'react';
-import { asc, desc, eq, count } from 'drizzle-orm';
+import { asc, desc, eq, count, sql } from 'drizzle-orm';
 import { db } from '@/lib/db';
 import { customers, orders } from '@/lib/db/schema';
 
 /**
- * Customers for the admin list, with order counts, ordered by shipping
- * mark (smallest/oldest first).
+ * Customers for the admin list with the aggregates the table needs to
+ * sort on: order count, lifetime spend (paid+ only), and the most recent
+ * order timestamp. Ordered by shipping mark (smallest/oldest first) so
+ * the page has a sensible default before the client applies a sort.
  */
 export async function listCustomers() {
   const rows = await db
@@ -16,13 +18,23 @@ export async function listCustomers() {
       name: customers.name,
       email: customers.email,
       phone: customers.phone,
+      createdAt: customers.createdAt,
       orderCount: count(orders.id),
+      // Pending/cancelled orders don't count as real revenue.
+      lifetimeSpend: sql<number>`coalesce(sum(case when ${orders.status} in ('paid','processing','shipped','delivered') then ${orders.total} else 0 end), 0)`,
+      lastOrderAt: sql<Date | null>`max(${orders.createdAt})`,
     })
     .from(customers)
     .leftJoin(orders, eq(orders.customerId, customers.id))
     .groupBy(customers.id)
     .orderBy(asc(customers.shippingMarkNo));
-  return rows;
+  // Postgres returns SUM/MAX as strings over the wire; coerce so the
+  // table can sort numerically.
+  return rows.map((r) => ({
+    ...r,
+    lifetimeSpend: Number(r.lifetimeSpend ?? 0),
+    lastOrderAt: r.lastOrderAt ? new Date(r.lastOrderAt) : null,
+  }));
 }
 
 /** A customer with their orders, by id. */
