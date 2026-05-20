@@ -65,6 +65,23 @@ export async function getCustomerDetail(
   };
 }
 
+/**
+ * Peek at the next shipping mark a new customer would receive, without
+ * advancing the sequence. Used by the New Customer dialog to show admins
+ * what they're about to assign. Concurrent admin creates may shift the
+ * actual value by one or two — the server still enforces uniqueness.
+ */
+export async function getNextShippingMark(): Promise<string> {
+  await requireAdmin();
+  const [row] = await db
+    .select({
+      max: sql<number>`coalesce(max(${customers.shippingMarkNo}), 0)`,
+    })
+    .from(customers);
+  const next = Number(row?.max ?? 0) + 1;
+  return `GD${next}`;
+}
+
 /** Creates a customer manually from the admin, allocating a shipping mark. */
 export async function createCustomer(
   raw: unknown

@@ -1,5 +1,5 @@
 'use client';
-import { useState, useTransition } from 'react';
+import { useEffect, useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import {
@@ -12,7 +12,10 @@ import {
 import { Button } from '@/components/admin/ui/button';
 import { Input } from '@/components/admin/ui/input';
 import { Label } from '@/components/ui/label';
-import { createCustomer } from '@/app/actions/shop/admin-customers';
+import {
+  createCustomer,
+  getNextShippingMark,
+} from '@/app/actions/shop/admin-customers';
 
 /** Creates a customer manually and navigates to their detail page. */
 export function NewCustomerDialog() {
@@ -22,7 +25,25 @@ export function NewCustomerDialog() {
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [mark, setMark] = useState('');
+  const [nextMark, setNextMark] = useState<string | null>(null);
   const [pending, start] = useTransition();
+
+  // Peek at what mark the server would assign so the admin sees it before
+  // submitting. Refreshed every time the dialog opens.
+  useEffect(() => {
+    if (!open) return;
+    let alive = true;
+    getNextShippingMark()
+      .then((v) => {
+        if (alive) setNextMark(v);
+      })
+      .catch(() => {
+        if (alive) setNextMark(null);
+      });
+    return () => {
+      alive = false;
+    };
+  }, [open]);
 
   function reset() {
     setName('');
@@ -81,11 +102,21 @@ export function NewCustomerDialog() {
               id="nc-mark"
               value={mark}
               onChange={(e) => setMark(e.target.value)}
-              placeholder="Auto-assigned (e.g. GD212)"
+              placeholder={nextMark ?? 'Auto-assigned'}
               autoComplete="off"
             />
             <p className="text-xs text-zinc-500">
-              Leave blank to auto-assign the next GD number.
+              {nextMark ? (
+                <>
+                  Will be assigned{' '}
+                  <span className="font-medium text-zinc-900 tabular-nums">
+                    {nextMark}
+                  </span>{' '}
+                  — type a different mark to override.
+                </>
+              ) : (
+                'Leave blank to auto-assign the next GD number.'
+              )}
             </p>
           </div>
           <div className="space-y-1">
