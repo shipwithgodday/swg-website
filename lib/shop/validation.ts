@@ -57,6 +57,15 @@ export const customerCreateSchema = z.object({
     .optional()
     .nullable(),
   phone: z.string().trim().min(1).optional().nullable(),
+  // Optional: blank string is normalised to undefined and the action auto-
+  // assigns the next GD mark.
+  shippingMark: z
+    .string()
+    .trim()
+    .min(1)
+    .max(32, 'Shipping mark is too long')
+    .optional()
+    .or(z.literal('').transform(() => undefined)),
 });
 
 export type CustomerCreateInput = z.infer<typeof customerCreateSchema>;

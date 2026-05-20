@@ -1,6 +1,6 @@
 'use client';
 import { useState } from 'react';
-import { ShoppingBag } from 'lucide-react';
+import { ShoppingCart } from 'lucide-react';
 import {
   Sheet,
   SheetContent,
@@ -18,7 +18,7 @@ export function CartDrawer() {
   return (
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger className="relative inline-flex items-center">
-        <ShoppingBag className="size-5" />
+        <ShoppingCart className="size-5" />
         {itemCount > 0 && (
           <span className="absolute -right-2 -top-2 flex size-4 items-center justify-center rounded-full bg-primary text-[10px] font-semibold text-black">
             {itemCount}

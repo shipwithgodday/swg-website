@@ -21,12 +21,14 @@ export function NewCustomerDialog() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
+  const [mark, setMark] = useState('');
   const [pending, start] = useTransition();
 
   function reset() {
     setName('');
     setEmail('');
     setPhone('');
+    setMark('');
   }
 
   function submit(e: React.FormEvent) {
@@ -36,6 +38,7 @@ export function NewCustomerDialog() {
         name,
         email: email || null,
         phone: phone || null,
+        shippingMark: mark.trim() || undefined,
       });
       if (res.ok && res.id) {
         toast.success('Customer created');
@@ -67,18 +70,29 @@ export function NewCustomerDialog() {
             <Label htmlFor="nc-name">Name</Label>
             <Input
               id="nc-name"
-              className="text-foreground"
               value={name}
               onChange={(e) => setName(e.target.value)}
               autoFocus
             />
           </div>
           <div className="space-y-1">
+            <Label htmlFor="nc-mark">Shipping mark</Label>
+            <Input
+              id="nc-mark"
+              value={mark}
+              onChange={(e) => setMark(e.target.value)}
+              placeholder="Auto-assigned (e.g. GD212)"
+              autoComplete="off"
+            />
+            <p className="text-xs text-zinc-500">
+              Leave blank to auto-assign the next GD number.
+            </p>
+          </div>
+          <div className="space-y-1">
             <Label htmlFor="nc-email">Email</Label>
             <Input
               id="nc-email"
               type="email"
-              className="text-foreground"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
             />
@@ -87,15 +101,14 @@ export function NewCustomerDialog() {
             <Label htmlFor="nc-phone">Phone</Label>
             <Input
               id="nc-phone"
-              className="text-foreground"
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
             />
           </div>
-          <p className="text-xs text-muted-foreground">
-            A shipping mark is assigned automatically.
-          </p>
-          <Button type="submit" variant="gold" disabled={pending || !name.trim()}>
+          <Button
+            type="submit"
+            variant="gold"
+            disabled={pending || !name.trim()}>
             {pending ? 'Creating…' : 'Create customer'}
           </Button>
         </form>

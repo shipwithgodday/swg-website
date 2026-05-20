@@ -74,27 +74,42 @@ export async function createCustomer(
   if (!parsed.success) {
     return { ok: false, error: parsed.error.issues[0].message };
   }
-  const { name, email, phone } = parsed.data;
+  const { name, email, phone, shippingMark } = parsed.data;
 
+  // Always advance the sequence so `shippingMarkNo` (used for sorting) stays
+  // monotonic, even when the visible mark is a custom string.
   const seq = await db.execute(
     sql`SELECT nextval('shipping_mark_seq') AS n`
   );
   const markNo = Number((seq.rows[0] as { n: string | number }).n);
 
-  const [created] = await db
-    .insert(customers)
-    .values({
-      shippingMark: `GD${markNo}`,
-      shippingMarkNo: markNo,
-      name,
-      email: email ?? null,
-      phone: phone ?? null,
-      source: 'admin',
-    })
-    .returning({ id: customers.id });
+  try {
+    const [created] = await db
+      .insert(customers)
+      .values({
+        shippingMark: shippingMark ?? `GD${markNo}`,
+        shippingMarkNo: markNo,
+        name,
+        email: email ?? null,
+        phone: phone ?? null,
+        source: 'admin',
+      })
+      .returning({ id: customers.id });
 
-  revalidatePath('/admin/customers');
-  return { ok: true, id: created.id };
+    revalidatePath('/admin/customers');
+    return { ok: true, id: created.id };
+  } catch (err) {
+    // 23505 = unique violation; shipping_mark is unique.
+    if (
+      err &&
+      typeof err === 'object' &&
+      'code' in err &&
+      (err as { code?: string }).code === '23505'
+    ) {
+      return { ok: false, error: 'That shipping mark is already in use' };
+    }
+    throw err;
+  }
 }
 
 export async function updateCustomer(
