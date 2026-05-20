@@ -16,6 +16,7 @@ import { CustomerEditForm } from '@/components/admin/CustomerEditForm';
 import { OrderStatusBadge } from '@/components/shop/OrderStatusBadge';
 import { formatCedis } from '@/lib/shop/money';
 import {
+  deleteCustomer,
   getCustomerDetail,
   mergeCustomers,
   type CustomerDetail,
@@ -38,6 +39,7 @@ export function CustomerDetailDialog({
   const [loading, setLoading] = useState(false);
   const [mergedId, setMergedId] = useState('');
   const [merging, startMerge] = useTransition();
+  const [deleting, startDelete] = useTransition();
 
   useEffect(() => {
     if (!customer) {
@@ -67,6 +69,28 @@ export function CustomerDetailDialog({
         router.refresh();
         const refreshed = await getCustomerDetail(customer.id);
         setDetail(refreshed);
+      } else {
+        toast.error(res.error);
+      }
+    });
+  }
+
+  function doDelete() {
+    if (!customer) return;
+    const label = customer.name ?? customer.shippingMark;
+    if (
+      !confirm(
+        `Delete ${label}? This cannot be undone. If they had the most recent shipping mark, it will be freed up for the next new customer.`
+      )
+    ) {
+      return;
+    }
+    startDelete(async () => {
+      const res = await deleteCustomer(customer.id);
+      if (res.ok) {
+        toast.success(`${label} deleted`);
+        onClose();
+        router.refresh();
       } else {
         toast.error(res.error);
       }
@@ -171,6 +195,35 @@ export function CustomerDetailDialog({
                   {merging ? 'Merging…' : 'Merge'}
                 </Button>
               </div>
+            </section>
+
+            <section className="rounded-md border border-destructive/30 bg-destructive/5 p-4">
+              <h3 className="text-sm font-semibold text-destructive">
+                Delete customer
+              </h3>
+              {detail && detail.orders.length > 0 ? (
+                <p className="mt-1 text-sm text-muted-foreground">
+                  This customer has {detail.orders.length}{' '}
+                  {detail.orders.length === 1 ? 'order' : 'orders'} and
+                  can&apos;t be deleted. Cancel or reassign their
+                  orders first.
+                </p>
+              ) : (
+                <>
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    Permanently removes this record. If this is the
+                    most recent shipping mark, it&apos;ll be freed up
+                    for the next new customer.
+                  </p>
+                  <Button
+                    variant="destructive"
+                    className="mt-3"
+                    disabled={deleting || loading}
+                    onClick={doDelete}>
+                    {deleting ? 'Deleting…' : 'Delete customer'}
+                  </Button>
+                </>
+              )}
             </section>
           </div>
         )}

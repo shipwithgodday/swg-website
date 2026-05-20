@@ -198,3 +198,61 @@ export async function mergeCustomers(
   revalidatePath(`/admin/customers/${survivorId}`);
   return { ok: true };
 }
+
+/**
+ * Deletes a customer that has no orders. If the deleted customer held
+ * the highest `shippingMarkNo`, rewinds the `shipping_mark_seq` so the
+ * next new customer reuses that mark (no permanent gap at the top).
+ *
+ * Customers with orders are protected — those orders carry historical
+ * value and a hanging FK would break the orders view. The admin should
+ * cancel/handle the orders first, or merge into another customer.
+ */
+export async function deleteCustomer(id: string): Promise<ActionResult> {
+  await requireAdmin();
+
+  const [c] = await db
+    .select({
+      id: customers.id,
+      shippingMarkNo: customers.shippingMarkNo,
+    })
+    .from(customers)
+    .where(eq(customers.id, id));
+  if (!c) return { ok: false, error: 'Customer not found.' };
+
+  const [oc] = await db
+    .select({ n: sql<number>`count(*)` })
+    .from(orders)
+    .where(eq(orders.customerId, id));
+  const orderCount = Number(oc?.n ?? 0);
+  if (orderCount > 0) {
+    return {
+      ok: false,
+      error:
+        orderCount === 1
+          ? 'This customer has 1 order. Delete or reassign it first.'
+          : `This customer has ${orderCount} orders. Delete or reassign them first.`,
+    };
+  }
+
+  await db.delete(customers).where(eq(customers.id, id));
+
+  // Rewind the shipping-mark sequence to the new max so that if we just
+  // deleted the most-recently-allocated mark, the next new customer
+  // picks it up again instead of skipping past it. setval(seq, n, true)
+  // sets last_value=n with is_called=true, so the next nextval()
+  // returns n + 1. Skip entirely if no customers remain (sequences with
+  // MINVALUE=1 reject setval(0)).
+  const [maxRow] = await db
+    .select({ m: sql<number | null>`max(${customers.shippingMarkNo})` })
+    .from(customers);
+  const newMax = Number(maxRow?.m ?? 0);
+  if (newMax > 0) {
+    await db.execute(
+      sql`SELECT setval('shipping_mark_seq', ${newMax}, true)`
+    );
+  }
+
+  revalidatePath('/admin/customers');
+  return { ok: true };
+}
