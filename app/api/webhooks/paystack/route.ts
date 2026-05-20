@@ -1,9 +1,25 @@
 import { NextResponse } from 'next/server';
 import { sql, eq } from 'drizzle-orm';
+import { z } from 'zod';
 import { db } from '@/lib/db';
 import { orders, orderItems, productVariants } from '@/lib/db/schema';
 import { verifyPaystackSignature } from '@/lib/shop/paystack';
 import { sendOrderConfirmationEmail } from '@/lib/shop/order-email';
+
+// Paystack delivers many event shapes; we only act on `charge.success`,
+// which always carries `data.reference` and `data.amount`. We parse with
+// `.passthrough()` so future fields don't break the webhook.
+const paystackEventSchema = z
+  .object({
+    event: z.string(),
+    data: z
+      .object({
+        reference: z.string().min(1),
+        amount: z.number().int().nonnegative(),
+      })
+      .passthrough(),
+  })
+  .passthrough();
 
 export async function POST(request: Request) {
   const secret = process.env.PAYSTACK_SECRET_KEY;
@@ -18,22 +34,20 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'bad signature' }, { status: 401 });
   }
 
-  let event: {
-    event?: string;
-    data?: { reference?: string; amount?: number };
-  };
+  let raw: unknown;
   try {
-    event = JSON.parse(rawBody);
+    raw = JSON.parse(rawBody);
   } catch {
     return NextResponse.json({ error: 'bad json' }, { status: 400 });
   }
 
-  // Acknowledge anything that is not a successful charge.
-  if (event.event !== 'charge.success' || !event.data?.reference) {
+  const parsed = paystackEventSchema.safeParse(raw);
+  // Acknowledge non-charge or unrecognised payloads — Paystack retries on
+  // non-2xx, and we don't want them retrying events we don't care about.
+  if (!parsed.success || parsed.data.event !== 'charge.success') {
     return NextResponse.json({ received: true });
   }
-
-  const reference = event.data.reference;
+  const { reference, amount } = parsed.data.data;
   const [order] = await db
     .select()
     .from(orders)
@@ -45,13 +59,10 @@ export async function POST(request: Request) {
   }
 
   // Verify Paystack charged the amount we expect before trusting it.
-  if (
-    typeof event.data.amount === 'number' &&
-    event.data.amount !== order.total
-  ) {
+  if (amount !== order.total) {
     console.error(
       `paystack webhook: amount mismatch for ${reference} — ` +
-        `charged ${event.data.amount}, expected ${order.total}`
+        `charged ${amount}, expected ${order.total}`
     );
     return NextResponse.json({ received: true });
   }

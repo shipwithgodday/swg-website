@@ -1,15 +1,40 @@
 import { NextResponse } from 'next/server';
+import { z } from 'zod';
 import dbConnect from '@/lib/mongoose';
 import Customer from '@/models/Customer';
 
+const subscribeSchema = z.object({
+  fullName: z.string().trim().min(2, 'Name must be at least 2 characters'),
+  email: z.string().trim().email('Please enter a valid email address'),
+  phoneNumber: z
+    .string()
+    .trim()
+    .min(10, 'Please enter a valid phone number'),
+});
+
 export async function POST(request: Request) {
+  let body: unknown;
+  try {
+    body = await request.json();
+  } catch {
+    return NextResponse.json(
+      { error: 'Invalid request body' },
+      { status: 400 }
+    );
+  }
+
+  const parsed = subscribeSchema.safeParse(body);
+  if (!parsed.success) {
+    return NextResponse.json(
+      { error: parsed.error.issues[0]?.message ?? 'Invalid input' },
+      { status: 400 }
+    );
+  }
+  const { fullName, email, phoneNumber } = parsed.data;
+
   try {
     await dbConnect();
 
-    const body = await request.json();
-    const { fullName, email, phoneNumber } = body;
-
-    // Check if customer already exists
     const existingCustomer = await Customer.findOne({ email });
     if (existingCustomer) {
       return NextResponse.json(
@@ -21,7 +46,6 @@ export async function POST(request: Request) {
       );
     }
 
-    // Create new customer
     const customer = await Customer.create({
       fullName,
       email,

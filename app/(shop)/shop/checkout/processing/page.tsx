@@ -71,7 +71,7 @@ export default async function ProcessingPage({
       />
 
       <Container className="py-12 md:py-16">
-        <div className="grid gap-6 md:grid-cols-[1fr_360px]">
+        <div className="grid items-start gap-6 md:grid-cols-[1fr_360px]">
           <div className="space-y-6">
             <div className="flex items-start gap-3 rounded-2xl border border-emerald-200 bg-emerald-50 p-5">
               <span className="grid size-9 shrink-0 place-items-center rounded-full bg-emerald-100 text-emerald-700 ring-1 ring-emerald-200">
