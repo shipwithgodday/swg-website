@@ -13,14 +13,14 @@ export function ProductGallery({
   const [active, setActive] = useState(0);
   if (images.length === 0) {
     return (
-      <div className="flex aspect-square items-center justify-center rounded-xl bg-muted text-muted-foreground">
+      <div className="flex aspect-square items-center justify-center rounded-2xl bg-muted text-muted-foreground">
         No image
       </div>
     );
   }
   return (
-    <div>
-      <div className="relative aspect-square overflow-hidden rounded-xl bg-muted">
+    <div className="space-y-4">
+      <div className="relative aspect-square overflow-hidden rounded-2xl bg-muted ring-1 ring-border">
         <Image
           src={images[active].url}
           alt={name}
@@ -31,22 +31,25 @@ export function ProductGallery({
         />
       </div>
       {images.length > 1 && (
-        <div className="mt-3 flex gap-2">
+        <div className="flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           {images.map((img, i) => (
             <button
               key={img.id}
               type="button"
               onClick={() => setActive(i)}
+              aria-label={`View image ${i + 1}`}
               className={cn(
-                'relative size-16 overflow-hidden rounded-md border',
-                i === active ? 'border-primary' : 'border-border'
+                'relative size-20 shrink-0 overflow-hidden rounded-xl ring-1 transition-all',
+                i === active
+                  ? 'ring-2 ring-primary'
+                  : 'ring-border opacity-70 hover:opacity-100'
               )}>
               <Image
                 src={img.url}
                 alt=""
                 fill
                 className="object-cover"
-                sizes="64px"
+                sizes="80px"
               />
             </button>
           ))}
