@@ -4,6 +4,7 @@ import { usePathname } from 'next/navigation';
 import {
   FolderTree,
   LayoutDashboard,
+  Mail,
   Package,
   ShoppingCart,
   Truck,
@@ -30,6 +31,10 @@ const NAV = [
       { href: '/admin/orders', label: 'Orders', icon: ShoppingCart },
       { href: '/admin/customers', label: 'Customers', icon: Users },
     ],
+  },
+  {
+    section: 'Marketing',
+    items: [{ href: '/admin/emails', label: 'Emails', icon: Mail }],
   },
   {
     section: 'Settings',

@@ -1,8 +1,9 @@
 import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server';
 import { NextResponse } from 'next/server';
 
-const isProtectedRoute = createRouteMatcher(['/email', '/api/send-bulk']);
-const isAdminRoute = createRouteMatcher(['/admin(.*)']);
+// /api/send-bulk is admin-only — it's gated by the admin matcher below.
+// (The page that calls it, /admin/emails, already requires admin role.)
+const isAdminRoute = createRouteMatcher(['/admin(.*)', '/api/send-bulk']);
 
 // NOTE: /shop/checkout, /shop/orders and /account are intentionally NOT
 // gated here. Each page renders an in-page SignInCard (with Clerk's
@@ -11,13 +12,6 @@ const isAdminRoute = createRouteMatcher(['/admin(.*)']);
 // the standalone /sign-in route mid-checkout.
 
 export default clerkMiddleware(async (auth, request) => {
-  if (isProtectedRoute(request)) {
-    const session = await auth();
-    if (!session.userId) {
-      return NextResponse.redirect(new URL('/sign-in', request.url));
-    }
-  }
-
   if (isAdminRoute(request)) {
     const session = await auth();
     if (!session.userId) {
