@@ -5,6 +5,7 @@ import { db } from '@/lib/db';
 import { orders } from '@/lib/db/schema';
 import { requireAdmin } from '@/lib/shop/auth';
 import { canTransition } from '@/lib/shop/order-status';
+import { sendOrderStatusEmail } from '@/lib/shop/order-email';
 import type { ActionResult } from './categories';
 
 export async function updateOrderStatus(
@@ -29,6 +30,13 @@ export async function updateOrderStatus(
     .update(orders)
     .set({ status: newStatus, updatedAt: new Date() })
     .where(eq(orders.id, orderId));
+
+  // Best-effort customer notification — never blocks the status change.
+  try {
+    await sendOrderStatusEmail(orderId, newStatus);
+  } catch (error) {
+    console.error('updateOrderStatus: email send failed', error);
+  }
 
   revalidatePath('/admin/orders');
   revalidatePath(`/admin/orders/${orderId}`);
