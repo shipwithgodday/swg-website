@@ -84,7 +84,16 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <ClerkProvider>
+    <ClerkProvider
+      appearance={{
+        // Hides the 'Secured by Clerk' badge on every Clerk surface
+        // (sign-in / sign-up modals, UserButton menu, UserProfile,
+        // and the standalone /sign-in route). Inherited globally so
+        // individual components don't need to override.
+        elements: {
+          footer: { display: 'none' },
+        },
+      }}>
       <html lang="en">
         <body>
           <CartProvider>
