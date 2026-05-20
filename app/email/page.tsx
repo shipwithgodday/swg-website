@@ -287,7 +287,7 @@ export default function EmailPage() {
             </div>
             <div className="flex gap-4">
               <Button asChild>
-                <Link href="/signup">Add Customer</Link>
+                <Link href="/subscribe">Add Customer</Link>
               </Button>
             </div>
           </div>

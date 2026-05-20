@@ -36,7 +36,7 @@ export default function SignupPage() {
 
   const onSubmit = async (data: SignupFormValues) => {
     try {
-      const response = await fetch('/api/customers/signup', {
+      const response = await fetch('/api/customers/subscribe', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

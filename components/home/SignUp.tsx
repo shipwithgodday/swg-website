@@ -30,7 +30,7 @@ function SignUp() {
           </p>
 
           <Button className="mt-8">
-            <Link href="/signup" className="flex items-center gap-2">
+            <Link href="/subscribe" className="flex items-center gap-2">
               Subscribe
               <Icon name="ArrowRight" />
             </Link>

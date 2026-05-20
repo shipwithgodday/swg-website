@@ -10,8 +10,8 @@ import {
 } from '@clerk/nextjs';
 import MobileNavItem from './MobileNavItem';
 import { Button } from '@/components/ui/button';
+import { Icon } from '@/components/ui/icon';
 import { navItems } from './navItems';
-import Link from 'next/link';
 
 interface MobileMenuProps {
   menuOpen: boolean;
@@ -43,18 +43,15 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
             setMenuOpen={setMenuOpen}
           />
         ))}
-        <div className="mt-2 flex flex-wrap items-center gap-3">
-          <Button onClick={handleButtonClick}>
-            <Link href={'/schedule'}>Schedule a Call</Link>
-          </Button>
+        <div className="mt-3 flex flex-wrap items-center gap-3">
           <SignedOut>
             <SignInButton mode="modal">
-              <button
-                type="button"
-                className="text-sm font-medium text-black hover:text-black/60"
-                onClick={handleButtonClick}>
-                Sign in
-              </button>
+              <Button onClick={handleButtonClick}>
+                <span className="flex items-center gap-1">
+                  Sign in
+                  <Icon name="ArrowRight" />
+                </span>
+              </Button>
             </SignInButton>
           </SignedOut>
           <SignedIn>

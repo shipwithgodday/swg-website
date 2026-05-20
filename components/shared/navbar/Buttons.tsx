@@ -9,7 +9,6 @@ import {
   UserButton,
 } from '@clerk/nextjs';
 import { Button } from '@/components/ui/button';
-import Link from 'next/link';
 import { Icon } from '@/components/ui/icon';
 import { CartLink } from './CartLink';
 
@@ -23,29 +22,23 @@ const Buttons = ({
   <div className="flex items-center gap-4">
     <CartLink />
 
-    <SignedOut>
-      <SignInButton mode="modal">
-        <button
-          type="button"
-          className="hidden text-sm font-medium text-black transition-colors hover:text-black/60 md:block">
-          Sign in
-        </button>
-      </SignInButton>
-    </SignedOut>
-    <SignedIn>
-      <UserButton
-        afterSignOutUrl="/"
-        appearance={{ elements: { avatarBox: 'size-8' } }}
-      />
-    </SignedIn>
-
     <div className="hidden md:block">
-      <Button className="hover:scale-105 transition-all duration-300">
-        <Link className="flex items-center gap-1" href={'/schedule'}>
-          Schedule a Call
-          <Icon name="ArrowRight" />
-        </Link>
-      </Button>
+      <SignedOut>
+        <SignInButton mode="modal">
+          <Button className="hover:scale-105 transition-all duration-300">
+            <span className="flex items-center gap-1">
+              Sign in
+              <Icon name="ArrowRight" />
+            </span>
+          </Button>
+        </SignInButton>
+      </SignedOut>
+      <SignedIn>
+        <UserButton
+          afterSignOutUrl="/"
+          appearance={{ elements: { avatarBox: 'size-9' } }}
+        />
+      </SignedIn>
     </div>
 
     <button

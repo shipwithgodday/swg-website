@@ -20,5 +20,6 @@ export const navItems: NavItem[] = [
   },
   { text: 'Shop', url: '/shop' },
   { text: 'Contact', url: '/contact' },
+  { text: 'Schedule a Call', url: '/schedule' },
   // { text: 'Email', url: '/email' },
 ];
