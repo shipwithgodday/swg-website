@@ -1,6 +1,7 @@
 'use client';
 import { useState, useTransition } from 'react';
 import { toast } from 'sonner';
+import { SignInButton } from '@clerk/nextjs';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -22,9 +23,16 @@ interface Zone {
   fee: number;
 }
 
-export function CheckoutForm({ zones }: { zones: Zone[] }) {
+interface CheckoutFormProps {
+  zones: Zone[];
+  /** True when a Clerk session is active. Guests still get to check out. */
+  signedIn: boolean;
+}
+
+export function CheckoutForm({ zones, signedIn }: CheckoutFormProps) {
   const { items } = useCart();
   const [zoneId, setZoneId] = useState('');
+  const [email, setEmail] = useState('');
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [address, setAddress] = useState('');
@@ -55,6 +63,7 @@ export function CheckoutForm({ zones }: { zones: Zone[] }) {
         shipPhone: phone,
         shipAddress: address,
         shipCity: city,
+        ...(signedIn ? {} : { shipEmail: email }),
       });
       if (res.ok) {
         window.location.href = res.authorizationUrl;
@@ -77,14 +86,46 @@ export function CheckoutForm({ zones }: { zones: Zone[] }) {
       onSubmit={submit}
       className="grid gap-8 lg:grid-cols-[1fr_360px] lg:gap-12">
       <div className="space-y-8">
+        {!signedIn && (
+          <p className="rounded-xl border border-border bg-muted/30 px-4 py-3 text-sm text-muted-foreground">
+            Checking out as a guest — no account needed. Already have one?{' '}
+            <SignInButton
+              mode="modal"
+              forceRedirectUrl="/shop/checkout"
+              signUpForceRedirectUrl="/shop/checkout">
+              <button
+                type="button"
+                className="font-medium text-primary underline-offset-4 hover:underline">
+                Sign in
+              </button>
+            </SignInButton>{' '}
+            to attach this order to your profile.
+          </p>
+        )}
+
         <section className="space-y-4 rounded-2xl border border-border bg-white p-5 shadow-sm sm:p-6">
           <h2 className="text-sm font-semibold tracking-wide text-muted-foreground uppercase">
             Delivery details
           </h2>
+          {!signedIn && (
+            <div className="space-y-2">
+              <Label htmlFor="email">Email</Label>
+              <Input
+                id="email"
+                type="email"
+                autoComplete="email"
+                placeholder="We'll send the order confirmation here"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+            </div>
+          )}
           <div className="space-y-2">
             <Label htmlFor="name">Full name</Label>
             <Input
               id="name"
+              autoComplete="name"
               value={name}
               onChange={(e) => setName(e.target.value)}
               required
@@ -94,6 +135,7 @@ export function CheckoutForm({ zones }: { zones: Zone[] }) {
             <Label htmlFor="phone">Phone</Label>
             <Input
               id="phone"
+              autoComplete="tel"
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
               required
@@ -103,6 +145,7 @@ export function CheckoutForm({ zones }: { zones: Zone[] }) {
             <Label htmlFor="address">Address</Label>
             <Input
               id="address"
+              autoComplete="street-address"
               value={address}
               onChange={(e) => setAddress(e.target.value)}
               required
@@ -112,6 +155,7 @@ export function CheckoutForm({ zones }: { zones: Zone[] }) {
             <Label htmlFor="city">City / town</Label>
             <Input
               id="city"
+              autoComplete="address-level2"
               value={city}
               onChange={(e) => setCity(e.target.value)}
               required

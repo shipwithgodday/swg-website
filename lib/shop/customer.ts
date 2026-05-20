@@ -8,6 +8,66 @@ export function normalizePhone(raw: string | null | undefined): string {
   return digits.length > 9 ? digits.slice(-9) : digits;
 }
 
+export interface ResolveGuestInput {
+  email: string;
+  phone: string | null;
+  name: string | null;
+}
+
+/**
+ * Resolves (or creates) the customer for a guest checkout — i.e. an order
+ * placed without a Clerk session. Mirrors `resolveCustomerId`'s match logic
+ * by email first, then phone, but skips the Clerk-link step.
+ *
+ * If a future visitor signs in with the same email, `resolveCustomerId`'s
+ * `clerkUserId is null` candidate scan will link them to the customer row
+ * created here, so order history follows them across accounts.
+ */
+export async function resolveGuestCustomer(
+  input: ResolveGuestInput
+): Promise<string> {
+  const normalizedEmail = input.email.trim().toLowerCase();
+
+  // Match by email (case-insensitive). A pre-existing Clerk-linked row with
+  // the same email is fine to reuse — it's the same person.
+  const byEmail = await db
+    .select({ id: customers.id })
+    .from(customers)
+    .where(sql`lower(${customers.email}) = ${normalizedEmail}`)
+    .limit(1);
+  if (byEmail[0]) return byEmail[0].id;
+
+  // Match by phone, normalized to the last 9 digits.
+  if (input.phone) {
+    const target = normalizePhone(input.phone);
+    if (target) {
+      const candidates = await db.select().from(customers);
+      const match = candidates.find(
+        (c) => normalizePhone(c.phone) === target
+      );
+      if (match) return match.id;
+    }
+  }
+
+  // Brand-new guest — allocate the next shipping mark.
+  const seq = await db.execute(
+    sql`SELECT nextval('shipping_mark_seq') AS n`
+  );
+  const markNo = Number((seq.rows[0] as { n: string | number }).n);
+  const [created] = await db
+    .insert(customers)
+    .values({
+      shippingMark: `GD${markNo}`,
+      shippingMarkNo: markNo,
+      email: input.email,
+      phone: input.phone,
+      name: input.name,
+      source: 'guest',
+    })
+    .returning({ id: customers.id });
+  return created.id;
+}
+
 export interface ResolveCustomerInput {
   clerkUserId: string;
   email: string | null;

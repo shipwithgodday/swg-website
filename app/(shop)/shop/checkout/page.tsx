@@ -6,7 +6,6 @@ import { PageHero } from '@/components/shared/PageHero';
 import { db } from '@/lib/db';
 import { deliveryZones } from '@/lib/db/schema';
 import { CheckoutForm } from '@/components/shop/CheckoutForm';
-import { SignInCard } from '@/components/shop/SignInCard';
 import { MotionReveal } from '@/components/shop/MotionReveal';
 
 export const metadata: Metadata = { title: 'Checkout' };
@@ -14,17 +13,15 @@ export const metadata: Metadata = { title: 'Checkout' };
 export default async function CheckoutPage() {
   const { userId } = await auth();
 
-  const zones = userId
-    ? await db
-        .select({
-          id: deliveryZones.id,
-          name: deliveryZones.name,
-          fee: deliveryZones.fee,
-        })
-        .from(deliveryZones)
-        .where(eq(deliveryZones.active, true))
-        .orderBy(asc(deliveryZones.name))
-    : [];
+  const zones = await db
+    .select({
+      id: deliveryZones.id,
+      name: deliveryZones.name,
+      fee: deliveryZones.fee,
+    })
+    .from(deliveryZones)
+    .where(eq(deliveryZones.active, true))
+    .orderBy(asc(deliveryZones.name));
 
   return (
     <>
@@ -36,17 +33,7 @@ export default async function CheckoutPage() {
 
       <Container className="py-12 md:py-16">
         <MotionReveal>
-          {userId ? (
-            <CheckoutForm zones={zones} />
-          ) : (
-            <div className="mx-auto max-w-xl">
-              <SignInCard
-                title="Sign in to check out"
-                description="We use your account to attach this order to your shipping mark and keep a record of your purchases."
-                redirectUrl="/shop/checkout"
-              />
-            </div>
-          )}
+          <CheckoutForm zones={zones} signedIn={!!userId} />
         </MotionReveal>
       </Container>
     </>

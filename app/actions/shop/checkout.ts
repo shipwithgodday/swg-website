@@ -12,7 +12,10 @@ import {
   orderItems,
 } from '@/lib/db/schema';
 import { generateOrderNumber } from '@/lib/shop/order-number';
-import { resolveCustomerId } from '@/lib/shop/customer';
+import {
+  resolveCustomerId,
+  resolveGuestCustomer,
+} from '@/lib/shop/customer';
 import { initializeTransaction } from '@/lib/shop/paystack';
 
 const checkoutSchema = z.object({
@@ -29,6 +32,13 @@ const checkoutSchema = z.object({
   shipPhone: z.string().trim().min(1, 'Phone is required'),
   shipAddress: z.string().trim().min(1, 'Address is required'),
   shipCity: z.string().trim().min(1, 'City is required'),
+  // Required only for guest checkout — signed-in users get their email from
+  // the Clerk session instead.
+  shipEmail: z
+    .string()
+    .trim()
+    .email('Enter a valid email')
+    .optional(),
 });
 
 export type CheckoutResult =
@@ -39,13 +49,21 @@ export async function createCheckout(
   raw: unknown
 ): Promise<CheckoutResult> {
   const { userId } = await auth();
-  if (!userId) return { ok: false, error: 'Please sign in to check out.' };
 
   const parsed = checkoutSchema.safeParse(raw);
   if (!parsed.success) {
     return { ok: false, error: parsed.error.issues[0].message };
   }
   const input = parsed.data;
+
+  // Guests must supply an email on the form so we have somewhere to send the
+  // order confirmation; signed-in users get theirs from Clerk below.
+  if (!userId && !input.shipEmail) {
+    return {
+      ok: false,
+      error: 'Enter an email so we can send your order confirmation.',
+    };
+  }
 
   // Load the variants referenced by the cart, with their product.
   const variantIds = input.items.map((i) => i.variantId);
@@ -110,24 +128,38 @@ export async function createCheckout(
   );
   const total = subtotal + zone.fee;
 
-  // Resolve the customer (and allocate a shipping mark if new).
-  const user = await currentUser();
-  const email =
-    user?.primaryEmailAddress?.emailAddress ?? null;
-
-  if (!email) {
-    return {
-      ok: false,
-      error: 'Your account has no email address for the receipt.',
-    };
+  // Resolve the customer (and allocate a shipping mark if new). Signed-in
+  // users go through `resolveCustomerId` (which may link an imported row to
+  // their Clerk account); guests go through `resolveGuestCustomer` which
+  // skips the Clerk step but uses the same email/phone match logic so a
+  // future sign-up with the same email picks up the order history.
+  let customerId: string;
+  let email: string;
+  if (userId) {
+    const user = await currentUser();
+    const clerkEmail = user?.primaryEmailAddress?.emailAddress ?? null;
+    if (!clerkEmail) {
+      return {
+        ok: false,
+        error: 'Your account has no email address for the receipt.',
+      };
+    }
+    email = clerkEmail;
+    customerId = await resolveCustomerId({
+      clerkUserId: userId,
+      email,
+      phone: input.shipPhone,
+      name: input.shipName,
+    });
+  } else {
+    // Guard above ensures shipEmail is present.
+    email = input.shipEmail as string;
+    customerId = await resolveGuestCustomer({
+      email,
+      phone: input.shipPhone,
+      name: input.shipName,
+    });
   }
-
-  const customerId = await resolveCustomerId({
-    clerkUserId: userId,
-    email,
-    phone: input.shipPhone,
-    name: input.shipName,
-  });
 
   // Create the pending order + items atomically.
   const orderId = randomUUID();
