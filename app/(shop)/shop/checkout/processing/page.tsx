@@ -1,12 +1,13 @@
-import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { auth } from '@clerk/nextjs/server';
-import { Check } from 'lucide-react';
+import { ArrowRight, Check, Package } from 'lucide-react';
 
 import Container from '@/components/shared/container';
 import { PageHero } from '@/components/shared/PageHero';
 import { OrderSummary } from '@/components/shop/OrderSummary';
 import { SignUpForOrders } from '@/components/shop/SignUpForOrders';
+import { ClearCart } from '@/components/shop/ClearCart';
+import { Button } from '@/components/ui/button';
 import { verifyTransaction } from '@/lib/shop/paystack';
 import { completeOrder } from '@/lib/shop/complete-order';
 import { getOrderByNumber } from '@/lib/shop/orders';
@@ -53,16 +54,17 @@ export default async function ProcessingPage({
   }
   if (!result) return <Pending />;
 
-  // Signed-in shoppers go straight to the rich order page in their
-  // dashboard. Guests don't have access there (it's gated by Clerk +
-  // customer ownership), so we render the confirmation inline below
-  // with an invitation to create an account.
   const { userId } = await auth();
-  if (userId) redirect(`/shop/orders/${reference}`);
-
   const { order, items } = result;
+
   return (
     <>
+      {/* Clears the client cart on mount — runs for every successful
+          confirmation render, guest and signed-in alike. Server-side
+          `redirect()` would short-circuit before this could fire, so we
+          render the confirmation inline for both flows. */}
+      <ClearCart />
+
       <PageHero
         title="Order confirmed"
         highlightedWord="confirmed"
@@ -96,7 +98,33 @@ export default async function ProcessingPage({
             </div>
             <OrderSummary order={order} items={items} />
           </div>
-          <SignUpForOrders />
+
+          {userId ? (
+            <aside className="rounded-2xl border border-border bg-white p-5 shadow-sm">
+              <span className="grid size-10 place-items-center rounded-full bg-primary text-black">
+                <Package className="size-5" />
+              </span>
+              <h2 className="mt-3 text-base font-semibold">
+                Track this order
+              </h2>
+              <p className="mt-2 text-sm text-muted-foreground">
+                See the full status timeline, items and delivery
+                details on your dashboard.
+              </p>
+              <Button asChild className="mt-4 w-full">
+                <Link href={`/shop/orders/${order.orderNumber}`}>
+                  Open this order <ArrowRight className="size-4" />
+                </Link>
+              </Button>
+              <Link
+                href="/shop/orders"
+                className="mt-3 block text-center text-sm font-medium text-primary underline-offset-4 hover:underline">
+                All my orders
+              </Link>
+            </aside>
+          ) : (
+            <SignUpForOrders />
+          )}
         </div>
       </Container>
     </>
