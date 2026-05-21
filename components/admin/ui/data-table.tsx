@@ -128,8 +128,8 @@ export function DataTable<TData, TValue>({
         </div>
       </div>
 
-      <div className="overflow-hidden rounded-xl border border-zinc-200 bg-white">
-        <Table>
+      <div className="overflow-x-auto rounded-xl border border-zinc-200 bg-white">
+        <Table className="min-w-[640px]">
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow

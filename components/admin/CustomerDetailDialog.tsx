@@ -156,13 +156,13 @@ export function CustomerDetailDialog({
                   <Link
                     key={o.id}
                     href={`/admin/orders/${o.id}`}
-                    className="flex items-center justify-between gap-3 rounded-md border border-border p-3 text-sm hover:bg-accent">
+                    className="flex flex-wrap items-center gap-x-3 gap-y-1.5 rounded-md border border-border p-3 text-sm hover:bg-accent">
                     <span className="font-medium">{o.orderNumber}</span>
                     <span className="text-muted-foreground">
                       {format(new Date(o.createdAt), 'd MMM yyyy')}
                     </span>
                     <OrderStatusBadge status={o.status} />
-                    <span className="font-medium">
+                    <span className="ml-auto font-medium tabular-nums">
                       {formatCedis(o.total)}
                     </span>
                   </Link>

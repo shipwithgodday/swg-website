@@ -290,7 +290,7 @@ export default function AdminEmailsPage() {
       )}
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-        <div className="bg-[#00365D] bg-opacity-90 shadow-lg rounded-lg p-6">
+        <div className="bg-[#00365D] bg-opacity-90 shadow-lg rounded-lg p-4 sm:p-6">
           <label className="block text-sm font-medium text-gray-200 mb-2">
             Email subject
           </label>
@@ -307,7 +307,7 @@ export default function AdminEmailsPage() {
           )}
         </div>
 
-        <div className="bg-[#00365D] bg-opacity-90 shadow-lg rounded-lg p-6">
+        <div className="bg-[#00365D] bg-opacity-90 shadow-lg rounded-lg p-4 sm:p-6">
           <label className="block text-sm font-medium text-gray-200 mb-2">
             Email content
           </label>
@@ -498,7 +498,7 @@ export default function AdminEmailsPage() {
           )}
         </div>
 
-        <div className="bg-[#00365D] bg-opacity-90 shadow-lg rounded-lg p-6">
+        <div className="bg-[#00365D] bg-opacity-90 shadow-lg rounded-lg p-4 sm:p-6">
           <div className="flex justify-between items-center mb-2">
             <label className="text-sm font-medium text-gray-200">
               Recipients ({emails.length})

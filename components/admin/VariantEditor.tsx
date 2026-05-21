@@ -34,7 +34,7 @@ export function VariantEditor({ variants, onChange }: Props) {
       {variants.map((v, i) => (
         <div
           key={i}
-          className="grid grid-cols-[1fr_1fr_1fr_1fr_auto] gap-3 items-end rounded-md border p-3">
+          className="grid grid-cols-2 items-end gap-3 rounded-md border p-3 sm:grid-cols-[1fr_1fr_1fr_1fr_auto]">
           <div className="space-y-1">
             <Label className="text-xs">Name</Label>
             <Input
@@ -71,16 +71,18 @@ export function VariantEditor({ variants, onChange }: Props) {
               }
             />
           </div>
-          <Button
-            type="button"
-            variant="ghost"
-            size="icon"
-            disabled={variants.length === 1}
-            onClick={() =>
-              onChange(variants.filter((_, idx) => idx !== i))
-            }>
-            <Trash2 className="size-4" />
-          </Button>
+          <div className="col-span-2 flex justify-end sm:col-span-1">
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              disabled={variants.length === 1}
+              onClick={() =>
+                onChange(variants.filter((_, idx) => idx !== i))
+              }>
+              <Trash2 className="size-4" />
+            </Button>
+          </div>
         </div>
       ))}
       <Button

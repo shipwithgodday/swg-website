@@ -52,7 +52,7 @@ export default async function AdminOrderDetailPage({
         </div>
       </section>
 
-      <div className="grid gap-6 md:grid-cols-[1fr_360px]">
+      <div className="grid gap-6 lg:grid-cols-[1fr_360px]">
         <OrderSummary order={order} items={items} />
 
         <div className="space-y-6">

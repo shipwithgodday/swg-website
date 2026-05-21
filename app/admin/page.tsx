@@ -81,7 +81,7 @@ export default async function AdminDashboardPage({
               <Link
                 key={o.id}
                 href={`/admin/orders/${o.id}`}
-                className="flex items-center gap-3 rounded-lg px-2 py-2 transition-colors hover:bg-zinc-50">
+                className="flex flex-wrap items-center gap-x-3 gap-y-1 rounded-lg px-2 py-2 transition-colors hover:bg-zinc-50">
                 <span className="font-medium text-zinc-900">
                   {o.orderNumber}
                 </span>
@@ -91,7 +91,7 @@ export default async function AdminDashboardPage({
                 <span className="ml-auto">
                   <StatusBadge status={o.status} kind="order" />
                 </span>
-                <span className="w-24 text-right font-medium text-zinc-900 tabular-nums">
+                <span className="min-w-20 text-right font-medium text-zinc-900 tabular-nums">
                   {formatCedis(o.total)}
                 </span>
               </Link>
@@ -110,8 +110,8 @@ export default async function AdminDashboardPage({
             <Link
               key={v.id}
               href={`/admin/products?edit=${v.productId}`}
-              className="flex items-center gap-3 rounded-lg px-2 py-2 transition-colors hover:bg-zinc-50">
-              <span className="text-sm text-zinc-800">
+              className="flex flex-wrap items-center gap-x-3 gap-y-1 rounded-lg px-2 py-2 transition-colors hover:bg-zinc-50">
+              <span className="min-w-0 flex-1 text-sm text-zinc-800">
                 {v.productName}{' '}
                 <span className="text-zinc-400">({v.variantName})</span>
               </span>
