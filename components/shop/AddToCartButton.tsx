@@ -27,7 +27,7 @@ export function AddToCartButton({
   imageUrl,
   variants,
 }: Props) {
-  const { addItem } = useCart();
+  const { addItem, itemCount, subtotal } = useCart();
   const firstAvailable =
     variants.find((v) => v.stockQuantity > 0) ?? variants[0];
   const [selectedId, setSelectedId] = useState(firstAvailable?.id);
@@ -121,13 +121,28 @@ export function AddToCartButton({
         </div>
       )}
 
-      <Button
-        onClick={add}
-        disabled={!canAdd}
-        className="w-full gap-2 text-base">
-        <ShoppingCart className="size-4" />
-        {canAdd ? 'Add to cart' : 'Out of stock'}
-      </Button>
+      <div className="space-y-3">
+        <Button
+          onClick={add}
+          disabled={!canAdd}
+          size="lg"
+          className="h-14 w-full gap-2.5 text-lg font-semibold">
+          <ShoppingCart className="size-5" />
+          {canAdd ? 'Add to cart' : 'Out of stock'}
+        </Button>
+
+        {itemCount > 0 && (
+          <p className="flex items-center justify-center gap-1.5 text-sm font-medium text-muted-foreground">
+            <ShoppingCart className="size-4 text-primary" />
+            <span className="tabular-nums">
+              {itemCount} {itemCount === 1 ? 'item' : 'items'}
+            </span>
+            <span aria-hidden>·</span>
+            <span className="tabular-nums">{formatCedis(subtotal)}</span>
+            <span>in your cart</span>
+          </p>
+        )}
+      </div>
     </div>
   );
 }
