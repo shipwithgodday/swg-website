@@ -29,6 +29,13 @@ export const productInputSchema = z.object({
   categoryId: z.string().uuid().optional().nullable(),
   status: z.enum(['draft', 'active', 'archived']),
   featured: z.boolean(),
+  isPreorder: z.boolean(),
+  preorderShipEstimate: z
+    .string()
+    .trim()
+    .max(120, 'Ship estimate is too long')
+    .nullable()
+    .optional(),
   variants: z
     .array(variantInputSchema)
     .min(1, 'A product needs at least one variant'),

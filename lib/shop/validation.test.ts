@@ -22,6 +22,8 @@ describe('productInputSchema', () => {
     categoryId: null,
     status: 'draft' as const,
     featured: false,
+    isPreorder: false,
+    preorderShipEstimate: null,
     variants: [
       { name: 'Default', sku: null, price: 5000, stockQuantity: 10 },
     ],
@@ -45,6 +47,33 @@ describe('productInputSchema', () => {
   it('rejects an invalid status', () => {
     expect(
       productInputSchema.safeParse({ ...base, status: 'live' }).success
+    ).toBe(false);
+  });
+  it('accepts a preorder product with a ship estimate', () => {
+    expect(
+      productInputSchema.safeParse({
+        ...base,
+        isPreorder: true,
+        preorderShipEstimate: 'Ships in ~2 weeks',
+      }).success
+    ).toBe(true);
+  });
+  it('accepts a preorder product without a ship estimate', () => {
+    expect(
+      productInputSchema.safeParse({
+        ...base,
+        isPreorder: true,
+        preorderShipEstimate: null,
+      }).success
+    ).toBe(true);
+  });
+  it('rejects a ship estimate longer than 120 characters', () => {
+    expect(
+      productInputSchema.safeParse({
+        ...base,
+        isPreorder: true,
+        preorderShipEstimate: 'x'.repeat(121),
+      }).success
     ).toBe(false);
   });
 });
