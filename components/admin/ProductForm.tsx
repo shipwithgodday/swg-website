@@ -34,6 +34,8 @@ export interface ProductFormValue {
   categoryId: string | null;
   status: Status;
   featured: boolean;
+  isPreorder: boolean;
+  preorderShipEstimate: string | null;
   variants: VariantRow[];
   images: ProductImageRow[];
 }
@@ -62,6 +64,10 @@ export function ProductForm({
   );
   const [status, setStatus] = useState<Status>(product?.status ?? 'draft');
   const [featured, setFeatured] = useState(product?.featured ?? false);
+  const [isPreorder, setIsPreorder] = useState(product?.isPreorder ?? false);
+  const [preorderShipEstimate, setPreorderShipEstimate] = useState(
+    product?.preorderShipEstimate ?? ''
+  );
   const [variants, setVariants] = useState<VariantRow[]>(
     product?.variants ?? [{ ...emptyVariant }]
   );
@@ -93,6 +99,10 @@ export function ProductForm({
       categoryId: categoryId === NO_CATEGORY ? null : categoryId,
       status,
       featured,
+      isPreorder,
+      preorderShipEstimate: isPreorder
+        ? (preorderShipEstimate.trim() || null)
+        : null,
       variants: variants.map((v) => ({
         id: v.id,
         name: v.name,
@@ -191,6 +201,41 @@ export function ProductForm({
             onCheckedChange={(c) => setFeatured(c === true)}
           />
           <Label htmlFor="product-featured">Featured on storefront</Label>
+        </div>
+        <div className="space-y-3 rounded-2xl border border-border bg-muted/30 p-4">
+          <div className="flex items-center gap-2">
+            <Checkbox
+              id="product-preorder"
+              checked={isPreorder}
+              onCheckedChange={(c) => setIsPreorder(c === true)}
+            />
+            <Label htmlFor="product-preorder">
+              This is a preorder product
+            </Label>
+          </div>
+          <p className="text-xs text-muted-foreground">
+            Customers can always order this product, regardless of variant
+            stock. Variant stock numbers are still tracked but are not
+            enforced at checkout.
+          </p>
+          {isPreorder && (
+            <div className="space-y-2">
+              <Label htmlFor="product-preorder-ship">
+                Expected ship estimate (optional)
+              </Label>
+              <Input
+                id="product-preorder-ship"
+                value={preorderShipEstimate}
+                onChange={(e) => setPreorderShipEstimate(e.target.value)}
+                placeholder='e.g. "Ships in ~2 weeks" or "Expected mid-June"'
+                maxLength={120}
+              />
+              <p className="text-xs text-muted-foreground">
+                Shown to customers on the product page, cart, and order
+                confirmation. Leave blank to omit.
+              </p>
+            </div>
+          )}
         </div>
         <VariantEditor variants={variants} onChange={setVariants} />
         <ProductImageField

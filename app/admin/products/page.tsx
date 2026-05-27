@@ -27,6 +27,8 @@ export default async function ProductsPage() {
     categoryName: p.category?.name ?? null,
     status: p.status as AdminProduct['status'],
     featured: p.featured,
+    isPreorder: p.isPreorder,
+    preorderShipEstimate: p.preorderShipEstimate,
     variants: p.variants.map((v) => ({
       id: v.id,
       name: v.name,
