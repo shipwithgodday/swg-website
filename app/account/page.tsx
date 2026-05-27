@@ -14,7 +14,7 @@ import {
 
 import Container from '@/components/shared/container';
 import { PageHero } from '@/components/shared/PageHero';
-import { MotionReveal } from '@/components/shop/MotionReveal';
+import { MotionReveal } from '@/components/shared/MotionReveal';
 import { OrderStatusBadge } from '@/components/shop/OrderStatusBadge';
 import { SignInCard } from '@/components/shop/SignInCard';
 import { formatCedis } from '@/lib/shop/money';

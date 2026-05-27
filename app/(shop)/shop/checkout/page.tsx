@@ -6,7 +6,7 @@ import { PageHero } from '@/components/shared/PageHero';
 import { db } from '@/lib/db';
 import { deliveryZones } from '@/lib/db/schema';
 import { CheckoutForm } from '@/components/shop/CheckoutForm';
-import { MotionReveal } from '@/components/shop/MotionReveal';
+import { MotionReveal } from '@/components/shared/MotionReveal';
 
 export const metadata: Metadata = { title: 'Checkout' };
 

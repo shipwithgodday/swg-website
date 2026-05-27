@@ -8,7 +8,7 @@ import { PageHero } from '@/components/shared/PageHero';
 import { formatCedis } from '@/lib/shop/money';
 import { OrderStatusBadge } from '@/components/shop/OrderStatusBadge';
 import { SignInCard } from '@/components/shop/SignInCard';
-import { MotionReveal } from '@/components/shop/MotionReveal';
+import { MotionReveal } from '@/components/shared/MotionReveal';
 import { claimCustomerByClerkId } from '@/lib/shop/customer';
 import { getOrdersForCustomer } from '@/lib/shop/orders';
 

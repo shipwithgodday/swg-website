@@ -14,6 +14,7 @@ import Color from '@tiptap/extension-color';
 import TextStyle from '@tiptap/extension-text-style';
 import { Link as LinkTiptap } from '@tiptap/extension-link';
 import { Input } from '@/components/ui/input';
+import { MotionReveal } from '@/components/shared/MotionReveal';
 
 // Define the form schema
 const emailFormSchema = z.object({
@@ -264,7 +265,7 @@ export default function AdminEmailsPage() {
         {customStyles}
       </style>
 
-      <div className="flex flex-wrap items-start justify-between gap-4">
+      <MotionReveal className="flex flex-wrap items-start justify-between gap-4">
         <div>
           <h1 className="text-2xl font-semibold text-zinc-900">
             Bulk emails
@@ -276,7 +277,7 @@ export default function AdminEmailsPage() {
         <Button asChild variant="outline">
           <Link href="/subscribe">Add customer</Link>
         </Button>
-      </div>
+      </MotionReveal>
 
       {status && (
         <div
@@ -289,6 +290,7 @@ export default function AdminEmailsPage() {
         </div>
       )}
 
+      <MotionReveal delay={0.05} as="div">
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
         <div className="bg-[#00365D] bg-opacity-90 shadow-lg rounded-lg p-4 sm:p-6">
           <label className="block text-sm font-medium text-gray-200 mb-2">
@@ -576,6 +578,7 @@ export default function AdminEmailsPage() {
           {loading ? 'Sending…' : 'Send emails'}
         </Button>
       </form>
+      </MotionReveal>
     </div>
   );
 }

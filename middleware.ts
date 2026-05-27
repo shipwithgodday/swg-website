@@ -14,13 +14,29 @@ const isAdminRoute = createRouteMatcher(['/admin(.*)', '/api/send-bulk']);
 export default clerkMiddleware(async (auth, request) => {
   if (isAdminRoute(request)) {
     const session = await auth();
+    // API callers (e.g. /api/send-bulk) expect JSON. An HTML redirect would
+    // make their fetch().json() blow up with "Invalid response from server",
+    // so answer those with a JSON error instead of redirecting.
+    const isApi = request.nextUrl.pathname.startsWith('/api');
+
     if (!session.userId) {
-      return NextResponse.redirect(new URL('/sign-in', request.url));
+      return isApi
+        ? NextResponse.json(
+            { error: 'Authentication required.' },
+            { status: 401 }
+          )
+        : NextResponse.redirect(new URL('/sign-in', request.url));
     }
+
     const role = (session.sessionClaims as { metadata?: { role?: string } })
       ?.metadata?.role;
     if (role !== 'admin') {
-      return NextResponse.redirect(new URL('/', request.url));
+      return isApi
+        ? NextResponse.json(
+            { error: 'Admin access required.' },
+            { status: 403 }
+          )
+        : NextResponse.redirect(new URL('/', request.url));
     }
   }
 });

@@ -9,7 +9,7 @@ import { PageHero } from '@/components/shared/PageHero';
 import { OrderStatusBadge } from '@/components/shop/OrderStatusBadge';
 import { OrderSummary } from '@/components/shop/OrderSummary';
 import { OrderStatusTimeline } from '@/components/shop/OrderStatusTimeline';
-import { MotionReveal } from '@/components/shop/MotionReveal';
+import { MotionReveal } from '@/components/shared/MotionReveal';
 import {
   getOrderByNumber,
   getCustomerByClerkId,

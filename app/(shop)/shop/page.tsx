@@ -6,7 +6,7 @@ import SectionHeader from '@/components/shared/section-header';
 import { PageHero } from '@/components/shared/PageHero';
 import { ProductGrid } from '@/components/shop/ProductGrid';
 import { CategoryFilter } from '@/components/shop/CategoryFilter';
-import { MotionReveal } from '@/components/shop/MotionReveal';
+import { MotionReveal } from '@/components/shared/MotionReveal';
 import {
   getFeaturedProducts,
   getActiveProducts,

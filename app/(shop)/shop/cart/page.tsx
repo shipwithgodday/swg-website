@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import Container from '@/components/shared/container';
 import { PageHero } from '@/components/shared/PageHero';
 import { CartView } from '@/components/shop/CartView';
-import { MotionReveal } from '@/components/shop/MotionReveal';
+import { MotionReveal } from '@/components/shared/MotionReveal';
 
 export const metadata: Metadata = { title: 'Cart' };
 

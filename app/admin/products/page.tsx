@@ -1,6 +1,7 @@
 import { Suspense } from 'react';
 import { db } from '@/lib/db';
 import { ProductsTable, type AdminProduct } from '@/components/admin/ProductsTable';
+import { MotionReveal } from '@/components/shared/MotionReveal';
 
 export default async function ProductsPage() {
   const [rows, categories] = await Promise.all([
@@ -43,7 +44,9 @@ export default async function ProductsPage() {
   // Suspense boundary required: ProductsTable reads useSearchParams.
   return (
     <Suspense>
-      <ProductsTable products={products} categories={categories} />
+      <MotionReveal>
+        <ProductsTable products={products} categories={categories} />
+      </MotionReveal>
     </Suspense>
   );
 }

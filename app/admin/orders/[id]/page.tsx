@@ -9,6 +9,7 @@ import { StatusBadge } from '@/components/admin/StatusBadge';
 import { OrderSummary } from '@/components/shop/OrderSummary';
 import { OrderStatusTimeline } from '@/components/shop/OrderStatusTimeline';
 import { OrderStatusUpdater } from '@/components/admin/OrderStatusUpdater';
+import { MotionReveal } from '@/components/shared/MotionReveal';
 
 export default async function AdminOrderDetailPage({
   params,
@@ -22,20 +23,22 @@ export default async function AdminOrderDetailPage({
 
   return (
     <div className="space-y-8">
-      <AdminPageHeader
-        title={`Order ${order.orderNumber}`}
-        description={[
-          `Placed ${format(new Date(order.createdAt), 'd MMM yyyy, HH:mm')}`,
-          order.paystackReference
-            ? `Paystack ${order.paystackReference}`
-            : null,
-        ]
-          .filter(Boolean)
-          .join(' · ')}>
-        <StatusBadge status={order.status} kind="order" />
-      </AdminPageHeader>
+      <MotionReveal>
+        <AdminPageHeader
+          title={`Order ${order.orderNumber}`}
+          description={[
+            `Placed ${format(new Date(order.createdAt), 'd MMM yyyy, HH:mm')}`,
+            order.paystackReference
+              ? `Paystack ${order.paystackReference}`
+              : null,
+          ]
+            .filter(Boolean)
+            .join(' · ')}>
+          <StatusBadge status={order.status} kind="order" />
+        </AdminPageHeader>
+      </MotionReveal>
 
-      <section className="rounded-2xl border border-zinc-200/70 bg-white p-5 shadow-sm sm:p-6">
+      <MotionReveal delay={0.05} as="section" className="rounded-2xl border border-zinc-200/70 bg-white p-5 shadow-sm sm:p-6">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
             <p className="text-xs font-semibold tracking-wide text-zinc-500 uppercase">
@@ -50,9 +53,9 @@ export default async function AdminOrderDetailPage({
         <div className="mt-6 border-t border-zinc-100 pt-6">
           <OrderStatusTimeline status={order.status} />
         </div>
-      </section>
+      </MotionReveal>
 
-      <div className="grid gap-6 lg:grid-cols-[1fr_360px]">
+      <MotionReveal delay={0.1} className="grid gap-6 lg:grid-cols-[1fr_360px]">
         <OrderSummary order={order} items={items} />
 
         <div className="space-y-6">
@@ -95,7 +98,7 @@ export default async function AdminOrderDetailPage({
             </div>
           </section>
         </div>
-      </div>
+      </MotionReveal>
     </div>
   );
 }

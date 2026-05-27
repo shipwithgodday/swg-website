@@ -7,7 +7,7 @@ import SectionHeader from '@/components/shared/section-header';
 import { ProductGallery } from '@/components/shop/ProductGallery';
 import { AddToCartButton } from '@/components/shop/AddToCartButton';
 import { ProductGrid } from '@/components/shop/ProductGrid';
-import { MotionReveal } from '@/components/shop/MotionReveal';
+import { MotionReveal } from '@/components/shared/MotionReveal';
 import {
   getProductBySlug,
   getActiveProducts,

@@ -15,6 +15,7 @@ import { StatCard } from '@/components/admin/StatCard';
 import { StatusBadge } from '@/components/admin/StatusBadge';
 import { RevenueChart } from '@/components/admin/RevenueChart';
 import { TopProducts } from '@/components/admin/TopProducts';
+import { MotionReveal } from '@/components/shared/MotionReveal';
 
 export default async function AdminDashboardPage({
   searchParams,
@@ -30,13 +31,15 @@ export default async function AdminDashboardPage({
 
   return (
     <div className="space-y-8">
-      <AdminPageHeader
-        title="Dashboard"
-        description="Sales performance and what needs attention.">
-        <DateRangeTabs />
-      </AdminPageHeader>
+      <MotionReveal>
+        <AdminPageHeader
+          title="Dashboard"
+          description="Sales performance and what needs attention.">
+          <DateRangeTabs />
+        </AdminPageHeader>
+      </MotionReveal>
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <MotionReveal delay={0.05} className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard
           label="Revenue"
           value={formatCedis(metrics.revenue.value)}
@@ -62,11 +65,13 @@ export default async function AdminDashboardPage({
           hint="paid / processing"
           icon={AlertCircle}
         />
-      </div>
+      </MotionReveal>
 
-      <RevenueChart data={series} />
+      <MotionReveal delay={0.1}>
+        <RevenueChart data={series} />
+      </MotionReveal>
 
-      <div className="grid gap-6 lg:grid-cols-2">
+      <MotionReveal delay={0.15} className="grid gap-6 lg:grid-cols-2">
         <TopProducts products={topProducts} />
 
         <div className="rounded-2xl border border-zinc-200/70 bg-white p-5 shadow-sm">
@@ -98,9 +103,9 @@ export default async function AdminDashboardPage({
             ))}
           </div>
         </div>
-      </div>
+      </MotionReveal>
 
-      <div className="rounded-2xl border border-zinc-200/70 bg-white p-5 shadow-sm">
+      <MotionReveal delay={0.2} className="rounded-2xl border border-zinc-200/70 bg-white p-5 shadow-sm">
         <h2 className="text-sm font-semibold text-zinc-900">Low stock</h2>
         <div className="mt-4 space-y-1">
           {metrics.lowStock.length === 0 && (
@@ -121,11 +126,13 @@ export default async function AdminDashboardPage({
             </Link>
           ))}
         </div>
-      </div>
+      </MotionReveal>
 
-      <p className="text-sm text-zinc-400">
-        {metrics.customerCount} customers total.
-      </p>
+      <MotionReveal delay={0.25}>
+        <p className="text-sm text-zinc-400">
+          {metrics.customerCount} customers total.
+        </p>
+      </MotionReveal>
     </div>
   );
 }

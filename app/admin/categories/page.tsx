@@ -3,6 +3,7 @@ import {
   CategoriesTable,
   type AdminCategory,
 } from '@/components/admin/CategoriesTable';
+import { MotionReveal } from '@/components/shared/MotionReveal';
 
 export default async function CategoriesPage() {
   const rows = await db.query.categories.findMany({
@@ -18,5 +19,9 @@ export default async function CategoriesPage() {
     productCount: c.products.length,
   }));
 
-  return <CategoriesTable categories={categories} />;
+  return (
+    <MotionReveal>
+      <CategoriesTable categories={categories} />
+    </MotionReveal>
+  );
 }
