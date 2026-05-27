@@ -45,6 +45,10 @@ export async function createProduct(raw: unknown): Promise<ActionResult> {
         categoryId: p.categoryId ?? null,
         status: p.status,
         featured: p.featured,
+        isPreorder: p.isPreorder,
+        preorderShipEstimate: p.isPreorder
+          ? (p.preorderShipEstimate ?? null)
+          : null,
       }),
       db.insert(productVariants).values(
         p.variants.map((v, i) => ({
@@ -115,6 +119,10 @@ export async function updateProduct(
         categoryId: p.categoryId ?? null,
         status: p.status,
         featured: p.featured,
+        isPreorder: p.isPreorder,
+        preorderShipEstimate: p.isPreorder
+          ? (p.preorderShipEstimate ?? null)
+          : null,
         updatedAt: new Date(),
       })
       .where(eq(products.id, id));
