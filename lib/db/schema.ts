@@ -38,6 +38,8 @@ export const products = pgTable('products', {
   }),
   status: text('status').notNull().default('draft'),
   featured: boolean('featured').notNull().default(false),
+  isPreorder: boolean('is_preorder').notNull().default(false),
+  preorderShipEstimate: text('preorder_ship_estimate'),
   ...timestamps,
 });
 
@@ -125,6 +127,8 @@ export const orderItems = pgTable('order_items', {
   variantName: text('variant_name').notNull(),
   unitPrice: integer('unit_price').notNull(),
   quantity: integer('quantity').notNull(),
+  isPreorder: boolean('is_preorder').notNull().default(false),
+  preorderShipEstimate: text('preorder_ship_estimate'),
 });
 
 export const productsRelations = relations(products, ({ one, many }) => ({
