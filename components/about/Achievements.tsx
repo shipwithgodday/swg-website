@@ -16,7 +16,7 @@ function Achievements() {
           {[
             {
               icon: Users,
-              title: '400+ Customers',
+              title: '600+ Customers',
               desc: 'Served and growing',
             },
             {
@@ -26,7 +26,7 @@ function Achievements() {
             },
             {
               icon: Globe,
-              title: '2 Countries',
+              title: '4 Countries',
               desc: 'Cross-border operations',
             },
             {

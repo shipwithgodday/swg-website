@@ -19,8 +19,8 @@ function Footer() {
             </Link>
             <p className="mt-4 text-gray-400 max-w-xs">
               Your trusted partner for seamless shipping solutions
-              between China and Ghana. Experience reliable logistics
-              services tailored to your needs.
+              between China, Ghana and the Caribbean. Experience
+              reliable logistics services tailored to your needs.
             </p>
           </div>
           <div className="grid grid-cols-2 gap-8 sm:gap-6 sm:grid-cols-3">

@@ -39,7 +39,7 @@ function Story() {
                 </h3>
                 <p>
                   Make international trade accessible and transparent
-                  for Ghanaian entrepreneurs.
+                  for entrepreneurs.
                 </p>
               </div>
             </div>
