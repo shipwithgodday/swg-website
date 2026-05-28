@@ -124,7 +124,7 @@ export function AddToCartButton(props: Props) {
               aria-label="Increase quantity"
               onClick={() =>
                 setQty((q) =>
-                  isPreorder ? q + 1 : Math.min(max || 1, q + 1)
+                  isPreorder ? Math.min(99, q + 1) : Math.min(max || 1, q + 1)
                 )
               }
               className="grid size-10 place-items-center rounded-full hover:bg-accent">

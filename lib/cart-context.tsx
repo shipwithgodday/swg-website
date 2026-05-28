@@ -44,19 +44,32 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
       const raw = localStorage.getItem(STORAGE_KEY);
       if (raw) {
         const parsed = JSON.parse(raw) as Partial<CartItem>[];
-        setItems(
-          parsed.map((p) => ({
-            variantId: p.variantId as string,
-            productSlug: p.productSlug as string,
-            productName: p.productName as string,
-            variantName: p.variantName as string,
-            unitPrice: p.unitPrice as number,
-            imageUrl: p.imageUrl ?? null,
-            quantity: p.quantity as number,
-            isPreorder: p.isPreorder ?? false,
-            preorderShipEstimate: p.preorderShipEstimate ?? null,
-          }))
-        );
+        const valid: CartItem[] = parsed.flatMap((p) => {
+          if (
+            typeof p.variantId !== 'string' ||
+            typeof p.productSlug !== 'string' ||
+            typeof p.productName !== 'string' ||
+            typeof p.variantName !== 'string' ||
+            typeof p.unitPrice !== 'number' ||
+            typeof p.quantity !== 'number'
+          ) {
+            return [];
+          }
+          return [
+            {
+              variantId: p.variantId,
+              productSlug: p.productSlug,
+              productName: p.productName,
+              variantName: p.variantName,
+              unitPrice: p.unitPrice,
+              imageUrl: p.imageUrl ?? null,
+              quantity: p.quantity,
+              isPreorder: p.isPreorder ?? false,
+              preorderShipEstimate: p.preorderShipEstimate ?? null,
+            },
+          ];
+        });
+        setItems(valid);
       }
     } catch {
       // ignore malformed storage
