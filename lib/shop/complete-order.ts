@@ -66,6 +66,10 @@ export async function completeOrder(
     .from(orderItems)
     .where(eq(orderItems.orderId, order.id));
   for (const it of items) {
+    // Preorder lines don't track variant stock — see preorder spec for
+    // background. Decrementing here would either silently no-op or
+    // oversell the remaining units.
+    if (it.isPreorder) continue;
     await db
       .update(productVariants)
       .set({
