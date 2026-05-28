@@ -103,13 +103,21 @@ export async function sendOrderStatusEmail(
     .where(eq(orderItems.orderId, orderId));
 
   const itemRows = items
-    .map(
-      (i) =>
-        `<tr><td style="padding:4px 0">${i.productName} (${i.variantName}) × ${i.quantity}</td>` +
+    .map((i) => {
+      const note = i.isPreorder
+        ? `<div style="color:#7a6300;font-size:12px">Preorder${
+            i.preorderShipEstimate
+              ? ` — ${i.preorderShipEstimate}`
+              : ''
+          }</div>`
+        : '';
+      return (
+        `<tr><td style="padding:4px 0">${i.productName} (${i.variantName}) × ${i.quantity}${note}</td>` +
         `<td style="text-align:right;padding:4px 0">${formatCedis(
           i.unitPrice * i.quantity
         )}</td></tr>`
-    )
+      );
+    })
     .join('');
 
   const html = `

@@ -1,4 +1,5 @@
 import { formatCedis } from '@/lib/shop/money';
+import { PreorderBadge } from './PreorderBadge';
 
 interface Item {
   id: string;
@@ -6,6 +7,8 @@ interface Item {
   variantName: string;
   unitPrice: number;
   quantity: number;
+  isPreorder: boolean;
+  preorderShipEstimate: string | null;
 }
 
 interface Order {
@@ -33,10 +36,18 @@ export function OrderSummary({
             key={i.id}
             className="flex items-start justify-between gap-3 py-3 text-sm">
             <div className="min-w-0">
-              <p className="font-medium">{i.productName}</p>
+              <div className="flex flex-wrap items-center gap-2">
+                <p className="font-medium">{i.productName}</p>
+                {i.isPreorder && <PreorderBadge variant="pill" />}
+              </div>
               <p className="text-xs text-muted-foreground">
                 {i.variantName} · ×{i.quantity}
               </p>
+              {i.isPreorder && i.preorderShipEstimate && (
+                <p className="text-xs text-primary">
+                  {i.preorderShipEstimate}
+                </p>
+              )}
             </div>
             <p className="font-semibold tabular-nums">
               {formatCedis(i.unitPrice * i.quantity)}
