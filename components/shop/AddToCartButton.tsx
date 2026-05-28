@@ -108,28 +108,36 @@ export function AddToCartButton(props: Props) {
                   : 'Out of stock'}
             </p>
           </div>
-          <div className="flex items-center rounded-full border border-border bg-white">
-            <button
-              type="button"
-              aria-label="Decrease quantity"
-              onClick={() => setQty((q) => Math.max(1, q - 1))}
-              className="grid size-10 place-items-center rounded-full hover:bg-accent">
-              <Minus className="size-4" />
-            </button>
-            <span className="w-8 text-center text-sm font-semibold tabular-nums">
-              {qty}
-            </span>
-            <button
-              type="button"
-              aria-label="Increase quantity"
-              onClick={() =>
-                setQty((q) =>
-                  isPreorder ? Math.min(99, q + 1) : Math.min(max || 1, q + 1)
-                )
-              }
-              className="grid size-10 place-items-center rounded-full hover:bg-accent">
-              <Plus className="size-4" />
-            </button>
+          <div className="flex flex-col items-end gap-2">
+            <div className="flex items-center rounded-full border border-border bg-white">
+              <button
+                type="button"
+                aria-label="Decrease quantity"
+                onClick={() => setQty((q) => Math.max(1, q - 1))}
+                className="grid size-10 place-items-center rounded-full hover:bg-accent">
+                <Minus className="size-4" />
+              </button>
+              <span className="w-8 text-center text-sm font-semibold tabular-nums">
+                {qty}
+              </span>
+              <button
+                type="button"
+                aria-label="Increase quantity"
+                onClick={() =>
+                  setQty((q) =>
+                    isPreorder ? Math.min(99, q + 1) : Math.min(max || 1, q + 1)
+                  )
+                }
+                className="grid size-10 place-items-center rounded-full hover:bg-accent">
+                <Plus className="size-4" />
+              </button>
+            </div>
+            <p className="text-sm tabular-nums text-muted-foreground">
+              Total{' '}
+              <span className="font-semibold text-foreground">
+                {formatCedis(selected.price * qty)}
+              </span>
+            </p>
           </div>
         </div>
       )}
