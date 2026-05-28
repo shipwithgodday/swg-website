@@ -2,6 +2,7 @@
 import Image from 'next/image';
 import { useCart } from '@/lib/cart-context';
 import { formatCedis } from '@/lib/shop/money';
+import { PreorderBadge } from './PreorderBadge';
 
 /** Right-rail summary that mirrors the cart with totals incl. delivery. */
 export function CheckoutSummary({ deliveryFee }: { deliveryFee: number }) {
@@ -27,12 +28,20 @@ export function CheckoutSummary({ deliveryFee }: { deliveryFee: number }) {
               )}
             </div>
             <div className="min-w-0 flex-1">
-              <p className="line-clamp-1 text-sm font-medium">
-                {i.productName}
-              </p>
+              <div className="flex flex-wrap items-center gap-2">
+                <p className="line-clamp-1 text-sm font-medium">
+                  {i.productName}
+                </p>
+                {i.isPreorder && <PreorderBadge variant="pill" />}
+              </div>
               <p className="text-xs text-muted-foreground">
                 {i.variantName} · ×{i.quantity}
               </p>
+              {i.isPreorder && i.preorderShipEstimate && (
+                <p className="text-xs text-primary">
+                  {i.preorderShipEstimate}
+                </p>
+              )}
             </div>
             <p className="text-sm font-semibold tabular-nums">
               {formatCedis(i.unitPrice * i.quantity)}

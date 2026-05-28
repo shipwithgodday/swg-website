@@ -5,6 +5,7 @@ import { Minus, Plus, ShoppingCart, Trash2 } from 'lucide-react';
 import { useCart } from '@/lib/cart-context';
 import { formatCedis } from '@/lib/shop/money';
 import { Button } from '@/components/ui/button';
+import { PreorderBadge } from './PreorderBadge';
 
 export function CartView({ onNavigate }: { onNavigate?: () => void }) {
   const { items, subtotal, setQuantity, removeItem } = useCart();
@@ -45,15 +46,23 @@ export function CartView({ onNavigate }: { onNavigate?: () => void }) {
               )}
             </div>
             <div className="min-w-0 flex-1">
-              <Link
-                href={`/shop/products/${i.productSlug}`}
-                onClick={onNavigate}
-                className="line-clamp-1 text-sm font-medium hover:underline">
-                {i.productName}
-              </Link>
+              <div className="flex flex-wrap items-center gap-2">
+                <Link
+                  href={`/shop/products/${i.productSlug}`}
+                  onClick={onNavigate}
+                  className="line-clamp-1 text-sm font-medium hover:underline">
+                  {i.productName}
+                </Link>
+                {i.isPreorder && <PreorderBadge variant="pill" />}
+              </div>
               <p className="text-xs text-muted-foreground">
                 {i.variantName}
               </p>
+              {i.isPreorder && i.preorderShipEstimate && (
+                <p className="text-xs text-primary">
+                  {i.preorderShipEstimate}
+                </p>
+              )}
               <div className="mt-2 flex items-center gap-3">
                 <div className="flex items-center rounded-full border border-border">
                   <button
