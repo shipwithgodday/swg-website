@@ -24,6 +24,7 @@ function toCard(
     name: string;
     images: { url: string }[];
     variants: { price: number; stockQuantity: number }[];
+    isPreorder: boolean;
   },
   featured = false,
 ) {
@@ -33,6 +34,7 @@ function toCard(
     imageUrl: p.images[0]?.url ?? null,
     variants: p.variants,
     featured,
+    isPreorder: p.isPreorder,
   };
 }
 

@@ -3,6 +3,7 @@ import Image from 'next/image';
 // import { Sparkles } from 'lucide-react';
 import { formatCedis } from '@/lib/shop/money';
 import { displayPrice, inStock } from '@/lib/shop/queries';
+import { PreorderBadge } from './PreorderBadge';
 
 export interface ProductCardData {
   slug: string;
@@ -11,6 +12,8 @@ export interface ProductCardData {
   variants: { price: number; stockQuantity: number }[];
   /** When true, shows a small gold "Featured" badge. */
   featured?: boolean;
+  /** When true, shows a "Preorder" pill in place of the sold-out badge. */
+  isPreorder?: boolean;
 }
 
 export function ProductCard({
@@ -39,14 +42,20 @@ export function ProductCard({
         )}
         {product.featured && (
           <span className="absolute top-3 left-3 inline-flex items-center gap-1 rounded-full bg-primary px-2.5 py-1 text-[11px] font-semibold text-black shadow-sm">
-            {/* <Sparkles className="size-3" /> */}
             Featured
           </span>
         )}
-        {!available && (
-          <span className="absolute top-3 right-3 rounded-full bg-black/80 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide text-white">
-            Sold out
-          </span>
+        {product.isPreorder ? (
+          <PreorderBadge
+            variant="pill"
+            className="absolute top-3 right-3"
+          />
+        ) : (
+          !available && (
+            <span className="absolute top-3 right-3 rounded-full bg-black/80 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide text-white">
+              Sold out
+            </span>
+          )
         )}
       </div>
       <div className="space-y-1 p-4">

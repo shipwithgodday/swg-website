@@ -142,6 +142,7 @@ export default async function ProductDetailPage({
                 name: p.name,
                 imageUrl: p.images[0]?.url ?? null,
                 variants: p.variants,
+                isPreorder: p.isPreorder,
               }))}
             />
           </div>
