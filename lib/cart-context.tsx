@@ -42,7 +42,22 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
   useEffect(() => {
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
-      if (raw) setItems(JSON.parse(raw) as CartItem[]);
+      if (raw) {
+        const parsed = JSON.parse(raw) as Partial<CartItem>[];
+        setItems(
+          parsed.map((p) => ({
+            variantId: p.variantId as string,
+            productSlug: p.productSlug as string,
+            productName: p.productName as string,
+            variantName: p.variantName as string,
+            unitPrice: p.unitPrice as number,
+            imageUrl: p.imageUrl ?? null,
+            quantity: p.quantity as number,
+            isPreorder: p.isPreorder ?? false,
+            preorderShipEstimate: p.preorderShipEstimate ?? null,
+          }))
+        );
+      }
     } catch {
       // ignore malformed storage
     }

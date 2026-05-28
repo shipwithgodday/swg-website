@@ -8,6 +8,8 @@ const item = (price: number, quantity: number): CartItem => ({
   unitPrice: price,
   imageUrl: null,
   quantity,
+  isPreorder: false,
+  preorderShipEstimate: null,
 });
 
 describe('cartSubtotal', () => {

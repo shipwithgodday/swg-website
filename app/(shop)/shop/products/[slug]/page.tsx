@@ -6,6 +6,7 @@ import Container from '@/components/shared/container';
 import SectionHeader from '@/components/shared/section-header';
 import { ProductGallery } from '@/components/shop/ProductGallery';
 import { AddToCartButton } from '@/components/shop/AddToCartButton';
+import { PreorderBadge } from '@/components/shop/PreorderBadge';
 import { ProductGrid } from '@/components/shop/ProductGrid';
 import { MotionReveal } from '@/components/shared/MotionReveal';
 import {
@@ -83,10 +84,17 @@ export default async function ProductDetailPage({
           <h1 className="mt-2 text-3xl font-bold tracking-tight md:text-4xl">
             {product.name}
           </h1>
-          {!available && (
-            <p className="mt-3 inline-flex w-fit rounded-full bg-destructive/10 px-3 py-1 text-sm font-medium text-destructive">
-              Currently out of stock
-            </p>
+          {product.isPreorder ? (
+            <PreorderBadge
+              variant="block"
+              shipEstimate={product.preorderShipEstimate}
+            />
+          ) : (
+            !available && (
+              <p className="mt-3 inline-flex w-fit rounded-full bg-destructive/10 px-3 py-1 text-sm font-medium text-destructive">
+                Currently out of stock
+              </p>
+            )
           )}
           {product.description && (
             <div
@@ -100,6 +108,8 @@ export default async function ProductDetailPage({
               productSlug={product.slug}
               productName={product.name}
               imageUrl={product.images[0]?.url ?? null}
+              isPreorder={product.isPreorder}
+              preorderShipEstimate={product.preorderShipEstimate}
               variants={product.variants.map((v) => ({
                 id: v.id,
                 name: v.name,
