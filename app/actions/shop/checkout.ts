@@ -75,6 +75,8 @@ export async function createCheckout(
       stock: productVariants.stockQuantity,
       productName: products.name,
       productStatus: products.status,
+      isPreorder: products.isPreorder,
+      preorderShipEstimate: products.preorderShipEstimate,
     })
     .from(productVariants)
     .innerJoin(products, eq(productVariants.productId, products.id))
@@ -89,6 +91,8 @@ export async function createCheckout(
     variantName: string;
     unitPrice: number;
     quantity: number;
+    isPreorder: boolean;
+    preorderShipEstimate: string | null;
   }[] = [];
   for (const item of input.items) {
     const v = byId.get(item.variantId);
@@ -98,7 +102,7 @@ export async function createCheckout(
         error: 'An item in your cart is no longer available.',
       };
     }
-    if (v.stock < item.quantity) {
+    if (!v.isPreorder && v.stock < item.quantity) {
       return {
         ok: false,
         error: `Not enough stock for ${v.productName} (${v.variantName}).`,
@@ -110,6 +114,8 @@ export async function createCheckout(
       variantName: v.variantName,
       unitPrice: v.price,
       quantity: item.quantity,
+      isPreorder: v.isPreorder,
+      preorderShipEstimate: v.preorderShipEstimate,
     });
   }
 
@@ -190,6 +196,8 @@ export async function createCheckout(
           variantName: l.variantName,
           unitPrice: l.unitPrice,
           quantity: l.quantity,
+          isPreorder: l.isPreorder,
+          preorderShipEstimate: l.preorderShipEstimate,
         }))
       ),
     ]);
