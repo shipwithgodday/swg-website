@@ -15,6 +15,13 @@
       "when": 1779925877755,
       "tag": "0001_complex_wonder_man",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1780017360638,
+      "tag": "0002_melted_demogoblin",
+      "breakpoints": true
     }
   ]
 }

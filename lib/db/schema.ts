@@ -6,6 +6,7 @@ import {
   boolean,
   timestamp,
   index,
+  uniqueIndex,
 } from 'drizzle-orm/pg-core';
 import { relations } from 'drizzle-orm';
 
@@ -196,8 +197,88 @@ export const orderItemsRelations = relations(orderItems, ({ one }) => ({
   }),
 }));
 
+export const containers = pgTable('containers', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  containerNumber: text('container_number').notNull().unique(),
+  etaPort: timestamp('eta_port', { withTimezone: true }),
+  etaWarehouse: timestamp('eta_warehouse', { withTimezone: true }),
+  ...timestamps,
+});
+
+export const etaAdjustments = pgTable('eta_adjustments', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  containerId: uuid('container_id')
+    .notNull()
+    .references(() => containers.id, { onDelete: 'cascade' }),
+  field: text('field').notNull(), // "etaPort" | "etaWarehouse"
+  previousDate: timestamp('previous_date', { withTimezone: true }),
+  newDate: timestamp('new_date', { withTimezone: true }).notNull(),
+  reason: text('reason'),
+  adjustedAt: timestamp('adjusted_at', { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  adjustedBy: text('adjusted_by').notNull(),
+});
+
+export const shipmentNotificationSubscribers = pgTable(
+  'shipment_notification_subscribers',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    containerId: uuid('container_id')
+      .notNull()
+      .references(() => containers.id, { onDelete: 'cascade' }),
+    customerId: uuid('customer_id').references(() => customers.id, {
+      onDelete: 'set null',
+    }),
+    emailOverride: text('email_override'),
+    invoiceNumber: text('invoice_number').notNull(),
+    subscribedAt: timestamp('subscribed_at', { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    notifiedPortArrival: boolean('notified_port_arrival')
+      .notNull()
+      .default(false),
+    notifiedWarehouseArrival: boolean('notified_warehouse_arrival')
+      .notNull()
+      .default(false),
+  },
+  (t) => [
+    uniqueIndex('subscribers_invoice_unique').on(t.invoiceNumber, t.containerId),
+  ]
+);
+
+export const containersRelations = relations(containers, ({ many }) => ({
+  adjustments: many(etaAdjustments),
+  subscribers: many(shipmentNotificationSubscribers),
+}));
+
+export const etaAdjustmentsRelations = relations(etaAdjustments, ({ one }) => ({
+  container: one(containers, {
+    fields: [etaAdjustments.containerId],
+    references: [containers.id],
+  }),
+}));
+
+export const shipmentNotificationSubscribersRelations = relations(
+  shipmentNotificationSubscribers,
+  ({ one }) => ({
+    container: one(containers, {
+      fields: [shipmentNotificationSubscribers.containerId],
+      references: [containers.id],
+    }),
+    customer: one(customers, {
+      fields: [shipmentNotificationSubscribers.customerId],
+      references: [customers.id],
+    }),
+  })
+);
+
 export type Product = typeof products.$inferSelect;
 export type ProductVariant = typeof productVariants.$inferSelect;
 export type ProductImage = typeof productImages.$inferSelect;
 export type Category = typeof categories.$inferSelect;
 export type Customer = typeof customers.$inferSelect;
+export type Container = typeof containers.$inferSelect;
+export type EtaAdjustment = typeof etaAdjustments.$inferSelect;
+export type ShipmentNotificationSubscriber =
+  typeof shipmentNotificationSubscribers.$inferSelect;
