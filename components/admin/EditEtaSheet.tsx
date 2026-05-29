@@ -29,7 +29,7 @@ export function EditEtaSheet({ container, open, onOpenChange }: Props) {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    if (container) {
+    if (open && container) {
       setEtaPort(container.etaPort ? new Date(container.etaPort) : undefined);
       setEtaWarehouse(
         container.etaWarehouse ? new Date(container.etaWarehouse) : undefined
@@ -37,7 +37,7 @@ export function EditEtaSheet({ container, open, onOpenChange }: Props) {
       setPortReason('');
       setWarehouseReason('');
     }
-  }, [container]);
+  }, [container, open]);
 
   const originalPort = container?.etaPort ? new Date(container.etaPort) : null;
   const originalWarehouse = container?.etaWarehouse

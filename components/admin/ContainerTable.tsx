@@ -18,7 +18,7 @@ interface Props {
 
 function formatEta(date: Date | null): string {
   if (!date) return 'Not set';
-  return format(new Date(date), 'd MMM yyyy');
+  return format(date, 'd MMM yyyy');
 }
 
 export function ContainerTable({ containers, onEdit }: Props) {
