@@ -23,6 +23,12 @@ export default function AdminShipmentsPage() {
           etaWarehouse: r.etaWarehouse
             ? new Date(r.etaWarehouse as string)
             : null,
+          arrivedAtPort: r.arrivedAtPort
+            ? new Date(r.arrivedAtPort as string)
+            : null,
+          arrivedAtWarehouse: r.arrivedAtWarehouse
+            ? new Date(r.arrivedAtWarehouse as string)
+            : null,
           createdAt: new Date(r.createdAt as string),
           updatedAt: new Date(r.updatedAt as string),
         } as ContainerRow))
@@ -59,7 +65,11 @@ export default function AdminShipmentsPage() {
       </MotionReveal>
 
       <MotionReveal delay={0.05}>
-        <ContainerTable containers={containers} onEdit={handleEdit} />
+        <ContainerTable
+          containers={containers}
+          onEdit={handleEdit}
+          onArrivalMarked={loadContainers}
+        />
       </MotionReveal>
 
       <MotionReveal delay={0.1}>
