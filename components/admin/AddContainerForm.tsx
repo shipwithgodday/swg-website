@@ -1,12 +1,14 @@
 'use client';
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { Input } from '@/components/admin/ui/input';
 import { Button } from '@/components/admin/ui/button';
 
-export function AddContainerForm() {
-  const router = useRouter();
+interface Props {
+  onSuccess?: () => void;
+}
+
+export function AddContainerForm({ onSuccess }: Props) {
   const [containerNumber, setContainerNumber] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -29,7 +31,7 @@ export function AddContainerForm() {
       }
       toast.success(`Container ${num} added`);
       setContainerNumber('');
-      router.refresh();
+      onSuccess?.();
     } catch {
       toast.error('Something went wrong');
     } finally {

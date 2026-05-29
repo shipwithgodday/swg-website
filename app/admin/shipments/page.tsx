@@ -13,11 +13,16 @@ export default function AdminShipmentsPage() {
   const [editTarget, setEditTarget] = useState<ContainerRow | null>(null);
   const [sheetOpen, setSheetOpen] = useState(false);
 
-  useEffect(() => {
+  async function loadContainers() {
     fetch('/api/admin/containers')
       .then((r) => r.json())
       .then(setContainers)
       .catch(console.error);
+  }
+
+  useEffect(() => {
+    loadContainers();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   function handleEdit(container: ContainerRow) {
@@ -28,10 +33,7 @@ export default function AdminShipmentsPage() {
   function handleSheetClose(open: boolean) {
     setSheetOpen(open);
     if (!open) {
-      fetch('/api/admin/containers')
-        .then((r) => r.json())
-        .then(setContainers)
-        .catch(console.error);
+      loadContainers();
     }
   }
 
@@ -51,7 +53,7 @@ export default function AdminShipmentsPage() {
       </MotionReveal>
 
       <MotionReveal delay={0.1}>
-        <AddContainerForm />
+        <AddContainerForm onSuccess={loadContainers} />
       </MotionReveal>
 
       <EditEtaSheet
