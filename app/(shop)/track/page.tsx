@@ -224,8 +224,7 @@ export default function TrackPage() {
     if (e.status === 'found' && notifySteps[i] !== 'done') acc.push(i);
     return acc;
   }, []);
-  const showNotifyAll =
-    unsubscribedFoundIndices.length >= 2 && notifyAllStep !== 'done';
+  const showNotifyAll = unsubscribedFoundIndices.length >= 2;
   const anyFoundNeedsEmail = unsubscribedFoundIndices.some(
     (i) => !entries[i]?.data?.customer?.hasEmail
   );
@@ -482,7 +481,7 @@ export default function TrackPage() {
               />
             ))}
 
-            {showNotifyAll && (
+            {showNotifyAll && notifyAllStep !== 'done' && (
               <div className="rounded-2xl border border-zinc-200/70 bg-white p-6 shadow-sm">
                 {notifyAllStep === 'idle' && (
                   <button
@@ -539,12 +538,14 @@ export default function TrackPage() {
                     </div>
                   </div>
                 )}
+              </div>
+            )}
 
-                {notifyAllStep === 'done' && (
-                  <p className="rounded-lg bg-green-50 px-4 py-3 text-sm text-green-800">
-                    You&apos;re subscribed to all shipments!
-                  </p>
-                )}
+            {notifyAllStep === 'done' && (
+              <div className="rounded-2xl border border-zinc-200/70 bg-white p-6 shadow-sm">
+                <p className="rounded-lg bg-green-50 px-4 py-3 text-sm text-green-800">
+                  You&apos;re subscribed to all shipments!
+                </p>
               </div>
             )}
           </MotionReveal>
