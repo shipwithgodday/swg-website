@@ -8,6 +8,8 @@ import {
 import type { Container } from '@/lib/db/schema';
 
 const FROM = 'Ship With Godday <info@shipwithgodday.com>';
+const BASE_URL =
+  process.env.NEXT_PUBLIC_BASE_URL ?? 'https://shipwithgodday.com';
 
 function formatEtaDate(date: Date): string {
   return date.toLocaleDateString('en-GB', {
@@ -35,7 +37,7 @@ function buildPortEmail(opts: {
     <p>Your shipment <strong>${opts.invoiceNumber}</strong> is arriving at <strong>Tema Port</strong>.</p>
     ${rescheduleNote}
     <p style="font-size:1.4em;font-weight:bold;margin:12px 0">${dateStr}</p>
-    <p><a href="https://shipwithgodday.com/track?invoice=${opts.invoiceNumber}">View full shipment status →</a></p>
+    <p><a href="${BASE_URL}/track?invoice=${opts.invoiceNumber}">View full shipment status →</a></p>
     <hr style="border:none;border-top:1px solid #eee;margin:24px 0">
     <p style="color:#888;font-size:12px">Ship With Godday &mdash; Lucky Godday Business Services</p>
   `;
@@ -62,7 +64,7 @@ function buildWarehouseEmail(opts: {
     <p>Your shipment <strong>${opts.invoiceNumber}</strong> is arriving at our <strong>Ghana Warehouse</strong>.</p>
     ${rescheduleNote}
     <p style="font-size:1.4em;font-weight:bold;margin:12px 0">${dateStr}</p>
-    <p><a href="https://shipwithgodday.com/track?invoice=${opts.invoiceNumber}">View full shipment status →</a></p>
+    <p><a href="${BASE_URL}/track?invoice=${opts.invoiceNumber}">View full shipment status →</a></p>
     <hr style="border:none;border-top:1px solid #eee;margin:24px 0">
     <p style="color:#888;font-size:12px">Ship With Godday &mdash; Lucky Godday Business Services</p>
   `;
@@ -102,9 +104,6 @@ export async function sendShipmentNotifications(
     if (changedFields.etaPort && container.etaPort) {
       const isReschedule =
         !!changedFields.etaPortWasPreviouslySet && sub.notifiedPortArrival;
-      if (isReschedule) {
-        await resetSubscriberNotified(sub.id, 'notifiedPortArrival');
-      }
       if (!sub.notifiedPortArrival || isReschedule) {
         const { subject, html } = buildPortEmail({
           recipientName: sub.customerName,
@@ -114,6 +113,9 @@ export async function sendShipmentNotifications(
           reason: changedFields.etaPortReason ?? null,
         });
         try {
+          if (isReschedule) {
+            await resetSubscriberNotified(sub.id, 'notifiedPortArrival');
+          }
           const result = await resend.emails.send({
             from: FROM,
             to: [email],
@@ -143,9 +145,6 @@ export async function sendShipmentNotifications(
       const isReschedule =
         !!changedFields.etaWarehouseWasPreviouslySet &&
         sub.notifiedWarehouseArrival;
-      if (isReschedule) {
-        await resetSubscriberNotified(sub.id, 'notifiedWarehouseArrival');
-      }
       if (!sub.notifiedWarehouseArrival || isReschedule) {
         const { subject, html } = buildWarehouseEmail({
           recipientName: sub.customerName,
@@ -155,6 +154,9 @@ export async function sendShipmentNotifications(
           reason: changedFields.etaWarehouseReason ?? null,
         });
         try {
+          if (isReschedule) {
+            await resetSubscriberNotified(sub.id, 'notifiedWarehouseArrival');
+          }
           const result = await resend.emails.send({
             from: FROM,
             to: [email],
