@@ -147,6 +147,7 @@ export async function updateContainerEtas(
     .set(updatePayload)
     .where(eq(containers.id, id))
     .returning();
+  if (!updated) throw new Error(`Container ${id} not found after update`);
   return updated;
 }
 
@@ -215,9 +216,13 @@ export async function markSubscriberNotified(
   subscriberId: string,
   field: 'notifiedPortArrival' | 'notifiedWarehouseArrival'
 ): Promise<void> {
+  const payload =
+    field === 'notifiedPortArrival'
+      ? { notifiedPortArrival: true as const }
+      : { notifiedWarehouseArrival: true as const };
   await db
     .update(shipmentNotificationSubscribers)
-    .set({ [field]: true })
+    .set(payload)
     .where(eq(shipmentNotificationSubscribers.id, subscriberId));
 }
 
@@ -225,8 +230,12 @@ export async function resetSubscriberNotified(
   subscriberId: string,
   field: 'notifiedPortArrival' | 'notifiedWarehouseArrival'
 ): Promise<void> {
+  const payload =
+    field === 'notifiedPortArrival'
+      ? { notifiedPortArrival: false as const }
+      : { notifiedWarehouseArrival: false as const };
   await db
     .update(shipmentNotificationSubscribers)
-    .set({ [field]: false })
+    .set(payload)
     .where(eq(shipmentNotificationSubscribers.id, subscriberId));
 }
