@@ -19,6 +19,7 @@ export const navItems: NavItem[] = [
     ],
   },
   { text: 'Shop', url: '/shop' },
+  { text: 'Track Shipment', url: '/track' },
   { text: 'Contact', url: '/contact' },
   { text: 'Schedule a Call', url: '/schedule' },
   // { text: 'Email', url: '/email' },

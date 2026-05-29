@@ -128,11 +128,18 @@ function Footer() {
                     Contact
                   </Link>
                 </li>
-                <li>
+                <li className="mb-4">
                   <Link
                     href="/schedule"
                     className="hover:text-primary transition-colors">
                     Schedule a Call
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="/track"
+                    className="hover:text-primary transition-colors">
+                    Track Shipment
                   </Link>
                 </li>
               </ul>
