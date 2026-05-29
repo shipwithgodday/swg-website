@@ -74,6 +74,42 @@ function buildWarehouseEmail(opts: {
   };
 }
 
+function buildPortArrivedEmail(opts: {
+  recipientName: string | null;
+  invoiceNumber: string;
+}): { subject: string; html: string } {
+  const name = opts.recipientName ?? 'Valued Customer';
+  const html = `
+    <p>Hi ${name},</p>
+    <p>Great news — your shipment <strong>${opts.invoiceNumber}</strong> has arrived at <strong>Tema Port</strong> and is being processed.</p>
+    <p><a href="${BASE_URL}/track?invoice=${opts.invoiceNumber}">View full shipment status →</a></p>
+    <hr style="border:none;border-top:1px solid #eee;margin:24px 0">
+    <p style="color:#888;font-size:12px">Ship With Godday &mdash; Lucky Godday Business Services</p>
+  `;
+  return {
+    subject: `Your shipment ${opts.invoiceNumber} has arrived at Tema Port`,
+    html,
+  };
+}
+
+function buildWarehouseArrivedEmail(opts: {
+  recipientName: string | null;
+  invoiceNumber: string;
+}): { subject: string; html: string } {
+  const name = opts.recipientName ?? 'Valued Customer';
+  const html = `
+    <p>Hi ${name},</p>
+    <p>Great news — your shipment <strong>${opts.invoiceNumber}</strong> is ready for collection at our <strong>Ghana Warehouse</strong>.</p>
+    <p><a href="${BASE_URL}/track?invoice=${opts.invoiceNumber}">View full shipment status →</a></p>
+    <hr style="border:none;border-top:1px solid #eee;margin:24px 0">
+    <p style="color:#888;font-size:12px">Ship With Godday &mdash; Lucky Godday Business Services</p>
+  `;
+  return {
+    subject: `Your shipment ${opts.invoiceNumber} is ready at our Ghana Warehouse`,
+    html,
+  };
+}
+
 export async function sendShipmentNotifications(
   container: Container,
   changedFields: {
@@ -180,6 +216,74 @@ export async function sendShipmentNotifications(
           );
         }
       }
+    }
+  }
+}
+
+export async function sendArrivalNotifications(
+  container: Container,
+  milestone: 'port' | 'warehouse'
+): Promise<void> {
+  if (!process.env.RESEND_API_KEY) {
+    console.warn('sendArrivalNotifications: RESEND_API_KEY not set, skipping');
+    return;
+  }
+
+  const subscribers = await getSubscribersForContainer(container.id);
+
+  for (const sub of subscribers) {
+    const email = sub.emailOverride ?? sub.customerEmail ?? null;
+    if (!email) {
+      console.warn(
+        `sendArrivalNotifications: no email for subscriber ${sub.id} (invoice ${sub.invoiceNumber}), skipping`
+      );
+      continue;
+    }
+
+    const alreadyNotified =
+      milestone === 'port'
+        ? sub.notifiedPortArrived
+        : sub.notifiedWarehouseArrived;
+
+    if (alreadyNotified) continue;
+
+    const { subject, html } =
+      milestone === 'port'
+        ? buildPortArrivedEmail({
+            recipientName: sub.customerName,
+            invoiceNumber: sub.invoiceNumber,
+          })
+        : buildWarehouseArrivedEmail({
+            recipientName: sub.customerName,
+            invoiceNumber: sub.invoiceNumber,
+          });
+
+    try {
+      const result = await resend.emails.send({
+        from: FROM,
+        to: [email],
+        subject,
+        html,
+      });
+      if (result.error) {
+        console.error(
+          `sendArrivalNotifications: Resend error to ${email}: ${result.error.message}`
+        );
+      } else {
+        const flag =
+          milestone === 'port'
+            ? 'notifiedPortArrived'
+            : 'notifiedWarehouseArrived';
+        await markSubscriberNotified(sub.id, flag);
+        console.log(
+          `sendArrivalNotifications: sent ${milestone} arrival to ${email} (id ${result.data?.id})`
+        );
+      }
+    } catch (err) {
+      console.error(
+        `sendArrivalNotifications: unexpected error sending ${milestone} arrival`,
+        err
+      );
     }
   }
 }
