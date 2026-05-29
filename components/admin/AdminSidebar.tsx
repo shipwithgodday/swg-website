@@ -8,6 +8,7 @@ import {
   Mail,
   Menu,
   Package,
+  Ship,
   ShoppingCart,
   Truck,
   Users,
@@ -33,6 +34,12 @@ const NAV = [
     items: [
       { href: '/admin/orders', label: 'Orders', icon: ShoppingCart },
       { href: '/admin/customers', label: 'Customers', icon: Users },
+    ],
+  },
+  {
+    section: 'Logistics',
+    items: [
+      { href: '/admin/shipments', label: 'Shipments', icon: Ship },
     ],
   },
   {
