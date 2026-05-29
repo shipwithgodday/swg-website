@@ -19,6 +19,8 @@ type TrackResult =
       } | null;
       etaPort: string | null;
       etaWarehouse: string | null;
+      arrivedAtPort: string | null;
+      arrivedAtWarehouse: string | null;
     }
   | { found: false };
 
@@ -181,22 +183,34 @@ export default function TrackPage() {
                   <Ship className="size-5 shrink-0 text-[#00254F]" />
                   <div>
                     <p className="text-xs font-medium text-zinc-500">
-                      ETA — Tema Port
+                      {result.arrivedAtPort ? 'Arrived — Tema Port' : 'ETA — Tema Port'}
                     </p>
-                    <p className="text-sm font-semibold text-zinc-900">
-                      {formatEta(result.etaPort)}
-                    </p>
+                    {result.arrivedAtPort ? (
+                      <p className="text-sm font-semibold text-green-700">
+                        ✓ Arrived {format(new Date(result.arrivedAtPort), 'd MMMM yyyy')}
+                      </p>
+                    ) : (
+                      <p className="text-sm font-semibold text-zinc-900">
+                        {formatEta(result.etaPort)}
+                      </p>
+                    )}
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
                   <Warehouse className="size-5 shrink-0 text-[#00254F]" />
                   <div>
                     <p className="text-xs font-medium text-zinc-500">
-                      ETA — Ghana Warehouse
+                      {result.arrivedAtWarehouse ? 'Arrived — Ghana Warehouse' : 'ETA — Ghana Warehouse'}
                     </p>
-                    <p className="text-sm font-semibold text-zinc-900">
-                      {formatEta(result.etaWarehouse)}
-                    </p>
+                    {result.arrivedAtWarehouse ? (
+                      <p className="text-sm font-semibold text-green-700">
+                        ✓ Arrived {format(new Date(result.arrivedAtWarehouse), 'd MMMM yyyy')}
+                      </p>
+                    ) : (
+                      <p className="text-sm font-semibold text-zinc-900">
+                        {formatEta(result.etaWarehouse)}
+                      </p>
+                    )}
                   </div>
                 </div>
               </div>

@@ -29,5 +29,7 @@ export async function GET(req: NextRequest) {
       : null,
     etaPort: container.etaPort?.toISOString() ?? null,
     etaWarehouse: container.etaWarehouse?.toISOString() ?? null,
+    arrivedAtPort: container.arrivedAtPort?.toISOString() ?? null,
+    arrivedAtWarehouse: container.arrivedAtWarehouse?.toISOString() ?? null,
   });
 }
