@@ -202,6 +202,8 @@ export const containers = pgTable('containers', {
   containerNumber: text('container_number').notNull().unique(),
   etaPort: timestamp('eta_port', { withTimezone: true }),
   etaWarehouse: timestamp('eta_warehouse', { withTimezone: true }),
+  arrivedAtPort: timestamp('arrived_at_port', { withTimezone: true }),
+  arrivedAtWarehouse: timestamp('arrived_at_warehouse', { withTimezone: true }),
   ...timestamps,
 });
 
@@ -243,6 +245,12 @@ export const shipmentNotificationSubscribers = pgTable(
       .notNull()
       .default(false),
     notifiedWarehouseArrival: boolean('notified_warehouse_arrival')
+      .notNull()
+      .default(false),
+    notifiedPortArrived: boolean('notified_port_arrived')
+      .notNull()
+      .default(false),
+    notifiedWarehouseArrived: boolean('notified_warehouse_arrived')
       .notNull()
       .default(false),
   },
