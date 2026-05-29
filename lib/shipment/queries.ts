@@ -97,7 +97,7 @@ export async function updateContainerEtas(
     etaWarehouseReason?: string | null;
   },
   adjustedBy: string
-): Promise<Container> {
+): Promise<{ before: Container; updated: Container }> {
   const [current] = await db
     .select()
     .from(containers)
@@ -140,7 +140,7 @@ export async function updateContainerEtas(
     }
   }
 
-  if (Object.keys(updatePayload).length === 0) return current;
+  if (Object.keys(updatePayload).length === 0) return { before: current, updated: current };
 
   const [updated] = await db
     .update(containers)
@@ -148,7 +148,7 @@ export async function updateContainerEtas(
     .where(eq(containers.id, id))
     .returning();
   if (!updated) throw new Error(`Container ${id} not found after update`);
-  return updated;
+  return { before: current, updated };
 }
 
 export async function getAdjustmentLog(

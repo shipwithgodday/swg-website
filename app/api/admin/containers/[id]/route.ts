@@ -3,9 +3,6 @@ import { z } from 'zod';
 import { auth } from '@clerk/nextjs/server';
 import { isAdmin } from '@/lib/shop/auth';
 import { updateContainerEtas } from '@/lib/shipment/queries';
-import { db } from '@/lib/db';
-import { containers } from '@/lib/db/schema';
-import { eq } from 'drizzle-orm';
 import { sendShipmentNotifications } from '@/lib/shipment/notifications';
 
 function unauthorized() {
@@ -43,16 +40,6 @@ export async function PATCH(
     );
   }
 
-  // Load current state before update to detect reschedules
-  const [before] = await db
-    .select()
-    .from(containers)
-    .where(eq(containers.id, id));
-
-  if (!before) {
-    return NextResponse.json({ error: 'Container not found' }, { status: 404 });
-  }
-
   const { etaPort, etaWarehouse, etaPortReason, etaWarehouseReason } =
     parsed.data;
 
@@ -66,7 +53,16 @@ export async function PATCH(
     updates.etaWarehouseReason = etaWarehouseReason ?? null;
   }
 
-  const updated = await updateContainerEtas(id, updates, userId ?? 'admin');
+  let before: Awaited<ReturnType<typeof updateContainerEtas>>['before'];
+  let updated: Awaited<ReturnType<typeof updateContainerEtas>>['updated'];
+  try {
+    ({ before, updated } = await updateContainerEtas(id, updates, userId ?? 'admin'));
+  } catch (err) {
+    if (err instanceof Error && err.message.includes('not found')) {
+      return NextResponse.json({ error: 'Container not found' }, { status: 404 });
+    }
+    throw err;
+  }
 
   // Detect which fields actually changed for notification purposes
   const portChanged =
