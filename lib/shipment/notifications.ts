@@ -113,9 +113,6 @@ export async function sendShipmentNotifications(
           reason: changedFields.etaPortReason ?? null,
         });
         try {
-          if (isReschedule) {
-            await resetSubscriberNotified(sub.id, 'notifiedPortArrival');
-          }
           const result = await resend.emails.send({
             from: FROM,
             to: [email],
@@ -127,6 +124,9 @@ export async function sendShipmentNotifications(
               `sendShipmentNotifications: Resend error for port notification to ${email}: ${result.error.message}`
             );
           } else {
+            if (isReschedule) {
+              await resetSubscriberNotified(sub.id, 'notifiedPortArrival');
+            }
             await markSubscriberNotified(sub.id, 'notifiedPortArrival');
             console.log(
               `sendShipmentNotifications: sent port ETA to ${email} (id ${result.data?.id})`
@@ -154,9 +154,6 @@ export async function sendShipmentNotifications(
           reason: changedFields.etaWarehouseReason ?? null,
         });
         try {
-          if (isReschedule) {
-            await resetSubscriberNotified(sub.id, 'notifiedWarehouseArrival');
-          }
           const result = await resend.emails.send({
             from: FROM,
             to: [email],
@@ -168,6 +165,9 @@ export async function sendShipmentNotifications(
               `sendShipmentNotifications: Resend error for warehouse notification to ${email}: ${result.error.message}`
             );
           } else {
+            if (isReschedule) {
+              await resetSubscriberNotified(sub.id, 'notifiedWarehouseArrival');
+            }
             await markSubscriberNotified(sub.id, 'notifiedWarehouseArrival');
             console.log(
               `sendShipmentNotifications: sent warehouse ETA to ${email} (id ${result.data?.id})`

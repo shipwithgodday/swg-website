@@ -16,6 +16,17 @@ export default function AdminShipmentsPage() {
   async function loadContainers() {
     fetch('/api/admin/containers')
       .then((r) => r.json())
+      .then((rows: Array<Record<string, unknown>>) =>
+        rows.map((r) => ({
+          ...r,
+          etaPort: r.etaPort ? new Date(r.etaPort as string) : null,
+          etaWarehouse: r.etaWarehouse
+            ? new Date(r.etaWarehouse as string)
+            : null,
+          createdAt: new Date(r.createdAt as string),
+          updatedAt: new Date(r.updatedAt as string),
+        } as ContainerRow))
+      )
       .then(setContainers)
       .catch(console.error);
   }
