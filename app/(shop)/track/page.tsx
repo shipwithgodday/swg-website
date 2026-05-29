@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import { format } from 'date-fns';
 import { toast } from 'sonner';
-import { Ship, Warehouse, Loader2, Plus, X } from 'lucide-react';
+import { Ship, Warehouse, Loader2, Plus, X, Bell } from 'lucide-react';
 import { PageHero } from '@/components/shared/PageHero';
 import Container from '@/components/shared/container';
 import { MotionReveal } from '@/components/shared/MotionReveal';
@@ -44,6 +44,7 @@ interface ResultCardProps {
   entry: ResultEntry;
   notifyStep: NotifyStep;
   emailInput: string;
+  hideCustomer?: boolean;
   onEmailChange: (v: string) => void;
   onNotifyStart: () => void;
   onNotifySubmit: () => void;
@@ -54,6 +55,7 @@ function ResultCard({
   entry,
   notifyStep,
   emailInput,
+  hideCustomer = false,
   onEmailChange,
   onNotifyStart,
   onNotifySubmit,
@@ -99,7 +101,7 @@ function ResultCard({
             {result.invoiceNumber}
           </p>
         </div>
-        {result.customer?.name && (
+        {!hideCustomer && result.customer?.name && (
           <div className="text-right">
             <span className="text-xs text-zinc-400">Customer</span>
             <p className="text-sm font-medium text-zinc-900">
@@ -228,6 +230,19 @@ export default function TrackPage() {
   const anyFoundNeedsEmail = unsubscribedFoundIndices.some(
     (i) => !entries[i]?.data?.customer?.hasEmail
   );
+
+  const foundEntries = entries.filter(
+    (e): e is ResultEntry & { data: Extract<TrackResult, { found: true }> } =>
+      e.status === 'found' && !!e.data
+  );
+  const sharedCustomerName =
+    foundEntries.length > 1 &&
+    foundEntries[0].data.customer?.name != null &&
+    foundEntries.every(
+      (e) => e.data.customer?.name === foundEntries[0].data.customer?.name
+    )
+      ? foundEntries[0].data.customer.name
+      : null;
 
   function addInvoice() {
     if (invoices.length >= MAX_INVOICES) return;
@@ -449,47 +464,25 @@ export default function TrackPage() {
         </MotionReveal>
 
         {showResults && (
-          <MotionReveal className="mx-auto mt-10 max-w-lg space-y-4">
-            {entries.map((entry, idx) => (
-              <ResultCard
-                key={`${entry.invoice}-${idx}`}
-                entry={entry}
-                notifyStep={notifySteps[idx] ?? 'idle'}
-                emailInput={emailInputs[idx] ?? ''}
-                onEmailChange={(val) =>
-                  setEmailInputs((prev) => {
-                    const next = [...prev];
-                    next[idx] = val;
-                    return next;
-                  })
-                }
-                onNotifyStart={() =>
-                  setNotifySteps((prev) => {
-                    const next = [...prev];
-                    next[idx] = 'confirming';
-                    return next;
-                  })
-                }
-                onNotifySubmit={() => handleSubscribe(idx)}
-                onNotifyCancel={() =>
-                  setNotifySteps((prev) => {
-                    const next = [...prev];
-                    next[idx] = 'idle';
-                    return next;
-                  })
-                }
-              />
-            ))}
-
+          <MotionReveal className="mx-auto mt-10 space-y-4">
+            {/* Notify All — shown at the top so it's visible before scrolling on mobile */}
             {showNotifyAll && notifyAllStep !== 'done' && (
-              <div className="rounded-2xl border border-zinc-200/70 bg-white p-6 shadow-sm">
+              <div className="w-full rounded-2xl border border-primary/30 bg-primary/5 p-4 shadow-sm">
                 {notifyAllStep === 'idle' && (
-                  <button
-                    type="button"
-                    onClick={() => setNotifyAllStep('confirming')}
-                    className="w-full rounded-lg border border-zinc-200 px-4 py-2 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-50">
-                    Notify Me for All Shipments
-                  </button>
+                  <div className="flex items-center justify-between gap-4">
+                    <div className="flex items-center gap-2.5">
+                      <Bell className="size-4 shrink-0 text-zinc-700" />
+                      <p className="text-sm font-medium text-zinc-700">
+                        Get updates for all {unsubscribedFoundIndices.length} shipments at once
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setNotifyAllStep('confirming')}
+                      className="shrink-0 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-zinc-950 transition-opacity hover:opacity-90">
+                      Notify All
+                    </button>
+                  </div>
                 )}
 
                 {(notifyAllStep === 'confirming' ||
@@ -542,12 +535,56 @@ export default function TrackPage() {
             )}
 
             {notifyAllStep === 'done' && (
-              <div className="rounded-2xl border border-zinc-200/70 bg-white p-6 shadow-sm">
-                <p className="rounded-lg bg-green-50 px-4 py-3 text-sm text-green-800">
-                  You&apos;re subscribed to all shipments!
-                </p>
+              <p className="w-full rounded-2xl bg-green-50 px-5 py-4 text-sm text-green-800">
+                You&apos;re subscribed to all shipments!
+              </p>
+            )}
+
+            {/* Shared customer header */}
+            {sharedCustomerName && (
+              <div className="flex items-center gap-2 px-1">
+                <span className="text-xs text-zinc-400">Customer</span>
+                <span className="text-sm font-semibold text-zinc-800">
+                  {sharedCustomerName}
+                </span>
               </div>
             )}
+
+            {/* Cards — row on desktop, column on mobile */}
+            <div className="flex flex-col gap-4 md:flex-row md:items-start">
+              {entries.map((entry, idx) => (
+                <div key={`${entry.invoice}-${idx}`} className="md:flex-1 md:min-w-0">
+                  <ResultCard
+                    entry={entry}
+                    notifyStep={notifySteps[idx] ?? 'idle'}
+                    emailInput={emailInputs[idx] ?? ''}
+                    hideCustomer={!!sharedCustomerName}
+                    onEmailChange={(val) =>
+                      setEmailInputs((prev) => {
+                        const next = [...prev];
+                        next[idx] = val;
+                        return next;
+                      })
+                    }
+                    onNotifyStart={() =>
+                      setNotifySteps((prev) => {
+                        const next = [...prev];
+                        next[idx] = 'confirming';
+                        return next;
+                      })
+                    }
+                    onNotifySubmit={() => handleSubscribe(idx)}
+                    onNotifyCancel={() =>
+                      setNotifySteps((prev) => {
+                        const next = [...prev];
+                        next[idx] = 'idle';
+                        return next;
+                      })
+                    }
+                  />
+                </div>
+              ))}
+            </div>
           </MotionReveal>
         )}
       </Container>
