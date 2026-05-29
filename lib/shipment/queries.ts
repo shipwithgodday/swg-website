@@ -57,6 +57,8 @@ export async function getContainersWithSubscriberCounts(): Promise<ContainerRow[
       containerNumber: containers.containerNumber,
       etaPort: containers.etaPort,
       etaWarehouse: containers.etaWarehouse,
+      arrivedAtPort: containers.arrivedAtPort,
+      arrivedAtWarehouse: containers.arrivedAtWarehouse,
       createdAt: containers.createdAt,
       updatedAt: containers.updatedAt,
       subscriberCount: sql<number>`count(${shipmentNotificationSubscribers.id})::int`,
@@ -161,6 +163,24 @@ export async function getAdjustmentLog(
     .orderBy(etaAdjustments.adjustedAt);
 }
 
+export async function markContainerArrived(
+  id: string,
+  milestone: 'port' | 'warehouse'
+): Promise<Container> {
+  const col =
+    milestone === 'port'
+      ? { arrivedAtPort: new Date() }
+      : { arrivedAtWarehouse: new Date() };
+
+  const [updated] = await db
+    .update(containers)
+    .set(col)
+    .where(eq(containers.id, id))
+    .returning();
+  if (!updated) throw new Error(`Container ${id} not found`);
+  return updated;
+}
+
 export async function upsertSubscriber(
   containerId: string,
   customerId: string | null,
@@ -198,6 +218,10 @@ export async function getSubscribersForContainer(
         shipmentNotificationSubscribers.notifiedPortArrival,
       notifiedWarehouseArrival:
         shipmentNotificationSubscribers.notifiedWarehouseArrival,
+      notifiedPortArrived:
+        shipmentNotificationSubscribers.notifiedPortArrived,
+      notifiedWarehouseArrived:
+        shipmentNotificationSubscribers.notifiedWarehouseArrived,
       customerEmail: customers.email,
       customerName: customers.name,
     })
@@ -214,12 +238,20 @@ export async function getSubscribersForContainer(
 
 export async function markSubscriberNotified(
   subscriberId: string,
-  field: 'notifiedPortArrival' | 'notifiedWarehouseArrival'
+  field:
+    | 'notifiedPortArrival'
+    | 'notifiedWarehouseArrival'
+    | 'notifiedPortArrived'
+    | 'notifiedWarehouseArrived'
 ): Promise<void> {
   const payload =
     field === 'notifiedPortArrival'
       ? { notifiedPortArrival: true as const }
-      : { notifiedWarehouseArrival: true as const };
+      : field === 'notifiedWarehouseArrival'
+      ? { notifiedWarehouseArrival: true as const }
+      : field === 'notifiedPortArrived'
+      ? { notifiedPortArrived: true as const }
+      : { notifiedWarehouseArrived: true as const };
   await db
     .update(shipmentNotificationSubscribers)
     .set(payload)
