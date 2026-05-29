@@ -215,14 +215,14 @@ export default function TrackPage() {
                 <div className="mt-5 space-y-3 rounded-lg bg-zinc-50 p-4">
                   {result.customer?.hasEmail && result.customer.maskedEmail && (
                     <p className="text-sm text-zinc-600">
-                      We'll send updates to{' '}
+                      We&apos;ll send updates to{' '}
                       <strong>{result.customer.maskedEmail}</strong>
                     </p>
                   )}
                   {needsEmailInput && (
                     <div>
                       <p className="mb-1.5 text-sm text-zinc-600">
-                        We don't have an email on file for you. Please enter
+                        We don&apos;t have an email on file for you. Please enter
                         one to receive notifications.
                       </p>
                       <input
@@ -257,7 +257,7 @@ export default function TrackPage() {
 
               {notifyStep === 'done' && (
                 <p className="mt-5 rounded-lg bg-green-50 px-4 py-3 text-sm text-green-800">
-                  You're subscribed! We'll email you when ETAs are updated.
+                  You&apos;re subscribed! We&apos;ll email you when ETAs are updated.
                 </p>
               )}
             </div>
@@ -282,7 +282,7 @@ export default function TrackPage() {
           <MotionReveal className="mx-auto max-w-md text-center">
             <div className="rounded-2xl border border-zinc-200/70 bg-white p-8 shadow-sm">
               <p className="text-zinc-700">
-                We couldn't find a shipment for that invoice number. Please
+                We couldn&apos;t find a shipment for that invoice number. Please
                 double-check and try again.
               </p>
               <button

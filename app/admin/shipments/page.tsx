@@ -33,8 +33,7 @@ export default function AdminShipmentsPage() {
 
   useEffect(() => {
     loadContainers();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   function handleEdit(container: ContainerRow) {
     setEditTarget(container);
