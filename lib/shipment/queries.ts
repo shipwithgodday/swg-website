@@ -1,5 +1,5 @@
 import 'server-only';
-import { eq, sql } from 'drizzle-orm';
+import { eq, sql, isNull, and } from 'drizzle-orm';
 import { db } from '@/lib/db';
 import {
   containers,
@@ -171,13 +171,26 @@ export async function markContainerArrived(
     milestone === 'port'
       ? { arrivedAtPort: new Date() }
       : { arrivedAtWarehouse: new Date() };
+  const guard =
+    milestone === 'port'
+      ? isNull(containers.arrivedAtPort)
+      : isNull(containers.arrivedAtWarehouse);
 
   const [updated] = await db
     .update(containers)
     .set(col)
-    .where(eq(containers.id, id))
+    .where(and(eq(containers.id, id), guard))
     .returning();
-  if (!updated) throw new Error(`Container ${id} not found`);
+
+  if (!updated) {
+    // Either not found or already arrived — return existing row
+    const [existing] = await db
+      .select()
+      .from(containers)
+      .where(eq(containers.id, id));
+    if (!existing) throw new Error(`Container ${id} not found`);
+    return existing;
+  }
   return updated;
 }
 
