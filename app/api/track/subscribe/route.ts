@@ -35,7 +35,7 @@ export async function POST(req: NextRequest) {
   const hasEmail = !!customer?.email || !!emailOverride;
   if (!hasEmail) {
     return NextResponse.json(
-      { error: 'An email address is required to subscribe' },
+      { error: 'An email address is required' },
       { status: 400 }
     );
   }
