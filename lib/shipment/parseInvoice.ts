@@ -1,3 +1,8 @@
+/**
+ * Parses an invoice number against a list of known shipping marks.
+ * Returns { containerNumber, shippingMark } where shippingMark is always
+ * uppercase, regardless of input casing. Returns null if no match.
+ */
 export function parseInvoiceNumber(
   invoice: string,
   shippingMarks: string[]

@@ -1,6 +1,6 @@
 export function maskEmail(email: string): string {
   const at = email.indexOf('@');
-  if (at === -1) return email;
+  if (at <= 0) return email;
   const local = email.slice(0, at);
   const domain = email.slice(at);
   const visible = local.slice(0, Math.min(2, local.length));
