@@ -205,20 +205,24 @@ export const containers = pgTable('containers', {
   ...timestamps,
 });
 
-export const etaAdjustments = pgTable('eta_adjustments', {
-  id: uuid('id').primaryKey().defaultRandom(),
-  containerId: uuid('container_id')
-    .notNull()
-    .references(() => containers.id, { onDelete: 'cascade' }),
-  field: text('field').notNull(), // "etaPort" | "etaWarehouse"
-  previousDate: timestamp('previous_date', { withTimezone: true }),
-  newDate: timestamp('new_date', { withTimezone: true }).notNull(),
-  reason: text('reason'),
-  adjustedAt: timestamp('adjusted_at', { withTimezone: true })
-    .notNull()
-    .defaultNow(),
-  adjustedBy: text('adjusted_by').notNull(),
-});
+export const etaAdjustments = pgTable(
+  'eta_adjustments',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    containerId: uuid('container_id')
+      .notNull()
+      .references(() => containers.id, { onDelete: 'cascade' }),
+    field: text('field').notNull(), // "etaPort" | "etaWarehouse"
+    previousDate: timestamp('previous_date', { withTimezone: true }), // null when this is the initial ETA set
+    newDate: timestamp('new_date', { withTimezone: true }).notNull(),
+    reason: text('reason'),
+    adjustedAt: timestamp('adjusted_at', { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    adjustedBy: text('adjusted_by').notNull(),
+  },
+  (t) => [index('eta_adjustments_container_id_idx').on(t.containerId)]
+);
 
 export const shipmentNotificationSubscribers = pgTable(
   'shipment_notification_subscribers',
@@ -244,6 +248,7 @@ export const shipmentNotificationSubscribers = pgTable(
   },
   (t) => [
     uniqueIndex('subscribers_invoice_unique').on(t.invoiceNumber, t.containerId),
+    index('subscribers_container_id_idx').on(t.containerId),
   ]
 );
 

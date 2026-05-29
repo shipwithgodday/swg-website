@@ -1,0 +1,2 @@
+CREATE INDEX "eta_adjustments_container_id_idx" ON "eta_adjustments" USING btree ("container_id");--> statement-breakpoint
+CREATE INDEX "subscribers_container_id_idx" ON "shipment_notification_subscribers" USING btree ("container_id");
