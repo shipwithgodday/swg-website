@@ -269,6 +269,7 @@ export default function TrackPage() {
                 setInvoice('');
                 setResult(null);
                 setNotifyStep('idle');
+                setEmailInput('');
               }}
               className="block w-full text-center text-sm text-zinc-500 underline">
               Track a different invoice
