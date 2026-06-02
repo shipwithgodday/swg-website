@@ -112,6 +112,7 @@ export function OrderTrackPanel() {
               type="text"
               value={orderNumber}
               onChange={(e) => setOrderNumber(e.target.value)}
+              aria-label="Order number"
               placeholder="e.g. SWG-7K2P9QXM"
               disabled={isLoading}
               className="block w-full rounded-lg border border-zinc-200 bg-white px-4 py-2.5 text-sm text-zinc-900 placeholder-zinc-400 shadow-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 disabled:opacity-50"
