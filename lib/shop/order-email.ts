@@ -7,6 +7,8 @@ import { formatOrderStatus } from '@/lib/shop/status-format';
 import resend from '@/lib/emails';
 
 const FROM = 'Ship With Godday <info@shipwithgodday.com>';
+const BASE_URL =
+  process.env.NEXT_PUBLIC_BASE_URL ?? 'https://shipwithgodday.com';
 
 interface StatusCopy {
   subject: (orderNumber: string) => string;
@@ -139,6 +141,13 @@ export async function sendOrderStatusEmail(
             order.total
           )}</strong></td></tr>
     </table>
+    <p style="margin:16px 0 4px">
+      <a href="${BASE_URL}/track?order=${order.orderNumber}"
+         style="color:#00254F;font-weight:600;text-decoration:underline">Track your order</a>
+    </p>
+    <p style="color:#777;font-size:12px;margin:0 0 16px">
+      You can check your order status anytime at ${BASE_URL}/track using your order number ${order.orderNumber}.
+    </p>
     <p style="margin:16px 0 4px"><strong>Deliver to</strong></p>
     <p style="color:#555;margin:0">${order.shipName}<br>${order.shipAddress}<br>${order.shipCity}<br>${order.shipPhone}</p>
   `;
