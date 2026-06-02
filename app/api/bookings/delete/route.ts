@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import dbConnect from '@/lib/mongoose';
-import BookingModel from '@/models/Booking';
+import { and, eq } from 'drizzle-orm';
+import { db } from '@/lib/db';
+import { bookings } from '@/lib/db/schema';
+import { isAdmin } from '@/lib/shop/auth';
 
 type DeleteRequestBody = {
   date: string;
@@ -9,7 +11,13 @@ type DeleteRequestBody = {
 
 export async function POST(request: NextRequest) {
   try {
-    // Parse the request body
+    if (!(await isAdmin())) {
+      return NextResponse.json(
+        { success: false, error: 'Unauthorized' },
+        { status: 401 }
+      );
+    }
+
     const body: DeleteRequestBody = await request.json();
     const { date, time } = body;
 
@@ -20,26 +28,15 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Connect to the database
-    await dbConnect();
+    const deleted = await db
+      .delete(bookings)
+      .where(and(eq(bookings.date, date), eq(bookings.time, time)))
+      .returning();
 
-    // Delete the booking
-    const result = await BookingModel.deleteOne({ date, time });
-
-    // Convert the result to a plain JS object to ensure serialization works
-    const serializedResult = {
+    return NextResponse.json({
       success: true,
-      deletedCount: result.deletedCount,
-    };
-
-    if (result.deletedCount === 0) {
-      return NextResponse.json(
-        { success: false, error: 'Booking not found' },
-        { status: 404 }
-      );
-    }
-
-    return NextResponse.json(serializedResult);
+      deletedCount: deleted.length,
+    });
   } catch (error) {
     console.error('Error deleting booking:', error);
     return NextResponse.json(
