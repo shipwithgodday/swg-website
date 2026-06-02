@@ -87,13 +87,6 @@ export const customers = pgTable(
   ]
 );
 
-export const deliveryZones = pgTable('delivery_zones', {
-  id: uuid('id').primaryKey().defaultRandom(),
-  name: text('name').notNull(),
-  fee: integer('fee').notNull(),
-  active: boolean('active').notNull().default(true),
-});
-
 export const orders = pgTable('orders', {
   id: uuid('id').primaryKey().defaultRandom(),
   orderNumber: text('order_number').notNull().unique(),
@@ -102,16 +95,11 @@ export const orders = pgTable('orders', {
     .references(() => customers.id),
   status: text('status').notNull().default('pending'),
   subtotal: integer('subtotal').notNull(),
-  deliveryFee: integer('delivery_fee').notNull(),
   total: integer('total').notNull(),
-  deliveryZoneId: uuid('delivery_zone_id').references(
-    () => deliveryZones.id
-  ),
   shipName: text('ship_name'),
   shipPhone: text('ship_phone'),
   shipAddress: text('ship_address'),
   shipCity: text('ship_city'),
-  shipRegion: text('ship_region'),
   paystackReference: text('paystack_reference'),
   ...timestamps,
 });
@@ -167,21 +155,10 @@ export const customersRelations = relations(customers, ({ many }) => ({
   orders: many(orders),
 }));
 
-export const deliveryZonesRelations = relations(
-  deliveryZones,
-  ({ many }) => ({
-    orders: many(orders),
-  })
-);
-
 export const ordersRelations = relations(orders, ({ one, many }) => ({
   customer: one(customers, {
     fields: [orders.customerId],
     references: [customers.id],
-  }),
-  deliveryZone: one(deliveryZones, {
-    fields: [orders.deliveryZoneId],
-    references: [deliveryZones.id],
   }),
   items: many(orderItems),
 }));

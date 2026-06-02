@@ -91,9 +91,7 @@ export default async function AdminOrderDetailPage({
             <div className="mt-3 space-y-0.5 text-sm">
               <p className="font-medium text-zinc-900">{order.shipName}</p>
               <p className="text-zinc-500">{order.shipAddress}</p>
-              <p className="text-zinc-500">
-                {order.shipCity}, {order.shipRegion}
-              </p>
+              <p className="text-zinc-500">{order.shipCity}</p>
               <p className="text-zinc-500">{order.shipPhone}</p>
             </div>
           </section>

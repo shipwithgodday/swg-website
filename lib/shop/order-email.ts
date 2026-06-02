@@ -134,17 +134,13 @@ export async function sendOrderStatusEmail(
           <td style="text-align:right;padding-top:8px;border-top:1px solid #eee">${formatCedis(
             order.subtotal
           )}</td></tr>
-      <tr><td>Delivery${order.shipRegion ? ` (${order.shipRegion})` : ''}</td>
-          <td style="text-align:right">${formatCedis(
-            order.deliveryFee
-          )}</td></tr>
       <tr><td style="padding-top:8px;border-top:1px solid #eee"><strong>Total</strong></td>
           <td style="text-align:right;padding-top:8px;border-top:1px solid #eee"><strong>${formatCedis(
             order.total
           )}</strong></td></tr>
     </table>
     <p style="margin:16px 0 4px"><strong>Deliver to</strong></p>
-    <p style="color:#555;margin:0">${order.shipName}<br>${order.shipAddress}<br>${order.shipCity}, ${order.shipRegion}<br>${order.shipPhone}</p>
+    <p style="color:#555;margin:0">${order.shipName}<br>${order.shipAddress}<br>${order.shipCity}<br>${order.shipPhone}</p>
   `;
 
   // Resend doesn't throw on send failures; it resolves with

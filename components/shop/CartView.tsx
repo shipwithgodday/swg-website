@@ -112,9 +112,6 @@ export function CartView({ onNavigate }: { onNavigate?: () => void }) {
           <span>Total</span>
           <span className="tabular-nums">{formatCedis(subtotal)}</span>
         </div>
-        <p className="mt-1 text-xs text-muted-foreground">
-          Delivery is calculated at checkout.
-        </p>
         <Button asChild className="mt-4 w-full">
           <Link href="/shop/checkout" onClick={onNavigate}>
             Checkout

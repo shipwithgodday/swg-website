@@ -68,7 +68,7 @@ export default async function OrderDetailPage({
               <p className="text-muted-foreground">
                 {order.shipAddress}
                 <br />
-                {order.shipCity}, {order.shipRegion}
+                {order.shipCity}
                 <br />
                 {order.shipPhone}
               </p>

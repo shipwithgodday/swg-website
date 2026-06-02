@@ -10,7 +10,6 @@ import {
   Package,
   Ship,
   ShoppingCart,
-  Truck,
   Users,
   X,
 } from 'lucide-react';
@@ -20,13 +19,19 @@ import { cn } from '@/lib/utils';
 const NAV = [
   {
     section: 'Overview',
-    items: [{ href: '/admin', label: 'Dashboard', icon: LayoutDashboard }],
+    items: [
+      { href: '/admin', label: 'Dashboard', icon: LayoutDashboard },
+    ],
   },
   {
     section: 'Catalog',
     items: [
       { href: '/admin/products', label: 'Products', icon: Package },
-      { href: '/admin/categories', label: 'Categories', icon: FolderTree },
+      {
+        href: '/admin/categories',
+        label: 'Categories',
+        icon: FolderTree,
+      },
     ],
   },
   {
@@ -45,16 +50,6 @@ const NAV = [
   {
     section: 'Marketing',
     items: [{ href: '/admin/emails', label: 'Emails', icon: Mail }],
-  },
-  {
-    section: 'Settings',
-    items: [
-      {
-        href: '/admin/settings/delivery-zones',
-        label: 'Delivery zones',
-        icon: Truck,
-      },
-    ],
   },
 ];
 
@@ -97,7 +92,7 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
                       'flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors',
                       active
                         ? 'bg-primary text-zinc-950'
-                        : 'text-zinc-400 hover:bg-zinc-900 hover:text-white'
+                        : 'text-zinc-400 hover:bg-zinc-900 hover:text-white',
                     )}>
                     <Icon className="size-4" />
                     {label}
@@ -110,7 +105,7 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
       </nav>
 
       <div className="border-t border-zinc-900 px-5 py-4">
-        <p className="text-xs text-zinc-600">Lucky Godday Business Services</p>
+        <p className="text-xs text-zinc-600">Ship With Godday</p>
       </div>
     </>
   );
@@ -153,7 +148,9 @@ export function AdminSidebar() {
           <span className="grid size-7 place-items-center rounded-lg bg-primary text-zinc-950">
             <span className="text-xs font-bold">G</span>
           </span>
-          <span className="text-sm font-semibold text-white">Godday</span>
+          <span className="text-sm font-semibold text-white">
+            Godday
+          </span>
         </Link>
         <button
           type="button"

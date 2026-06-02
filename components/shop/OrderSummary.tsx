@@ -13,9 +13,7 @@ interface Item {
 
 interface Order {
   subtotal: number;
-  deliveryFee: number;
   total: number;
-  shipRegion: string | null;
 }
 
 export function OrderSummary({
@@ -60,19 +58,6 @@ export function OrderSummary({
           <span>Subtotal</span>
           <span className="tabular-nums">
             {formatCedis(order.subtotal)}
-          </span>
-        </div>
-        <div className="flex justify-between text-muted-foreground">
-          <span>
-            Delivery{' '}
-            {order.shipRegion && (
-              <span className="text-foreground/70">
-                ({order.shipRegion})
-              </span>
-            )}
-          </span>
-          <span className="tabular-nums">
-            {formatCedis(order.deliveryFee)}
           </span>
         </div>
         <div className="mt-2 flex justify-between border-t border-border pt-3 text-base font-semibold">

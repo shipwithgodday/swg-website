@@ -76,11 +76,3 @@ export const customerCreateSchema = z.object({
 });
 
 export type CustomerCreateInput = z.infer<typeof customerCreateSchema>;
-
-export const deliveryZoneSchema = z.object({
-  name: z.string().trim().min(1, 'Name is required'),
-  fee: z.number().int().nonnegative('Fee must be 0 or more'),
-  active: z.boolean(),
-});
-
-export type DeliveryZoneInput = z.infer<typeof deliveryZoneSchema>;

@@ -7,7 +7,6 @@ import { db } from '@/lib/db';
 import {
   productVariants,
   products,
-  deliveryZones,
   orders,
   orderItems,
 } from '@/lib/db/schema';
@@ -27,7 +26,6 @@ const checkoutSchema = z.object({
       })
     )
     .min(1, 'Your cart is empty'),
-  deliveryZoneId: z.string().uuid(),
   shipName: z.string().trim().min(1, 'Name is required'),
   shipPhone: z.string().trim().min(1, 'Phone is required'),
   shipAddress: z.string().trim().min(1, 'Address is required'),
@@ -119,20 +117,11 @@ export async function createCheckout(
     });
   }
 
-  // Delivery zone.
-  const [zone] = await db
-    .select()
-    .from(deliveryZones)
-    .where(eq(deliveryZones.id, input.deliveryZoneId));
-  if (!zone || !zone.active) {
-    return { ok: false, error: 'Select a valid delivery region.' };
-  }
-
   const subtotal = lineItems.reduce(
     (s, l) => s + l.unitPrice * l.quantity,
     0
   );
-  const total = subtotal + zone.fee;
+  const total = subtotal;
 
   // Resolve the customer (and allocate a shipping mark if new). Signed-in
   // users go through `resolveCustomerId` (which may link an imported row to
@@ -178,14 +167,11 @@ export async function createCheckout(
         customerId,
         status: 'pending',
         subtotal,
-        deliveryFee: zone.fee,
         total,
-        deliveryZoneId: zone.id,
         shipName: input.shipName,
         shipPhone: input.shipPhone,
         shipAddress: input.shipAddress,
         shipCity: input.shipCity,
-        shipRegion: zone.name,
         paystackReference: orderNumber,
       }),
       db.insert(orderItems).values(

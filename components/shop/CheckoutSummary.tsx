@@ -4,10 +4,10 @@ import { useCart } from '@/lib/cart-context';
 import { formatCedis } from '@/lib/shop/money';
 import { PreorderBadge } from './PreorderBadge';
 
-/** Right-rail summary that mirrors the cart with totals incl. delivery. */
-export function CheckoutSummary({ deliveryFee }: { deliveryFee: number }) {
+/** Right-rail summary that mirrors the cart with totals. */
+export function CheckoutSummary() {
   const { items, subtotal } = useCart();
-  const total = subtotal + deliveryFee;
+  const total = subtotal;
   return (
     <aside className="rounded-2xl border border-border bg-white p-5 shadow-sm md:sticky md:top-32">
       <h2 className="text-sm font-semibold tracking-wide text-muted-foreground uppercase">
@@ -53,10 +53,6 @@ export function CheckoutSummary({ deliveryFee }: { deliveryFee: number }) {
         <div className="flex justify-between text-muted-foreground">
           <span>Subtotal</span>
           <span className="tabular-nums">{formatCedis(subtotal)}</span>
-        </div>
-        <div className="flex justify-between text-muted-foreground">
-          <span>Delivery</span>
-          <span className="tabular-nums">{formatCedis(deliveryFee)}</span>
         </div>
         <div className="mt-2 flex justify-between border-t border-border pt-3 text-base font-semibold">
           <span>Total</span>

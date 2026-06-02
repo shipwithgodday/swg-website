@@ -13,7 +13,6 @@
     "db:migrate": "drizzle-kit migrate",
     "db:studio": "drizzle-kit studio",
     "import:customers": "tsx --env-file .env.local scripts/import-customers.ts",
-    "seed:zones": "tsx --env-file .env.local scripts/seed-delivery-zones.ts",
     "seed:products": "tsx --env-file .env.local scripts/seed-products.ts"
   },
   "dependencies": {
