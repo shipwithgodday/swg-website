@@ -13,7 +13,8 @@
     "db:migrate": "drizzle-kit migrate",
     "db:studio": "drizzle-kit studio",
     "import:customers": "tsx --env-file .env.local scripts/import-customers.ts",
-    "seed:products": "tsx --env-file .env.local scripts/seed-products.ts"
+    "seed:products": "tsx --env-file .env.local scripts/seed-products.ts",
+    "seed:booking-hours": "tsx --env-file .env.local scripts/seed-booking-hours.ts"
   },
   "dependencies": {
     "@clerk/nextjs": "6.19.4",
