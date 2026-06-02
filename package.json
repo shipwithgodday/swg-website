@@ -14,7 +14,8 @@
     "db:studio": "drizzle-kit studio",
     "import:customers": "tsx --env-file .env.local scripts/import-customers.ts",
     "seed:products": "tsx --env-file .env.local scripts/seed-products.ts",
-    "seed:booking-hours": "tsx --env-file .env.local scripts/seed-booking-hours.ts"
+    "seed:booking-hours": "tsx --env-file .env.local scripts/seed-booking-hours.ts",
+    "migrate:bookings": "tsx --env-file .env.local scripts/migrate-bookings.ts"
   },
   "dependencies": {
     "@clerk/nextjs": "6.19.4",
