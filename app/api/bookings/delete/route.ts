@@ -2,22 +2,17 @@ import { NextRequest, NextResponse } from 'next/server';
 import { and, eq } from 'drizzle-orm';
 import { db } from '@/lib/db';
 import { bookings } from '@/lib/db/schema';
-import { isAdmin } from '@/lib/shop/auth';
 
 type DeleteRequestBody = {
   date: string;
   time: string;
 };
 
+// Public endpoint: used by the booking wizard to roll back a just-created
+// booking when the confirmation email fails. Admin-initiated deletions use
+// the guarded `deleteBooking` server action, not this route.
 export async function POST(request: NextRequest) {
   try {
-    if (!(await isAdmin())) {
-      return NextResponse.json(
-        { success: false, error: 'Unauthorized' },
-        { status: 401 }
-      );
-    }
-
     const body: DeleteRequestBody = await request.json();
     const { date, time } = body;
 
