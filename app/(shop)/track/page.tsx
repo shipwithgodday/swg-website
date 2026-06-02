@@ -1,11 +1,12 @@
 'use client';
-import { useState } from 'react';
+import { Suspense, useState } from 'react';
 import { format } from 'date-fns';
 import { toast } from 'sonner';
 import { Ship, Warehouse, Loader2, Plus, X, Bell } from 'lucide-react';
 import { PageHero } from '@/components/shared/PageHero';
 import Container from '@/components/shared/container';
 import { MotionReveal } from '@/components/shared/MotionReveal';
+import { OrderTrackPanel } from '@/components/shop/OrderTrackPanel';
 
 const MAX_INVOICES = 5;
 
@@ -587,6 +588,10 @@ export default function TrackPage() {
             </div>
           </MotionReveal>
         )}
+
+        <Suspense fallback={null}>
+          <OrderTrackPanel />
+        </Suspense>
       </Container>
     </>
   );
