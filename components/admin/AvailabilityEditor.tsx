@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useTransition } from 'react';
+import { useState, useTransition, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import {
   saveWeekdayHours,
   addBlackoutDate,
@@ -48,6 +49,11 @@ export function AvailabilityEditor({
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
+  const router = useRouter();
+
+  useEffect(() => {
+    setBlackouts(initialBlackouts);
+  }, [initialBlackouts]);
 
   function updateRow(weekday: number, patch: Partial<WeekdayRow>) {
     setRows((prev) =>
@@ -74,16 +80,10 @@ export function AvailabilityEditor({
         reason: newReason || undefined,
       });
       if (res.ok) {
-        // Optimistic local add; server revalidation will reconcile.
-        setBlackouts((prev) =>
-          [
-            ...prev,
-            { id: `tmp-${newDate}`, date: newDate, reason: newReason || null },
-          ].sort((a, b) => a.date.localeCompare(b.date))
-        );
         setNewDate('');
         setNewReason('');
         setMessage('Blackout date added.');
+        router.refresh();
       } else {
         setError(res.error);
       }
@@ -93,8 +93,12 @@ export function AvailabilityEditor({
   function onRemoveBlackout(id: string) {
     startTransition(async () => {
       const res = await removeBlackoutDate(id);
-      if (res.ok) setBlackouts((prev) => prev.filter((b) => b.id !== id));
-      else setError(res.error);
+      if (res.ok) {
+        setBlackouts((prev) => prev.filter((b) => b.id !== id));
+        router.refresh();
+      } else {
+        setError(res.error);
+      }
     });
   }
 
@@ -130,6 +134,7 @@ export function AvailabilityEditor({
               <div className="flex flex-wrap items-center gap-2">
                 <input
                   type="time"
+                  aria-label="Open time"
                   value={r.openTime}
                   disabled={!r.isOpen}
                   onChange={(e) =>
@@ -140,6 +145,7 @@ export function AvailabilityEditor({
                 <span className="text-zinc-400">to</span>
                 <input
                   type="time"
+                  aria-label="Close time"
                   value={r.closeTime}
                   disabled={!r.isOpen}
                   onChange={(e) =>
@@ -187,12 +193,14 @@ export function AvailabilityEditor({
         <div className="mt-4 flex flex-wrap items-end gap-2">
           <input
             type="date"
+            aria-label="Blackout date"
             value={newDate}
             onChange={(e) => setNewDate(e.target.value)}
             className="rounded-lg border border-zinc-300 px-2 py-1 text-sm"
           />
           <input
             type="text"
+            aria-label="Reason"
             placeholder="Reason (optional)"
             value={newReason}
             onChange={(e) => setNewReason(e.target.value)}
@@ -225,7 +233,7 @@ export function AvailabilityEditor({
               <button
                 type="button"
                 onClick={() => onRemoveBlackout(b.id)}
-                disabled={isPending || b.id.startsWith('tmp-')}
+                disabled={isPending}
                 className="text-xs font-medium text-red-600 hover:underline disabled:opacity-40"
               >
                 Remove
