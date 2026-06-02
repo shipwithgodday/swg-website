@@ -1,5 +1,6 @@
 'use client';
 
+import { SignedIn } from '@clerk/nextjs';
 import DesktopNavItem from './DesktopNavItem';
 import { navItems } from './navItems';
 
@@ -8,6 +9,9 @@ const Links: React.FC = () => (
     {navItems.map((item, index) => (
       <DesktopNavItem key={index} {...item} />
     ))}
+    <SignedIn>
+      <DesktopNavItem text="Orders" url="/shop/orders" />
+    </SignedIn>
   </div>
 );
 
