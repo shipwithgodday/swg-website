@@ -44,6 +44,13 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
             setMenuOpen={setMenuOpen}
           />
         ))}
+        <SignedIn>
+          <MobileNavItem
+            text="Orders"
+            url="/shop/orders"
+            setMenuOpen={setMenuOpen}
+          />
+        </SignedIn>
         <div className="mt-3 flex flex-wrap items-center gap-3">
           <SignedOut>
             <SignInButton mode="modal">
