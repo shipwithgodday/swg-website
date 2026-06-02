@@ -103,7 +103,7 @@ export const EmailTemplate = ({
   const bookingDate = parse(
     bookingDetails.date,
     'yyyy-MM-dd',
-    new Date()
+    new Date(),
   );
 
   // Format date for display
@@ -118,7 +118,7 @@ export const EmailTemplate = ({
       <Preview>
         {isOwnerNotification
           ? 'New Booking Notification'
-          : 'Your consultation with Lucky Godday Business Services is confirmed'}
+          : 'Your consultation with Ship With Godday is confirmed'}
       </Preview>
       <Body style={main}>
         <Container style={container}>
@@ -202,8 +202,8 @@ export const EmailTemplate = ({
               <>
                 <Text style={paragraph}>Hi {firstName},</Text>
                 <Text style={paragraph}>
-                  Your consultation with Lucky Godday Business
-                  Services has been confirmed for {formattedDate} at{' '}
+                  Your consultation with Ship With Godday has been
+                  confirmed for {formattedDate} at{' '}
                   {bookingDetails.time}.
                 </Text>
 
@@ -286,7 +286,7 @@ export const EmailTemplate = ({
                 <Text style={paragraph}>
                   Thanks,
                   <br />
-                  Lucky Godday Business Services
+                  Ship With Godday
                 </Text>
               </>
             )}

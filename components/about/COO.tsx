@@ -44,7 +44,7 @@ function COO() {
           <div className="w-full md:w-3/5 space-y-6">
             <div>
               <h3 className="text-3xl md:text-4xl font-bold ">
-                Clara Mawena Anator
+                Clara Mawuena Anator
               </h3>
               <p className="text-xl text-gray-500 font-medium mt-2">
                 Chief Operating Officer

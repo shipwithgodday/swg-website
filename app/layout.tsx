@@ -1,7 +1,10 @@
 import type { Metadata } from 'next';
 import './globals.css';
 import { ClerkProvider } from '@clerk/nextjs';
-import { SiteNavbar, SiteFooter } from '@/components/shared/SiteChrome';
+import {
+  SiteNavbar,
+  SiteFooter,
+} from '@/components/shared/SiteChrome';
 import { GoogleAnalytics } from '@next/third-parties/google';
 import { WebVitals } from '@/components/analytics/WebVitals';
 import { Toaster } from '@/components/ui/sonner';
@@ -9,7 +12,7 @@ import { CartProvider } from '@/lib/cart-context';
 
 export const metadata: Metadata = {
   title: {
-    default: 'Ship With Godday | Lucky Godday Business Services',
+    default: 'Ship With Godday',
     template: '%s | Ship With Godday',
   },
   description:
@@ -28,7 +31,7 @@ export const metadata: Metadata = {
   ],
   authors: [{ name: 'Godday' }],
   creator: 'Godday',
-  publisher: 'Lucky Godday Business Services',
+  publisher: 'Ship With Godday',
   formatDetection: {
     email: false,
     address: false,
@@ -42,7 +45,7 @@ export const metadata: Metadata = {
     type: 'website',
     locale: 'en_US',
     url: 'https://shipwithgodday.com',
-    title: 'Ship With Godday | Lucky Godday Business Services',
+    title: 'Ship With Godday',
     description:
       'Your trusted partner for seamless shipping solutions between China and Ghana. Experience reliable logistics, procurement, and payment services tailored to your business needs.',
     siteName: 'Ship With Godday',
@@ -57,7 +60,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Ship With Godday | Lucky Godday Business Services',
+    title: 'Ship With Godday',
     description:
       'Your trusted partner for seamless shipping solutions between China and Ghana.',
     images: ['/logo.png'],

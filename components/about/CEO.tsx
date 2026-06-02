@@ -64,11 +64,11 @@ function CEO() {
               is also fluent in both Mandarin Chinese and English.
             </p>
             <p className="text-gray-700 leading-relaxed">
-              Godday oversees oversees China, Ghana, Jamaica and
-              Barbados operations, ensuring seamless coordination
-              between procurement, quality control, customs clearance,
-              and client services. His commitment to excellence drives
-              our company&apos;s success.
+              Godday oversees China, Ghana, Jamaica and Barbados
+              operations, ensuring seamless coordination between
+              procurement, quality control, customs clearance, and
+              client services. His commitment to excellence drives our
+              company&apos;s success.
             </p>
             <div className="mt-4">
               <Button>

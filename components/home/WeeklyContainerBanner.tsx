@@ -23,7 +23,8 @@ export default function WeeklyContainerBanner() {
                 className="w-8 h-8 text-primary hidden md:block"
               />
               <h2 className="text-2xl md:text-3xl font-bold tracking-tight">
-                Weekly Containers From China to Ghana
+                Biweekly Containers From China to Ghana and the
+                Caribbean
               </h2>
               <Icon
                 name="Ship"

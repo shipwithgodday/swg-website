@@ -29,9 +29,10 @@ function AboutHero() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.3 }}
                 className="hidden md:block">
-                <SectionHeader highlightedWord="Your Trusted Shipping Partner">
-                  Connecting Ghana to China: Your Trusted Shipping
-                  Partner
+                <SectionHeader highlightedWord="China, Barbados, Jamaica, UK, and the US">
+                  Connecting Ghana to China, Barbados, Jamaica, UK,
+                  and the US
+                  {/* Your Trusted Shipping Partner */}
                 </SectionHeader>
               </motion.div>
 

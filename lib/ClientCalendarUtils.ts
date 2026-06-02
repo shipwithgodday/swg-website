@@ -15,7 +15,7 @@ interface BookingCalendarData {
 
 export function getClientCalendarLinks(
   booking: BookingCalendarData,
-  isOwner: boolean = false
+  isOwner: boolean = false,
 ) {
   const startTime = new Date(booking.formattedDateTime);
   const endTime = new Date(startTime.getTime() + 60 * 60 * 1000); // 1 hour later
@@ -24,7 +24,7 @@ export function getClientCalendarLinks(
   const title = encodeURIComponent(
     isOwner
       ? `Meeting with ${booking.fullName || 'Client'}`
-      : `Lucky Godday Business Services Consultation ${booking.meetingType ? `(${booking.meetingType})` : ''} ${booking.desiredService ? `- ${booking.desiredService}` : ''}`
+      : `Ship With Godday Consultation ${booking.meetingType ? `(${booking.meetingType})` : ''} ${booking.desiredService ? `- ${booking.desiredService}` : ''}`,
   );
 
   // Create a more detailed description
@@ -40,19 +40,19 @@ export function getClientCalendarLinks(
           `Email: ${booking.email || 'Not provided'}\n` +
           `Service: ${booking.desiredService || 'Not specified'}\n` +
           `Meeting Type: ${booking.meetingType || 'Not specified'}`
-      : `Consultation with Lucky Godday Business Services\n` +
+      : `Consultation with Ship With Godday\n` +
           `Date: ${format(startTime, 'MMMM d, yyyy')}\n` +
           `Time: ${format(startTime, 'h:mm a')} - ${format(endTime, 'h:mm a')} GMT\n` +
           (booking.meetingType === 'Online'
             ? `Meeting Link: https://meet.google.com/wio-bcev-gmk\n`
             : `Meeting Type: In-person\n`) +
-          `For any questions, contact: support@luckygodday.com`
+          `For any questions, contact: shipwithgoddayltd@gmail.com`,
   );
 
   return {
     google: `https://www.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${format(
       startTime,
-      "yyyyMMdd'T'HHmmss'Z'"
+      "yyyyMMdd'T'HHmmss'Z'",
     )}/${format(endTime, "yyyyMMdd'T'HHmmss'Z'")}&details=${details}`,
     outlook: `https://outlook.live.com/calendar/0/deeplink/compose?subject=${title}&startdt=${startTime.toISOString()}&enddt=${endTime.toISOString()}&body=${details}`,
   };

@@ -21,7 +21,7 @@ function Achievements() {
             },
             {
               icon: Package,
-              title: 'Weekly Shipments',
+              title: 'Biweekly Shipments',
               desc: 'From China warehouse',
             },
             {
@@ -32,7 +32,7 @@ function Achievements() {
             {
               icon: ShieldCheck,
               title: 'Trusted',
-              desc: 'By Kantamanto, Makola & Abossey Okai',
+              desc: 'By businesses across continents',
             },
           ].map((item, i) => (
             <article

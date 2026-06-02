@@ -66,7 +66,7 @@ function SocialProof() {
                   clients served
                 </p>
                 <p className="text-3xl md:text-4xl xl:text-6xl font-extralight">
-                  400+
+                  600+
                 </p>
               </motion.div>
               <motion.div
@@ -80,7 +80,7 @@ function SocialProof() {
                   years in business
                 </p>
                 <p className="text-3xl md:text-4xl xl:text-6xl font-extralight">
-                  2+
+                  3+
                 </p>
               </motion.div>
             </div>

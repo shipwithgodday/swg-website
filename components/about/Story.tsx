@@ -49,16 +49,16 @@ function Story() {
                   Our Vision
                 </h3>
                 <p>
-                  Empower every local shop owner with the tools to
-                  compete globally.
+                  Empower every local shop owner and entrpreneur with
+                  the tools to compete globally.
                 </p>
               </div>
               <p>
-                From Makola through Kantamanto to Abossey Okai,
-                we&apos;re powering local commerce through global
-                logistics. Our cross-border operations with teams in
-                both China and Ghana ensure seamless end-to-end
-                service.
+                From Makola through Kantamanto to Abossey Okai and
+                beyond, we&apos;re powering local commerce through
+                global logistics. Our cross-border operations with
+                teams in China, Ghana, and the Caribbean ensure
+                seamless end-to-end services.
               </p>
             </div>
           </div>
