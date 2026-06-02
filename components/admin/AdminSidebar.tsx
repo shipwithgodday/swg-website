@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
+  CalendarClock,
   FolderTree,
   LayoutDashboard,
   Mail,
@@ -50,6 +51,16 @@ const NAV = [
   {
     section: 'Marketing',
     items: [{ href: '/admin/emails', label: 'Emails', icon: Mail }],
+  },
+  {
+    section: 'Settings',
+    items: [
+      {
+        href: '/admin/settings/availability',
+        label: 'Scheduling',
+        icon: CalendarClock,
+      },
+    ],
   },
 ];
 
