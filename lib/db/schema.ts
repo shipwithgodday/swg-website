@@ -272,3 +272,45 @@ export type Container = typeof containers.$inferSelect;
 export type EtaAdjustment = typeof etaAdjustments.$inferSelect;
 export type ShipmentNotificationSubscriber =
   typeof shipmentNotificationSubscribers.$inferSelect;
+
+// ── Booking / scheduling ────────────────────────────────────────────────
+
+export const bookings = pgTable(
+  'bookings',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    date: text('date').notNull(), // 'YYYY-MM-DD'
+    time: text('time').notNull(), // 'HH:mm'
+    fullName: text('full_name').notNull(),
+    phoneNumber: text('phone_number').notNull(),
+    whatsappNumber: text('whatsapp_number'),
+    email: text('email').notNull(),
+    organization: text('organization'),
+    desiredService: text('desired_service').notNull(),
+    meetingType: text('meeting_type').notNull(),
+    ...timestamps,
+  },
+  (t) => ({
+    dateTimeUnique: uniqueIndex('bookings_date_time_unique').on(
+      t.date,
+      t.time
+    ),
+  })
+);
+
+export const bookingWeekdayHours = pgTable('booking_weekday_hours', {
+  weekday: integer('weekday').primaryKey(), // 0 = Sunday … 6 = Saturday
+  isOpen: boolean('is_open').notNull().default(true),
+  openTime: text('open_time').notNull(), // 'HH:mm'
+  closeTime: text('close_time').notNull(), // 'HH:mm'
+  slotMinutes: integer('slot_minutes').notNull().default(60),
+});
+
+export const bookingBlackoutDates = pgTable('booking_blackout_dates', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  date: text('date').notNull().unique(), // 'YYYY-MM-DD'
+  reason: text('reason'),
+  createdAt: timestamp('created_at', { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+});
