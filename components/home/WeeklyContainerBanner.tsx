@@ -33,8 +33,8 @@ export default function WeeklyContainerBanner() {
             </div>
             <p className="text-lg md:text-xl font-semibold text-primary">
               We load containers{' '}
-              <span className="text-white">EVERY WEEK</span> from our
-              China warehouse
+              <span className="text-white">EVERY TWO WEEKS</span> from
+              our China warehouse
             </p>
           </motion.div>
         </div>
