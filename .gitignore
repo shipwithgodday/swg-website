@@ -45,3 +45,5 @@ next-env.d.ts
 logs/combined.log
 logs/error.log
 docs/superpowers/
+# Brainstorming visual companion
+.superpowers/
