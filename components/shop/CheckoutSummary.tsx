@@ -2,6 +2,7 @@
 import Image from 'next/image';
 import { useCart } from '@/lib/cart-context';
 import { formatCedis } from '@/lib/shop/money';
+import { variantLabel } from '@/lib/shop/variant-label';
 import { PreorderBadge } from './PreorderBadge';
 
 /** Right-rail summary that mirrors the cart with totals. */
@@ -35,7 +36,9 @@ export function CheckoutSummary() {
                 {i.isPreorder && <PreorderBadge variant="pill" />}
               </div>
               <p className="text-xs text-muted-foreground">
-                {i.variantName} · ×{i.quantity}
+                {variantLabel(i.variantName)
+                  ? `${variantLabel(i.variantName)} · ×${i.quantity}`
+                  : `×${i.quantity}`}
               </p>
               {i.isPreorder && i.preorderShipEstimate && (
                 <p className="text-xs text-primary">

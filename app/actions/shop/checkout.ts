@@ -11,6 +11,7 @@ import {
   orderItems,
 } from '@/lib/db/schema';
 import { generateOrderNumber } from '@/lib/shop/order-number';
+import { variantLabel } from '@/lib/shop/variant-label';
 import {
   resolveCustomerId,
   resolveGuestCustomer,
@@ -101,9 +102,12 @@ export async function createCheckout(
       };
     }
     if (!v.isPreorder && v.stock < item.quantity) {
+      const label = variantLabel(v.variantName);
       return {
         ok: false,
-        error: `Not enough stock for ${v.productName} (${v.variantName}).`,
+        error: `Not enough stock for ${v.productName}${
+          label ? ` (${label})` : ''
+        }.`,
       };
     }
     lineItems.push({

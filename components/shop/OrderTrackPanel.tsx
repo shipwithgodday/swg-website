@@ -7,6 +7,7 @@ import { format } from 'date-fns';
 import { Package, Loader2, ChevronDown } from 'lucide-react';
 import { SignedIn, SignedOut, SignInButton } from '@clerk/nextjs';
 import { OrderStatusTimeline } from '@/components/shop/OrderStatusTimeline';
+import { variantLabel } from '@/lib/shop/variant-label';
 
 type OrderItem = {
   productName: string;
@@ -200,8 +201,13 @@ function OrderResultCard({
               key={i}
               className="flex justify-between gap-3 text-sm text-zinc-700">
               <span>
-                {item.productName}{' '}
-                <span className="text-zinc-400">({item.variantName})</span>
+                {item.productName}
+                {variantLabel(item.variantName) && (
+                  <span className="text-zinc-400">
+                    {' '}
+                    ({variantLabel(item.variantName)})
+                  </span>
+                )}
                 {item.isPreorder && (
                   <span className="ml-1 text-xs text-amber-700">
                     Preorder

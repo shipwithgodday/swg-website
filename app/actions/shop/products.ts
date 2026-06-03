@@ -22,10 +22,13 @@ function variantOptionValues(v: VariantInput): string[] {
   return v.optionValues ?? [];
 }
 
-/** Persisted display name: the option-value combination, else the default. */
+/**
+ * Persisted display name: the option-value combination for a real variant, or
+ * an empty string for a simple (option-less) product, which carries no label.
+ */
 function variantName(v: VariantInput): string {
   const values = variantOptionValues(v);
-  return values.length ? values.join(' / ') : v.name.trim() || 'Default';
+  return values.length ? values.join(' / ') : '';
 }
 
 /** Null for default variants; the value array otherwise. */

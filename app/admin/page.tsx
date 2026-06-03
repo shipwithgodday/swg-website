@@ -16,6 +16,7 @@ import { StatusBadge } from '@/components/admin/StatusBadge';
 import { RevenueChart } from '@/components/admin/RevenueChart';
 import { TopProducts } from '@/components/admin/TopProducts';
 import { MotionReveal } from '@/components/shared/MotionReveal';
+import { variantLabel } from '@/lib/shop/variant-label';
 
 export default async function AdminDashboardPage({
   searchParams,
@@ -117,8 +118,13 @@ export default async function AdminDashboardPage({
               href={`/admin/products?edit=${v.productId}`}
               className="flex flex-wrap items-center gap-x-3 gap-y-1 rounded-lg px-2 py-2 transition-colors hover:bg-zinc-50">
               <span className="min-w-0 flex-1 text-sm text-zinc-800">
-                {v.productName}{' '}
-                <span className="text-zinc-400">({v.variantName})</span>
+                {v.productName}
+                {variantLabel(v.variantName) && (
+                  <span className="text-zinc-400">
+                    {' '}
+                    ({variantLabel(v.variantName)})
+                  </span>
+                )}
               </span>
               <span className="ml-auto text-sm font-medium text-zinc-900 tabular-nums">
                 {v.stock} left

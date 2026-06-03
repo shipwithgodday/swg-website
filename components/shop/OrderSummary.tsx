@@ -1,4 +1,5 @@
 import { formatCedis } from '@/lib/shop/money';
+import { variantLabel } from '@/lib/shop/variant-label';
 import { PreorderBadge } from './PreorderBadge';
 
 interface Item {
@@ -39,7 +40,9 @@ export function OrderSummary({
                 {i.isPreorder && <PreorderBadge variant="pill" />}
               </div>
               <p className="text-xs text-muted-foreground">
-                {i.variantName} · ×{i.quantity}
+                {variantLabel(i.variantName)
+                  ? `${variantLabel(i.variantName)} · ×${i.quantity}`
+                  : `×${i.quantity}`}
               </p>
               {i.isPreorder && i.preorderShipEstimate && (
                 <p className="text-xs text-primary">

@@ -49,15 +49,20 @@ function cartesian(options: OptionDraft[]): string[][] {
 
 /**
  * Rebuild the variant rows for the current options, preserving the price,
- * stock, id and SKU of any combination that still exists.
+ * stock, id and SKU of any combination that still exists. When moving from a
+ * simple (option-less) product to variants, the simple product's price/stock
+ * seed the freshly created rows.
  */
 function regenerate(
   options: OptionDraft[],
   prev: VariantRow[]
 ): VariantRow[] {
   const byCombo = new Map(prev.map((v) => [comboKey(v.optionValues), v]));
+  // The option-less default row, if we're transitioning away from simple.
+  const seed = prev.find((v) => v.optionValues.length === 0);
   return cartesian(options).map((combo) => {
     const existing = byCombo.get(comboKey(combo));
+    const carried = combo.length ? seed : undefined;
     return {
       id: existing?.id,
       sku: existing?.sku,
@@ -65,8 +70,9 @@ function regenerate(
       name: combo.length
         ? combo.join(' / ')
         : (existing?.name ?? 'Default'),
-      priceCedis: existing?.priceCedis ?? '',
-      stockQuantity: existing?.stockQuantity ?? '0',
+      priceCedis: existing?.priceCedis ?? carried?.priceCedis ?? '',
+      stockQuantity:
+        existing?.stockQuantity ?? carried?.stockQuantity ?? '0',
     };
   });
 }
@@ -152,13 +158,21 @@ export function VariantEditor({ productName, value, onChange }: Props) {
     options.map((o) => o.name.trim().toLowerCase()).filter(Boolean)
   );
 
+  // A product is "simple" until an option has at least one value, at which
+  // point it gains generated variants. The simple product keeps a single
+  // internal line (variants[0]) carrying its own price, stock and SKU.
+  const hasVariants = readyOptions(options).length > 0;
+  const simple = variants[0];
+  const simpleStock = parseInt(simple?.stockQuantity || '0', 10);
+  const simpleLow = simpleStock > 0 && simpleStock <= LOW_STOCK_THRESHOLD;
+
   return (
     <div className="space-y-4">
       <div className="space-y-1">
-        <Label>Variants</Label>
+        <Label>Pricing &amp; variants</Label>
         <p className="text-xs text-muted-foreground">
-          Add an option like Size or Color and its values. Variants and SKUs are
-          generated automatically.
+          Set a price below for a simple product, or add an option like Size or
+          Color to create variants. SKUs are generated automatically.
         </p>
       </div>
 
@@ -239,7 +253,54 @@ export function VariantEditor({ productName, value, onChange }: Props) {
         </Button>
       )}
 
+      {/* ── Simple product (no options) ─────────────────────────────── */}
+      {!hasVariants && (
+        <div className="space-y-3 rounded-xl border border-border p-4">
+          <div className="flex items-center justify-between gap-3">
+            <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+              Simple product
+            </span>
+            <span className="truncate rounded bg-muted px-2 py-1 font-mono text-xs text-muted-foreground">
+              {generateSku(productName || 'Product', [])}
+            </span>
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-1">
+              <Label className="text-xs">Price (GHS)</Label>
+              <Input
+                type="number"
+                min="0"
+                step="0.01"
+                value={simple?.priceCedis ?? ''}
+                onChange={(e) =>
+                  updateVariant(0, { priceCedis: e.target.value })
+                }
+              />
+            </div>
+            <div className="space-y-1">
+              <Label className="text-xs">Stock</Label>
+              <div className="flex items-center gap-2">
+                <Input
+                  type="number"
+                  min="0"
+                  value={simple?.stockQuantity ?? '0'}
+                  onChange={(e) =>
+                    updateVariant(0, { stockQuantity: e.target.value })
+                  }
+                />
+                {simpleLow && (
+                  <span className="shrink-0 text-[10px] font-semibold text-orange-600">
+                    LOW
+                  </span>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* ── Generated variant grid ──────────────────────────────────── */}
+      {hasVariants && (
       <div className="space-y-2 rounded-xl border border-border p-4">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
@@ -343,6 +404,7 @@ export function VariantEditor({ productName, value, onChange }: Props) {
           </div>
         </div>
       </div>
+      )}
     </div>
   );
 }

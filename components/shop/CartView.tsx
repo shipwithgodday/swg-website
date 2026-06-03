@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { Minus, Plus, ShoppingCart, Trash2 } from 'lucide-react';
 import { useCart } from '@/lib/cart-context';
 import { formatCedis } from '@/lib/shop/money';
+import { variantLabel } from '@/lib/shop/variant-label';
 import { Button } from '@/components/ui/button';
 import { PreorderBadge } from './PreorderBadge';
 
@@ -55,9 +56,11 @@ export function CartView({ onNavigate }: { onNavigate?: () => void }) {
                 </Link>
                 {i.isPreorder && <PreorderBadge variant="pill" />}
               </div>
-              <p className="text-xs text-muted-foreground">
-                {i.variantName}
-              </p>
+              {variantLabel(i.variantName) && (
+                <p className="text-xs text-muted-foreground">
+                  {variantLabel(i.variantName)}
+                </p>
+              )}
               {i.isPreorder && i.preorderShipEstimate && (
                 <p className="text-xs text-primary">
                   {i.preorderShipEstimate}

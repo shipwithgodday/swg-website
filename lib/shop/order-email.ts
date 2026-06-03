@@ -3,6 +3,7 @@ import { eq } from 'drizzle-orm';
 import { db } from '@/lib/db';
 import { orders, orderItems, customers } from '@/lib/db/schema';
 import { formatCedis } from '@/lib/shop/money';
+import { variantLabel } from '@/lib/shop/variant-label';
 import { formatOrderStatus } from '@/lib/shop/status-format';
 import resend from '@/lib/emails';
 
@@ -113,8 +114,11 @@ export async function sendOrderStatusEmail(
               : ''
           }</div>`
         : '';
+      const label = variantLabel(i.variantName);
       return (
-        `<tr><td style="padding:4px 0">${i.productName} (${i.variantName}) × ${i.quantity}${note}</td>` +
+        `<tr><td style="padding:4px 0">${i.productName}${
+          label ? ` (${label})` : ''
+        } × ${i.quantity}${note}</td>` +
         `<td style="text-align:right;padding:4px 0">${formatCedis(
           i.unitPrice * i.quantity
         )}</td></tr>`
