@@ -15,15 +15,22 @@ import { CheckoutSummary } from '@/components/shop/CheckoutSummary';
 interface CheckoutFormProps {
   /** True when a Clerk session is active. Guests still get to check out. */
   signedIn: boolean;
+  /** Delivery details from a returning customer's last order, if any. */
+  prefill?: {
+    name: string;
+    phone: string;
+    address: string;
+    city: string;
+  };
 }
 
-export function CheckoutForm({ signedIn }: CheckoutFormProps) {
+export function CheckoutForm({ signedIn, prefill }: CheckoutFormProps) {
   const { items } = useCart();
   const [email, setEmail] = useState('');
-  const [name, setName] = useState('');
-  const [phone, setPhone] = useState('');
-  const [address, setAddress] = useState('');
-  const [city, setCity] = useState('');
+  const [name, setName] = useState(prefill?.name ?? '');
+  const [phone, setPhone] = useState(prefill?.phone ?? '');
+  const [address, setAddress] = useState(prefill?.address ?? '');
+  const [city, setCity] = useState(prefill?.city ?? '');
   const [pending, start] = useTransition();
 
   function submit(e: React.FormEvent) {
