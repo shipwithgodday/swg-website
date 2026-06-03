@@ -36,7 +36,7 @@ const STATUS_COPY: Record<string, StatusCopy> = {
   },
   shipped: {
     subject: (n) => `Order ${n} is on the way`,
-    headline: 'Your order has shipped',
+    headline: 'Your order has been shipped',
     intro:
       "Your order has left the warehouse and is on the way to you. We'll let you know once it has been delivered.",
   },
