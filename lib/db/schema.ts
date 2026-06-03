@@ -5,10 +5,21 @@ import {
   integer,
   boolean,
   timestamp,
+  jsonb,
   index,
   uniqueIndex,
 } from 'drizzle-orm/pg-core';
 import { relations } from 'drizzle-orm';
+
+/**
+ * A variant axis on a product, e.g. `{ name: 'Size', values: ['S','M','L'] }`.
+ * A product carries 0–2 of these; the cartesian product of their values
+ * defines its variants. Stored as JSON on `products.options`.
+ */
+export interface ProductOption {
+  name: string;
+  values: string[];
+}
 
 const timestamps = {
   createdAt: timestamp('created_at', { withTimezone: true })
@@ -41,6 +52,8 @@ export const products = pgTable('products', {
   featured: boolean('featured').notNull().default(false),
   isPreorder: boolean('is_preorder').notNull().default(false),
   preorderShipEstimate: text('preorder_ship_estimate'),
+  // 0–2 variant axes (Size, Color…). Empty array = a single default variant.
+  options: jsonb('options').$type<ProductOption[]>().notNull().default([]),
   ...timestamps,
 });
 
@@ -66,6 +79,9 @@ export const productVariants = pgTable('product_variants', {
   compareAtPrice: integer('compare_at_price'),
   stockQuantity: integer('stock_quantity').notNull().default(0),
   position: integer('position').notNull().default(0),
+  // One value per product option, ordered to match `products.options`.
+  // e.g. ['Medium','Red']. Null for legacy rows and single-default variants.
+  optionValues: jsonb('option_values').$type<string[]>(),
 });
 
 export const customers = pgTable(

@@ -29,10 +29,12 @@ export default async function ProductsPage() {
     featured: p.featured,
     isPreorder: p.isPreorder,
     preorderShipEstimate: p.preorderShipEstimate,
+    options: p.options ?? [],
     variants: p.variants.map((v) => ({
       id: v.id,
       name: v.name,
-      sku: v.sku ?? '',
+      sku: v.sku ?? undefined,
+      optionValues: v.optionValues ?? [],
       priceCedis: (v.price / 100).toFixed(2),
       stockQuantity: String(v.stockQuantity),
     })),
@@ -41,6 +43,9 @@ export default async function ProductsPage() {
       url: i.url,
       publicId: i.publicId,
     })),
+    lowStockCount: p.variants.filter(
+      (v) => v.stockQuantity > 0 && v.stockQuantity <= 5
+    ).length,
   }));
 
   // Suspense boundary required: ProductsTable reads useSearchParams.

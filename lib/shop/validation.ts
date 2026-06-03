@@ -8,10 +8,24 @@ export const categoryInputSchema = z.object({
 
 export type CategoryInput = z.infer<typeof categoryInputSchema>;
 
+// A variant axis, e.g. { name: 'Size', values: ['S','M','L'] }. A product
+// carries 0–2 of these; variants are the cartesian product of their values.
+export const productOptionSchema = z.object({
+  name: z.string().trim().min(1, 'Option name is required'),
+  values: z
+    .array(z.string().trim().min(1))
+    .min(1, 'Each option needs at least one value'),
+});
+
+export const productOptionsSchema = z
+  .array(productOptionSchema)
+  .max(2, 'A product can have at most two options');
+
 export const variantInputSchema = z.object({
   id: z.string().uuid().optional(),
   name: z.string().trim().min(1, 'Variant name is required'),
-  sku: z.string().trim().optional().nullable(),
+  // SKUs are generated server-side, never accepted from the client.
+  optionValues: z.array(z.string()).optional(),
   price: z.number().int().nonnegative('Price must be 0 or more'),
   compareAtPrice: z.number().int().nonnegative().optional().nullable(),
   stockQuantity: z.number().int().nonnegative('Stock must be 0 or more'),
@@ -36,6 +50,7 @@ export const productInputSchema = z.object({
     .max(120, 'Ship estimate is too long')
     .nullable()
     .optional(),
+  options: productOptionsSchema.default([]),
   variants: z
     .array(variantInputSchema)
     .min(1, 'A product needs at least one variant'),
@@ -44,6 +59,7 @@ export const productInputSchema = z.object({
 
 export type ProductImageInput = z.infer<typeof productImageInputSchema>;
 
+export type ProductOptionInput = z.infer<typeof productOptionSchema>;
 export type VariantInput = z.infer<typeof variantInputSchema>;
 export type ProductInput = z.infer<typeof productInputSchema>;
 

@@ -22,6 +22,7 @@ import { deleteProduct } from '@/app/actions/shop/products';
 
 export type AdminProduct = ProductFormValue & {
   categoryName: string | null;
+  lowStockCount: number;
 };
 
 function SortHeader({
@@ -144,7 +145,16 @@ export function ProductsTable({
         id: 'variants',
         header: 'Variants',
         enableGlobalFilter: false,
-        cell: ({ row }) => row.original.variants.length,
+        cell: ({ row }) => (
+          <div className="flex items-center gap-2">
+            <span>{row.original.variants.length}</span>
+            {row.original.lowStockCount > 0 && (
+              <span className="inline-flex items-center rounded-full bg-orange-100 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-orange-700">
+                {row.original.lowStockCount} low
+              </span>
+            )}
+          </div>
+        ),
       },
       {
         id: 'images',

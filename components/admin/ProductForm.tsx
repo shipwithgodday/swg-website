@@ -15,8 +15,11 @@ import {
 } from '@/components/admin/ui/select';
 import {
   VariantEditor,
-  emptyVariant,
+  emptyVariantState,
+  hydrateVariantState,
   type VariantRow,
+  type OptionDraft,
+  type VariantState,
 } from './VariantEditor';
 import {
   ProductImageField,
@@ -36,6 +39,7 @@ export interface ProductFormValue {
   featured: boolean;
   isPreorder: boolean;
   preorderShipEstimate: string | null;
+  options: OptionDraft[];
   variants: VariantRow[];
   images: ProductImageRow[];
 }
@@ -68,8 +72,10 @@ export function ProductForm({
   const [preorderShipEstimate, setPreorderShipEstimate] = useState(
     product?.preorderShipEstimate ?? ''
   );
-  const [variants, setVariants] = useState<VariantRow[]>(
-    product?.variants ?? [{ ...emptyVariant }]
+  const [variantState, setVariantState] = useState<VariantState>(() =>
+    product
+      ? hydrateVariantState(product.options, product.variants)
+      : emptyVariantState
   );
   const [images, setImages] = useState<ProductImageRow[]>(
     product?.images ?? []
@@ -93,6 +99,14 @@ export function ProductForm({
 
   function submit(e: React.FormEvent) {
     e.preventDefault();
+    // Only options with values define variants; each must be named.
+    const readyOptions = variantState.options.filter(
+      (o) => o.values.length > 0
+    );
+    if (readyOptions.some((o) => !o.name.trim())) {
+      toast.error('Give each option a name (e.g. Size, Color).');
+      return;
+    }
     const payload = {
       name,
       description: description || null,
@@ -103,10 +117,14 @@ export function ProductForm({
       preorderShipEstimate: isPreorder
         ? (preorderShipEstimate.trim() || null)
         : null,
-      variants: variants.map((v) => ({
+      options: readyOptions.map((o) => ({
+        name: o.name.trim(),
+        values: o.values,
+      })),
+      variants: variantState.variants.map((v) => ({
         id: v.id,
         name: v.name,
-        sku: v.sku || null,
+        optionValues: v.optionValues,
         price: Math.round(parseFloat(v.priceCedis || '0') * 100),
         stockQuantity: parseInt(v.stockQuantity || '0', 10),
       })),
@@ -237,7 +255,11 @@ export function ProductForm({
             </div>
           )}
         </div>
-        <VariantEditor variants={variants} onChange={setVariants} />
+        <VariantEditor
+          productName={name}
+          value={variantState}
+          onChange={setVariantState}
+        />
         <ProductImageField
           images={images}
           onChange={setImages}

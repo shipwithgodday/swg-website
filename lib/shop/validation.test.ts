@@ -1,4 +1,9 @@
-import { categoryInputSchema, productInputSchema, customerEditSchema } from './validation';
+import {
+  categoryInputSchema,
+  productInputSchema,
+  productOptionsSchema,
+  customerEditSchema,
+} from './validation';
 
 describe('categoryInputSchema', () => {
   it('accepts a valid category', () => {
@@ -74,6 +79,34 @@ describe('productInputSchema', () => {
         isPreorder: true,
         preorderShipEstimate: 'x'.repeat(121),
       }).success
+    ).toBe(false);
+  });
+});
+
+describe('productOptionsSchema', () => {
+  it('accepts up to two options', () => {
+    expect(
+      productOptionsSchema.safeParse([
+        { name: 'Size', values: ['S', 'M', 'L'] },
+        { name: 'Color', values: ['Red'] },
+      ]).success
+    ).toBe(true);
+  });
+  it('accepts an empty list', () => {
+    expect(productOptionsSchema.safeParse([]).success).toBe(true);
+  });
+  it('rejects more than two options', () => {
+    expect(
+      productOptionsSchema.safeParse([
+        { name: 'A', values: ['1'] },
+        { name: 'B', values: ['1'] },
+        { name: 'C', values: ['1'] },
+      ]).success
+    ).toBe(false);
+  });
+  it('rejects an option with no values', () => {
+    expect(
+      productOptionsSchema.safeParse([{ name: 'Size', values: [] }]).success
     ).toBe(false);
   });
 });

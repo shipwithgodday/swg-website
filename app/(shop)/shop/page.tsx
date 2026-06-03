@@ -10,6 +10,7 @@ import { MotionReveal } from '@/components/shared/MotionReveal';
 import {
   getFeaturedProducts,
   getActiveProducts,
+  getMostPurchasedProducts,
   getCategories,
 } from '@/lib/shop/queries';
 
@@ -39,9 +40,10 @@ function toCard(
 }
 
 export default async function ShopPage() {
-  const [featured, all, categories] = await Promise.all([
+  const [featured, all, popular, categories] = await Promise.all([
     getFeaturedProducts(),
     getActiveProducts(),
+    getMostPurchasedProducts(),
     getCategories(),
   ]);
 
@@ -71,6 +73,19 @@ export default async function ShopPage() {
               <ProductGrid
                 products={featured.map((p) => toCard(p, true))}
               />
+            </div>
+          </section>
+        )}
+
+        {popular.length > 0 && (
+          <section className="mt-16">
+            <MotionReveal>
+              <SectionHeader highlightedWord="popular" size="base">
+                Most popular
+              </SectionHeader>
+            </MotionReveal>
+            <div className="mt-6">
+              <ProductGrid products={popular.map((p) => toCard(p))} />
             </div>
           </section>
         )}

@@ -1,7 +1,9 @@
 import { NextResponse } from 'next/server';
+import { revalidateTag } from 'next/cache';
 import { z } from 'zod';
 import { verifyPaystackSignature } from '@/lib/shop/paystack';
 import { completeOrder } from '@/lib/shop/complete-order';
+import { POPULAR_PRODUCTS_TAG } from '@/lib/shop/queries';
 
 // Paystack delivers many event shapes; we only act on `charge.success`,
 // which always carries `data.reference` and `data.amount`. We parse with
@@ -49,6 +51,11 @@ export async function POST(request: Request) {
   const result = await completeOrder(reference, amount);
   if (result.status === 'not_found') {
     console.warn(`paystack webhook: unknown reference ${reference}`);
+  }
+  // A paid order changes the "most popular" ranking — refresh its cache.
+  // (Done here, in a route handler, not in the processing page's render.)
+  if (result.status === 'claimed' || result.status === 'already_paid') {
+    revalidateTag(POPULAR_PRODUCTS_TAG);
   }
   return NextResponse.json({ received: true });
 }
