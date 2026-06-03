@@ -180,68 +180,107 @@ export function VariantEditor({ productName, value, onChange }: Props) {
       {options.map((opt, idx) => (
         <div
           key={idx}
-          className="space-y-3 rounded-xl border border-border bg-muted/20 p-4">
-          <div className="flex items-center gap-2">
-            <Input
-              value={opt.name}
-              onChange={(e) => renameOption(idx, e.target.value)}
-              placeholder={idx === 0 ? 'e.g. Size' : 'e.g. Color'}
-              className="max-w-[200px] font-medium"
-            />
-            <div className="flex flex-wrap gap-1.5">
-              {PRESET_OPTIONS.filter(
-                (p) => !usedNames.has(p.toLowerCase())
-              ).map((preset) => (
-                <button
-                  key={preset}
-                  type="button"
-                  onClick={() => renameOption(idx, preset)}
-                  className="rounded-full border border-dashed border-border px-2.5 py-1 text-xs text-muted-foreground transition hover:border-foreground/40 hover:text-foreground">
-                  {preset}
-                </button>
-              ))}
-            </div>
+          className="space-y-4 rounded-xl border border-border bg-muted/20 p-4">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+              Option {idx + 1}
+            </span>
             <Button
               type="button"
               variant="ghost"
               size="icon"
-              className="ml-auto"
+              className="size-7"
               onClick={() => removeOption(idx)}
               aria-label="Remove option">
               <Trash2 className="size-4" />
             </Button>
           </div>
 
-          <div className="flex flex-wrap items-center gap-2">
-            {opt.values.map((val) => (
-              <span
-                key={val}
-                className="inline-flex items-center gap-1.5 rounded-full bg-foreground px-3 py-1 text-sm font-medium text-background">
-                {val}
-                <button
-                  type="button"
-                  onClick={() => removeValue(idx, val)}
-                  aria-label={`Remove ${val}`}
-                  className="opacity-60 transition hover:opacity-100">
-                  <X className="size-3.5" />
-                </button>
-              </span>
-            ))}
-            <Input
-              value={drafts[idx] ?? ''}
-              onChange={(e) =>
-                setDrafts((d) => ({ ...d, [idx]: e.target.value }))
-              }
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' || e.key === ',') {
-                  e.preventDefault();
-                  addValue(idx, drafts[idx] ?? '');
+          {/* Option name */}
+          <div className="space-y-1.5">
+            <Label className="text-xs">Option name</Label>
+            <div className="flex flex-wrap items-center gap-2">
+              <Input
+                value={opt.name}
+                onChange={(e) => renameOption(idx, e.target.value)}
+                placeholder={idx === 0 ? 'e.g. Size' : 'e.g. Color'}
+                className="max-w-[200px] font-medium"
+              />
+              {PRESET_OPTIONS.filter((p) => !usedNames.has(p.toLowerCase()))
+                .length > 0 && (
+                <>
+                  <span className="text-xs text-muted-foreground">or</span>
+                  {PRESET_OPTIONS.filter(
+                    (p) => !usedNames.has(p.toLowerCase())
+                  ).map((preset) => (
+                    <button
+                      key={preset}
+                      type="button"
+                      onClick={() => renameOption(idx, preset)}
+                      className="rounded-full border border-dashed border-border px-2.5 py-1 text-xs text-muted-foreground transition hover:border-foreground/40 hover:text-foreground">
+                      {preset}
+                    </button>
+                  ))}
+                </>
+              )}
+            </div>
+          </div>
+
+          {/* Values */}
+          <div className="space-y-1.5">
+            <Label className="text-xs">Values</Label>
+            {opt.values.length > 0 && (
+              <div className="flex flex-wrap items-center gap-2">
+                {opt.values.map((val) => (
+                  <span
+                    key={val}
+                    className="inline-flex items-center gap-1.5 rounded-full bg-foreground px-3 py-1 text-sm font-medium text-background">
+                    {val}
+                    <button
+                      type="button"
+                      onClick={() => removeValue(idx, val)}
+                      aria-label={`Remove ${val}`}
+                      className="opacity-60 transition hover:opacity-100">
+                      <X className="size-3.5" />
+                    </button>
+                  </span>
+                ))}
+              </div>
+            )}
+            <div className="flex items-center gap-2">
+              <Input
+                value={drafts[idx] ?? ''}
+                onChange={(e) =>
+                  setDrafts((d) => ({ ...d, [idx]: e.target.value }))
                 }
-              }}
-              onBlur={() => addValue(idx, drafts[idx] ?? '')}
-              placeholder="+ add value"
-              className="h-8 max-w-[140px]"
-            />
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ',') {
+                    e.preventDefault();
+                    addValue(idx, drafts[idx] ?? '');
+                  }
+                }}
+                onBlur={() => addValue(idx, drafts[idx] ?? '')}
+                placeholder={
+                  opt.name.trim().toLowerCase() === 'size'
+                    ? 'e.g. Small'
+                    : 'e.g. a value'
+                }
+                className="max-w-[200px]"
+              />
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                disabled={!(drafts[idx] ?? '').trim()}
+                onClick={() => addValue(idx, drafts[idx] ?? '')}>
+                <Plus className="mr-1 size-4" />
+                Add
+              </Button>
+            </div>
+            <p className="text-[11px] text-muted-foreground">
+              Add each value one at a time (e.g. Small, Medium, Large) — press
+              Enter or click Add.
+            </p>
           </div>
         </div>
       ))}
@@ -249,7 +288,9 @@ export function VariantEditor({ productName, value, onChange }: Props) {
       {options.length < MAX_OPTIONS && (
         <Button type="button" variant="outline" size="sm" onClick={addOption}>
           <Plus className="mr-1.5 size-4" />
-          {options.length === 0 ? 'Add an option' : 'Add another option'}
+          {options.length === 0
+            ? 'Add an option (Size, Color…)'
+            : 'Add another option'}
         </Button>
       )}
 
