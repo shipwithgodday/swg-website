@@ -2,11 +2,11 @@
 import { Suspense, useState } from 'react';
 import { format } from 'date-fns';
 import { toast } from 'sonner';
-import { Ship, Warehouse, Loader2, Plus, X, Bell } from 'lucide-react';
-import { PageHero } from '@/components/shared/PageHero';
+import { Ship, Warehouse, Loader2, Plus, X, Bell, PackageSearch } from 'lucide-react';
 import Container from '@/components/shared/container';
 import { MotionReveal } from '@/components/shared/MotionReveal';
 import { OrderTrackPanel } from '@/components/shop/OrderTrackPanel';
+import { TrackHero } from '@/components/shop/TrackHero';
 
 const MAX_INVOICES = 5;
 
@@ -394,14 +394,24 @@ export default function TrackPage() {
 
   return (
     <>
-      <PageHero
-        title="Track Your Shipments"
-        highlightedWord="Shipments"
-        subtitle="Enter your invoice numbers to see your containers' estimated arrival dates."
-      />
+      <TrackHero />
 
-      <Container className="py-12 md:py-20">
-        <MotionReveal className="mx-auto max-w-md">
+      <Container className="relative z-20 -mt-24 pb-12 md:-mt-28 md:pb-20">
+        <MotionReveal className="mx-auto max-w-md rounded-3xl border border-white/70 bg-white/95 p-6 shadow-2xl shadow-[#00254F]/15 ring-1 ring-zinc-900/5 backdrop-blur-sm md:p-8">
+          <div className="mb-5 flex items-start gap-3">
+            <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-[#00254F] text-primary">
+              <PackageSearch className="size-5" />
+            </span>
+            <div>
+              <h2 className="text-lg font-bold text-zinc-900">
+                Track a shipment
+              </h2>
+              <p className="text-sm text-zinc-500">
+                Add up to {MAX_INVOICES} invoice numbers to check at once.
+              </p>
+            </div>
+          </div>
+
           <form onSubmit={handleTrack} className="space-y-3">
             {invoices.map((inv, idx) => (
               <div key={idx} className="flex items-end gap-2">
