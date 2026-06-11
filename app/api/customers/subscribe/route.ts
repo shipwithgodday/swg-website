@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
-import dbConnect from '@/lib/mongoose';
-import Customer from '@/models/Customer';
+import { eq } from 'drizzle-orm';
+import { db } from '@/lib/db';
+import { subscribers } from '@/lib/db/schema';
 
 const subscribeSchema = z.object({
   fullName: z.string().trim().min(2, 'Name must be at least 2 characters'),
@@ -31,12 +32,15 @@ export async function POST(request: Request) {
     );
   }
   const { fullName, email, phoneNumber } = parsed.data;
+  const normalizedEmail = email.toLowerCase();
 
   try {
-    await dbConnect();
-
-    const existingCustomer = await Customer.findOne({ email });
-    if (existingCustomer) {
+    const [existing] = await db
+      .select({ id: subscribers.id })
+      .from(subscribers)
+      .where(eq(subscribers.email, normalizedEmail))
+      .limit(1);
+    if (existing) {
       return NextResponse.json(
         {
           error:
@@ -46,21 +50,30 @@ export async function POST(request: Request) {
       );
     }
 
-    const customer = await Customer.create({
-      fullName,
-      email,
-      phoneNumber,
-    });
+    const [customer] = await db
+      .insert(subscribers)
+      .values({ fullName, email: normalizedEmail, phoneNumber })
+      .returning({
+        id: subscribers.id,
+        fullName: subscribers.fullName,
+        email: subscribers.email,
+      });
 
     return NextResponse.json({
       message: 'Customer registered successfully',
-      customer: {
-        id: customer._id,
-        fullName: customer.fullName,
-        email: customer.email,
-      },
+      customer,
     });
   } catch (error) {
+    // 23505 = unique_violation: a concurrent signup beat us to the email.
+    if ((error as { code?: string }).code === '23505') {
+      return NextResponse.json(
+        {
+          error:
+            'You have already signed up with this email address. You will receive email updates automatically.',
+        },
+        { status: 400 }
+      );
+    }
     console.error('Error registering customer:', error);
     return NextResponse.json(
       { error: 'Failed to register customer' },

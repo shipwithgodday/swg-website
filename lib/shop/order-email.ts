@@ -35,11 +35,23 @@ const STATUS_COPY: Record<string, StatusCopy> = {
     intro:
       "Your order is being packed for shipment. We'll email you when it leaves the warehouse.",
   },
+  procured_china: {
+    subject: (n) => `Order ${n} is at our China warehouse`,
+    headline: 'Your order has reached our China warehouse',
+    intro:
+      "Your order has been procured and received at our China warehouse. It's being prepared for shipment to Ghana — we'll email you when it ships.",
+  },
   shipped: {
     subject: (n) => `Order ${n} is on the way`,
     headline: 'Your order has been shipped',
     intro:
       "Your order has left the warehouse and is on the way to you. We'll let you know once it has been delivered.",
+  },
+  arrived_ghana: {
+    subject: (n) => `Order ${n} has arrived in Ghana`,
+    headline: 'Your order is available at our Ghana warehouse',
+    intro:
+      "Your order has arrived and is now available at our Ghana warehouse. We'll let you know once it has been delivered.",
   },
   delivered: {
     subject: (n) => `Order ${n} delivered`,

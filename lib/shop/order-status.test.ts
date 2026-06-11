@@ -3,8 +3,10 @@ import { canTransition, nextStatuses } from './order-status';
 describe('canTransition', () => {
   it('allows the forward lifecycle steps', () => {
     expect(canTransition('paid', 'processing')).toBe(true);
-    expect(canTransition('processing', 'shipped')).toBe(true);
-    expect(canTransition('shipped', 'delivered')).toBe(true);
+    expect(canTransition('processing', 'procured_china')).toBe(true);
+    expect(canTransition('procured_china', 'shipped')).toBe(true);
+    expect(canTransition('shipped', 'arrived_ghana')).toBe(true);
+    expect(canTransition('arrived_ghana', 'delivered')).toBe(true);
   });
   it('allows jumping forward in the lifecycle', () => {
     expect(canTransition('paid', 'shipped')).toBe(true);
@@ -22,6 +24,8 @@ describe('canTransition', () => {
   });
   it('forbids going backwards in the lifecycle', () => {
     expect(canTransition('shipped', 'processing')).toBe(false);
+    expect(canTransition('shipped', 'procured_china')).toBe(false);
+    expect(canTransition('arrived_ghana', 'shipped')).toBe(false);
     expect(canTransition('processing', 'paid')).toBe(false);
     expect(canTransition('delivered', 'shipped')).toBe(false);
   });
@@ -37,16 +41,34 @@ describe('canTransition', () => {
 describe('nextStatuses', () => {
   it('offers every forward step plus cancelled from paid', () => {
     expect(nextStatuses('paid').sort()).toEqual(
-      ['cancelled', 'delivered', 'processing', 'shipped'].sort()
+      [
+        'cancelled',
+        'delivered',
+        'processing',
+        'procured_china',
+        'shipped',
+        'arrived_ghana',
+      ].sort()
     );
   });
   it('offers every later step plus cancelled from processing', () => {
     expect(nextStatuses('processing').sort()).toEqual(
-      ['cancelled', 'delivered', 'shipped'].sort()
+      [
+        'cancelled',
+        'delivered',
+        'procured_china',
+        'shipped',
+        'arrived_ghana',
+      ].sort()
     );
   });
-  it('offers delivered and cancelled from shipped', () => {
+  it('offers every later step plus cancelled from shipped', () => {
     expect(nextStatuses('shipped').sort()).toEqual(
+      ['cancelled', 'delivered', 'arrived_ghana'].sort()
+    );
+  });
+  it('offers delivered and cancelled from arrived_ghana', () => {
+    expect(nextStatuses('arrived_ghana').sort()).toEqual(
       ['cancelled', 'delivered'].sort()
     );
   });

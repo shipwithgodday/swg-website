@@ -4,7 +4,9 @@ import { cn } from '@/lib/utils';
 const STEPS = [
   { key: 'paid', label: 'Paid' },
   { key: 'processing', label: 'Processing' },
+  { key: 'procured_china', label: 'Procured to China Warehouse' },
   { key: 'shipped', label: 'Shipped' },
+  { key: 'arrived_ghana', label: 'Available at Ghana Warehouse' },
   { key: 'delivered', label: 'Delivered' },
 ] as const;
 
@@ -12,8 +14,10 @@ const STEP_INDEX: Record<string, number> = {
   pending: -1,
   paid: 0,
   processing: 1,
-  shipped: 2,
-  delivered: 3,
+  procured_china: 2,
+  shipped: 3,
+  arrived_ghana: 4,
+  delivered: 5,
 };
 
 /**

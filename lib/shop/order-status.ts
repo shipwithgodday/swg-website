@@ -2,7 +2,9 @@ export const ORDER_STATUSES = [
   'pending',
   'paid',
   'processing',
+  'procured_china',
   'shipped',
+  'arrived_ghana',
   'delivered',
   'cancelled',
 ] as const;
@@ -18,7 +20,9 @@ export type OrderStatus = (typeof ORDER_STATUSES)[number];
 const FORWARD_CHAIN: OrderStatus[] = [
   'paid',
   'processing',
+  'procured_china',
   'shipped',
+  'arrived_ghana',
   'delivered',
 ];
 
@@ -27,7 +31,9 @@ const CANCELLABLE: OrderStatus[] = [
   'pending',
   'paid',
   'processing',
+  'procured_china',
   'shipped',
+  'arrived_ghana',
 ];
 
 /** True if an admin may move an order from `from` to `to`. */

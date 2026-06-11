@@ -15,8 +15,7 @@
     "db:studio": "drizzle-kit studio",
     "import:customers": "tsx --env-file .env.local scripts/import-customers.ts",
     "seed:products": "tsx --env-file .env.local scripts/seed-products.ts",
-    "seed:booking-hours": "tsx --env-file .env.local scripts/seed-booking-hours.ts",
-    "migrate:bookings": "tsx --env-file .env.local scripts/migrate-bookings.ts"
+    "seed:booking-hours": "tsx --env-file .env.local scripts/seed-booking-hours.ts"
   },
   "dependencies": {
     "@clerk/nextjs": "6.19.4",
@@ -49,7 +48,6 @@
     "iconsax-reactjs": "^0.0.8",
     "js-cookie": "^3.0.5",
     "lucide-react": "^0.509.0",
-    "mongoose": "^8.15.0",
     "next": "15.3.8",
     "next-themes": "^0.4.6",
     "node-mailjet": "^6.0.8",

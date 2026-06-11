@@ -57,6 +57,13 @@
       "when": 1780511816587,
       "tag": "0007_structured_variants",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1781208620305,
+      "tag": "0008_smooth_calypso",
+      "breakpoints": true
     }
   ]
 }

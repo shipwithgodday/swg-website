@@ -11,7 +11,9 @@ const ORDER_STATUS_LABELS: Record<string, string> = {
   pending: 'Pending Payment',
   paid: 'Paid',
   processing: 'Processing',
+  procured_china: 'Procured to China Warehouse',
   shipped: 'Shipped',
+  arrived_ghana: 'Available at Ghana Warehouse',
   delivered: 'Delivered',
   cancelled: 'Cancelled',
 };

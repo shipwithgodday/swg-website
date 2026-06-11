@@ -314,6 +314,20 @@ export const bookings = pgTable(
   })
 );
 
+/**
+ * Marketing / newsletter signups from the public `/subscribe` form. These
+ * are contacts for bulk email and are intentionally separate from shop
+ * `customers` (which carry a required shipping mark). The bulk-email list
+ * joins a shipping mark in by email when the contact is also a shop customer.
+ */
+export const subscribers = pgTable('subscribers', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  fullName: text('full_name').notNull(),
+  email: text('email').notNull().unique(),
+  phoneNumber: text('phone_number').notNull(),
+  ...timestamps,
+});
+
 export const bookingWeekdayHours = pgTable('booking_weekday_hours', {
   weekday: integer('weekday').primaryKey(), // 0 = Sunday … 6 = Saturday
   isOpen: boolean('is_open').notNull().default(true),

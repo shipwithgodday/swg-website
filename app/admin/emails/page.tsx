@@ -87,7 +87,7 @@ const customStyles = `
 
 export default function AdminEmailsPage() {
   const [emails, setEmails] = useState<
-    { value: string; label: string }[]
+    { value: string; label: string; shippingMark?: string | null }[]
   >([]);
   const [selectedEmails, setSelectedEmails] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
@@ -520,7 +520,7 @@ export default function AdminEmailsPage() {
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search recipients..."
+              placeholder="Search by name, email or shipping mark..."
               className="w-full p-2 bg-white/15 backdrop-blur-sm text-white placeholder:text-gray-300 border border-white/20 rounded-lg"
             />
           </div>
@@ -533,15 +533,17 @@ export default function AdminEmailsPage() {
             ) : (
               <div className="space-y-2">
                 {emails
-                  .filter(
-                    (email) =>
-                      email.label
-                        .toLowerCase()
-                        .includes(searchQuery.toLowerCase()) ||
-                      email.value
-                        .toLowerCase()
-                        .includes(searchQuery.toLowerCase())
-                  )
+                  .filter((email) => {
+                    const q = searchQuery.toLowerCase();
+                    return (
+                      email.label.toLowerCase().includes(q) ||
+                      email.value.toLowerCase().includes(q) ||
+                      (email.shippingMark
+                        ?.toLowerCase()
+                        .includes(q) ??
+                        false)
+                    );
+                  })
                   .map((email) => (
                     <div
                       key={email.value}
@@ -555,8 +557,13 @@ export default function AdminEmailsPage() {
                       />
                       <label
                         htmlFor={`email-${email.value}`}
-                        className="ml-2 text-sm text-gray-200">
-                        {email.label}
+                        className="ml-2 flex flex-wrap items-center gap-2 text-sm text-gray-200">
+                        <span>{email.label}</span>
+                        {email.shippingMark && (
+                          <span className="inline-flex items-center rounded-full bg-blue-500/20 px-2 py-0.5 text-xs font-medium text-blue-200 ring-1 ring-inset ring-blue-400/30">
+                            {email.shippingMark}
+                          </span>
+                        )}
                       </label>
                     </div>
                   ))}

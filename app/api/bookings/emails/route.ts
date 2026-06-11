@@ -1,19 +1,52 @@
 import { NextResponse } from 'next/server';
-import dbConnect from '@/lib/mongoose';
-import Customer from '@/models/Customer';
+import { isNotNull } from 'drizzle-orm';
+import { db } from '@/lib/db';
+import {
+  subscribers,
+  customers as shopCustomers,
+} from '@/lib/db/schema';
 
 export async function GET() {
   try {
-    await dbConnect();
+    // Recipient list (marketing signups) and shipping marks both live in
+    // Postgres now. We join them by email to surface a mark next to
+    // recipients that are also shop customers.
+    const contacts = await db
+      .select({
+        email: subscribers.email,
+        fullName: subscribers.fullName,
+      })
+      .from(subscribers);
 
-    // Fetch all customers with email and fullName
-    const customers = await Customer.find({}, 'email fullName');
+    // email (lowercased) -> shippingMark. Best-effort: if the mark lookup
+    // fails we still return the recipient list, just without marks.
+    const markByEmail = new Map<string, string>();
+    try {
+      const rows = await db
+        .select({
+          email: shopCustomers.email,
+          shippingMark: shopCustomers.shippingMark,
+        })
+        .from(shopCustomers)
+        .where(isNotNull(shopCustomers.email));
+      for (const row of rows) {
+        if (row.email) {
+          markByEmail.set(row.email.toLowerCase(), row.shippingMark);
+        }
+      }
+    } catch (err) {
+      console.error('Failed to load shipping marks for recipients:', err);
+    }
 
-    // Format the data as objects with value and label properties
-    const formattedEmails = customers.map((customer) => ({
-      value: customer.email,
-      label: `${customer.fullName} (${customer.email})`,
-    }));
+    const formattedEmails = contacts.map((contact) => {
+      const shippingMark =
+        markByEmail.get(contact.email.toLowerCase()) ?? null;
+      return {
+        value: contact.email,
+        label: `${contact.fullName} (${contact.email})`,
+        shippingMark,
+      };
+    });
 
     return NextResponse.json({ emails: formattedEmails });
   } catch (error) {

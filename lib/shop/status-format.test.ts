@@ -24,7 +24,13 @@ describe('formatOrderStatus', () => {
     expect(formatOrderStatus('pending')).toBe('Pending Payment');
     expect(formatOrderStatus('paid')).toBe('Paid');
     expect(formatOrderStatus('processing')).toBe('Processing');
+    expect(formatOrderStatus('procured_china')).toBe(
+      'Procured to China Warehouse'
+    );
     expect(formatOrderStatus('shipped')).toBe('Shipped');
+    expect(formatOrderStatus('arrived_ghana')).toBe(
+      'Available at Ghana Warehouse'
+    );
     expect(formatOrderStatus('delivered')).toBe('Delivered');
     expect(formatOrderStatus('cancelled')).toBe('Cancelled');
   });
