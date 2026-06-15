@@ -77,7 +77,7 @@ function TermsAndConditions() {
                 Acceptance of Terms
               </h2>
               <p className="mt-5">
-                By using Lucky Godday Business service procurement and
+                By using Ship With Godday service procurement and
                 shipping services, you agree to comply with these
                 Terms and Conditions (T&Cs). If you disagree, kindly
                 refrain from using our services.

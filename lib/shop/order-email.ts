@@ -1,0 +1,199 @@
+import 'server-only';
+import { eq } from 'drizzle-orm';
+import { db } from '@/lib/db';
+import { orders, orderItems, customers } from '@/lib/db/schema';
+import { formatCedis } from '@/lib/shop/money';
+import { variantLabel } from '@/lib/shop/variant-label';
+import { formatOrderStatus } from '@/lib/shop/status-format';
+import resend from '@/lib/emails';
+
+const FROM = 'Ship With Godday <info@shipwithgodday.com>';
+const BASE_URL =
+  process.env.NEXT_PUBLIC_BASE_URL ?? 'https://shipwithgodday.com';
+
+interface StatusCopy {
+  subject: (orderNumber: string) => string;
+  headline: string;
+  intro: string;
+}
+
+/**
+ * Customer-facing copy per status. `pending` is intentionally omitted —
+ * we don't email the customer when the order is first created; that's
+ * the "paid" email after Paystack confirms.
+ */
+const STATUS_COPY: Record<string, StatusCopy> = {
+  paid: {
+    subject: (n) => `Order ${n} confirmed`,
+    headline: 'Thank you for your order',
+    intro:
+      "We've received your payment and we're getting started on your order. We'll email you again as it moves along.",
+  },
+  processing: {
+    subject: (n) => `Order ${n} is being prepared`,
+    headline: "We're preparing your order",
+    intro:
+      "Your order is being packed for shipment. We'll email you when it leaves the warehouse.",
+  },
+  procured_china: {
+    subject: (n) => `Order ${n} is at our China warehouse`,
+    headline: 'Your order has reached our China warehouse',
+    intro:
+      "Your order has been procured and received at our China warehouse. It's being prepared for shipment to Ghana — we'll email you when it ships.",
+  },
+  shipped: {
+    subject: (n) => `Order ${n} is on the way`,
+    headline: 'Your order has been shipped',
+    intro:
+      "Your order has left the warehouse and is on the way to you. We'll let you know once it has been delivered.",
+  },
+  arrived_ghana: {
+    subject: (n) => `Order ${n} has arrived in Ghana`,
+    headline: 'Your order is available at our Ghana warehouse',
+    intro:
+      "Your order has arrived and is now available at our Ghana warehouse. We'll let you know once it has been delivered.",
+  },
+  delivered: {
+    subject: (n) => `Order ${n} delivered`,
+    headline: 'Your order has been delivered',
+    intro:
+      'Thanks for shopping with Ship With Godday. If anything is amiss, just reply to this email and we will sort it out.',
+  },
+  cancelled: {
+    subject: (n) => `Order ${n} cancelled`,
+    headline: 'Your order has been cancelled',
+    intro:
+      'Your order has been cancelled. If you were charged, a refund is on the way. Reply to this email if you have any questions.',
+  },
+};
+
+/**
+ * Sends the customer-facing email for a given order status. Best-effort:
+ * every failure mode is logged so we can see what happened next time, but
+ * nothing throws — callers (webhook, callback page, admin status update)
+ * must never be blocked by an email problem.
+ */
+export async function sendOrderStatusEmail(
+  orderId: string,
+  status: string
+): Promise<void> {
+  const copy = STATUS_COPY[status];
+  if (!copy) {
+    // Statuses without customer-facing email (e.g. 'pending'). Silently skip.
+    return;
+  }
+
+  if (!process.env.RESEND_API_KEY) {
+    console.error(
+      `sendOrderStatusEmail: RESEND_API_KEY not set; skipping ${status} for ${orderId}`
+    );
+    return;
+  }
+
+  const [order] = await db
+    .select()
+    .from(orders)
+    .where(eq(orders.id, orderId));
+  if (!order) {
+    console.error(
+      `sendOrderStatusEmail: order ${orderId} not found`
+    );
+    return;
+  }
+
+  const [customer] = await db
+    .select()
+    .from(customers)
+    .where(eq(customers.id, order.customerId));
+  if (!customer?.email) {
+    console.warn(
+      `sendOrderStatusEmail: no email on customer for ${order.orderNumber}; skipping ${status}`
+    );
+    return;
+  }
+
+  const items = await db
+    .select()
+    .from(orderItems)
+    .where(eq(orderItems.orderId, orderId));
+
+  const itemRows = items
+    .map((i) => {
+      const note = i.isPreorder
+        ? `<div style="color:#7a6300;font-size:12px">Preorder${
+            i.preorderShipEstimate
+              ? ` — ${i.preorderShipEstimate}`
+              : ''
+          }</div>`
+        : '';
+      const label = variantLabel(i.variantName);
+      return (
+        `<tr><td style="padding:4px 0">${i.productName}${
+          label ? ` (${label})` : ''
+        } × ${i.quantity}${note}</td>` +
+        `<td style="text-align:right;padding:4px 0">${formatCedis(
+          i.unitPrice * i.quantity
+        )}</td></tr>`
+      );
+    })
+    .join('');
+
+  const html = `
+    <h2 style="margin:0 0 8px">${copy.headline}</h2>
+    <p style="color:#555;margin:0 0 16px">${copy.intro}</p>
+    <p style="margin:0 0 4px"><strong>Order:</strong> ${order.orderNumber}</p>
+    <p style="margin:0 0 4px"><strong>Status:</strong> ${formatOrderStatus(
+      status
+    )}</p>
+    <p style="margin:0 0 16px"><strong>Shipping mark:</strong> ${customer.shippingMark}</p>
+    <table style="width:100%;border-collapse:collapse;font-size:14px">
+      ${itemRows}
+      <tr><td style="padding-top:8px;border-top:1px solid #eee">Subtotal</td>
+          <td style="text-align:right;padding-top:8px;border-top:1px solid #eee">${formatCedis(
+            order.subtotal
+          )}</td></tr>
+      <tr><td style="padding-top:8px;border-top:1px solid #eee"><strong>Total</strong></td>
+          <td style="text-align:right;padding-top:8px;border-top:1px solid #eee"><strong>${formatCedis(
+            order.total
+          )}</strong></td></tr>
+    </table>
+    <p style="margin:16px 0 4px">
+      <a href="${BASE_URL}/track?order=${order.orderNumber}"
+         style="color:#00254F;font-weight:600;text-decoration:underline">Track your order</a>
+    </p>
+    <p style="color:#777;font-size:12px;margin:0 0 16px">
+      You can check your order status anytime at ${BASE_URL}/track using your order number ${order.orderNumber}.
+    </p>
+    <p style="margin:16px 0 4px"><strong>Deliver to</strong></p>
+    <p style="color:#555;margin:0">${order.shipName}<br>${order.shipAddress}<br>${order.shipCity}<br>${order.shipPhone}</p>
+  `;
+
+  // Resend doesn't throw on send failures; it resolves with
+  // `{ data: null, error: ResendError }`. Inspect the response.
+  const result = await resend.emails.send({
+    from: FROM,
+    to: [customer.email],
+    subject: copy.subject(order.orderNumber),
+    html,
+  });
+
+  if (result.error) {
+    console.error(
+      `sendOrderStatusEmail: Resend rejected ${status} for order ${order.orderNumber} ` +
+        `(to ${customer.email}): ${result.error.name} — ${result.error.message}`
+    );
+    return;
+  }
+
+  console.log(
+    `sendOrderStatusEmail: sent ${status} for ${order.orderNumber} to ${customer.email} (id ${result.data?.id})`
+  );
+}
+
+/**
+ * Back-compat alias for callers that still expect the old name. The
+ * 'paid' status is the original order-confirmation email.
+ */
+export function sendOrderConfirmationEmail(orderId: string) {
+  return sendOrderStatusEmail(orderId, 'paid');
+}

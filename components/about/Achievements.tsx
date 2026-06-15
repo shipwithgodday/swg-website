@@ -16,23 +16,23 @@ function Achievements() {
           {[
             {
               icon: Users,
-              title: '400+ Customers',
+              title: '600+ Customers',
               desc: 'Served and growing',
             },
             {
               icon: Package,
-              title: 'Weekly Shipments',
+              title: 'Biweekly Shipments',
               desc: 'From China warehouse',
             },
             {
               icon: Globe,
-              title: '2 Countries',
+              title: '4 Countries',
               desc: 'Cross-border operations',
             },
             {
               icon: ShieldCheck,
               title: 'Trusted',
-              desc: 'By Kantamanto, Makola & Abossey Okai',
+              desc: 'By businesses across continents',
             },
           ].map((item, i) => (
             <article

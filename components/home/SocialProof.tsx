@@ -50,8 +50,8 @@ function SocialProof() {
             transition={{ duration: 0.6, delay: 0.1 }}
             className="mt-8 md:mt-12 bg-secondary p-5 md:p-7 rounded-2xl">
             <p className="text-lg md:text-xl">
-              We have been in business for two years, and we have the
-              stats to prove it!
+              We have been in business for three years, and we have
+              the stats to prove it!
             </p>
 
             <div className="mt-8 md:mt-16 grid grid-cols-2 gap-4 md:gap-9">
@@ -66,7 +66,7 @@ function SocialProof() {
                   clients served
                 </p>
                 <p className="text-3xl md:text-4xl xl:text-6xl font-extralight">
-                  400+
+                  600+
                 </p>
               </motion.div>
               <motion.div
@@ -80,7 +80,7 @@ function SocialProof() {
                   years in business
                 </p>
                 <p className="text-3xl md:text-4xl xl:text-6xl font-extralight">
-                  2+
+                  3+
                 </p>
               </motion.div>
             </div>

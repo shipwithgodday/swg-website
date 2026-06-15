@@ -2,6 +2,7 @@
 import Container from '../shared/container';
 import SectionHeader from '../shared/section-header';
 import Image from 'next/image';
+import Link from 'next/link';
 import ProcurementStepCard from './ProcurementStepCard';
 import img1 from '@/public/sourcing/1.jpeg';
 import { motion, useInView } from 'framer-motion';
@@ -28,7 +29,18 @@ function ProcurementProcess() {
         </svg>
       ),
       title: 'Find Your Product',
-      text: 'Get a picture from the internet of the item/product you want to purchase.',
+      text: (
+        <span>
+          Get a picture from the internet of the item/product you want
+          to purchase or check out our{' '}
+          <Link
+            href="/shop"
+            className="underline underline-offset-4 text-primary">
+            shop
+          </Link>{' '}
+          to purchase directly from there.
+        </span>
+      ),
       color: 'bg-gradient-to-r from-[#00254F] to-[#00365D]',
     },
     {

@@ -37,9 +37,10 @@ function Hero() {
               transition={{ duration: 0.6, delay: 0.3 }}
               className="text-lg md:text-xl lg:text-2xl md:w-5/6 text-gray-200">
               Streamline your supply chain with our comprehensive
-              shipping solutions from China to Ghana. Experience
-              reliable sea and air freight services tailored to your
-              business needs.
+              shipping solutions from China to Ghana 🇬🇭, our primary
+              destination, plus Barbados 🇧🇧, Jamaica 🇯🇲, and the UK
+              🇬🇧. Experience reliable sea and air freight services
+              tailored to your business needs.
             </motion.p>
 
             <motion.div

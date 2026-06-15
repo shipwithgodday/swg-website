@@ -1,7 +1,7 @@
 'use server';
 
-import dbConnect from '@/lib/mongoose';
-import BookingModel from '@/models/Booking';
+import { db } from '@/lib/db';
+import { bookings } from '@/lib/db/schema';
 
 type BookingData = {
   date: string;
@@ -16,72 +16,48 @@ type BookingData = {
 };
 
 export async function createBooking(data: BookingData) {
-  const {
-    date,
-    time,
-    fullName,
-    phoneNumber,
-    whatsappNumber,
-    email,
-    organization,
-    desiredService,
-    meetingType,
-  } = data;
-
   try {
-    // Connect to MongoDB
-    await dbConnect();
-
-    // Create a new booking document
-    const newBooking = new BookingModel({
-      date,
-      time,
-      fullName,
-      phoneNumber,
-      whatsappNumber,
-      email,
-      organization,
-      desiredService,
-      meetingType,
-    });
-
-    // Save the booking
-    const savedBooking = await newBooking.save();
-
-    // Convert to a plain JavaScript object without Mongoose methods
-    // This ensures it can be serialized for client components
-    const serializedBooking = JSON.parse(
-      JSON.stringify({
-        date: savedBooking.date,
-        time: savedBooking.time,
-        fullName: savedBooking.fullName,
-        phoneNumber: savedBooking.phoneNumber,
-        whatsappNumber: savedBooking.whatsappNumber,
-        email: savedBooking.email,
-        organization: savedBooking.organization,
-        desiredService: savedBooking.desiredService,
-        meetingType: savedBooking.meetingType,
-        id: savedBooking._id.toString(),
+    const [saved] = await db
+      .insert(bookings)
+      .values({
+        date: data.date,
+        time: data.time,
+        fullName: data.fullName,
+        phoneNumber: data.phoneNumber,
+        whatsappNumber: data.whatsappNumber ?? null,
+        email: data.email,
+        organization: data.organization ?? null,
+        desiredService: data.desiredService,
+        meetingType: data.meetingType,
       })
-    );
+      .returning();
 
     return {
       success: true,
       message: 'Booking created successfully',
-      booking: serializedBooking,
+      booking: {
+        id: saved.id,
+        date: saved.date,
+        time: saved.time,
+        fullName: saved.fullName,
+        phoneNumber: saved.phoneNumber,
+        whatsappNumber: saved.whatsappNumber,
+        email: saved.email,
+        organization: saved.organization,
+        desiredService: saved.desiredService,
+        meetingType: saved.meetingType,
+      },
     };
   } catch (err) {
-    console.error('Error creating booking:', err);
-
-    // Check for duplicate key error (booking already exists)
-    if ((err as Error & { code?: number }).code === 11000) {
+    // Postgres unique-violation = duplicate (date, time) slot.
+    if ((err as { code?: string }).code === '23505') {
       return {
         success: false,
         message: 'This time slot is already booked',
         error: 'Duplicate booking',
       };
     }
-
+    console.error('Error creating booking:', err);
     return {
       success: false,
       message: 'Failed to create booking',

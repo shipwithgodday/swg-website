@@ -9,14 +9,14 @@ This document outlines all SEO implementations and best practices for the Ship W
 ```typescript
 export const metadata: Metadata = {
   title: {
-    default: 'Ship With Godday | Lucky Godday Business Services',
+    default: 'Ship With Godday',
     template: '%s | Ship With Godday'
   },
   description: 'Your trusted partner for seamless shipping solutions between China and Ghana...',
   keywords: ['shipping', 'logistics', 'Ghana', 'China', 'procurement', ...],
   authors: [{ name: 'Godday' }],
   creator: 'Godday',
-  publisher: 'Lucky Godday Business Services',
+  publisher: 'Ship With Godday',
   // ... other metadata
 };
 ```
@@ -111,7 +111,7 @@ export function WebVitals() {
 ```typescript
 export const trackEvent = (
   eventName: string,
-  eventParams?: { [key: string]: any }
+  eventParams?: { [key: string]: any },
 ) => {
   if (typeof window !== 'undefined' && window.gtag) {
     window.gtag('event', eventName, eventParams);

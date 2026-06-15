@@ -123,7 +123,7 @@ function CTA() {
               and handling weekly shipments, we&apos;ll walk you
               through it all. Schedule a quick call with our team and
               take the first step toward hassle-free shipping from
-              China to Ghana.
+              China to Ghana and the Caribbean.
             </motion.p>
 
             <motion.div

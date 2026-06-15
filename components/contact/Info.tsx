@@ -75,7 +75,7 @@ function Info() {
     {
       icon: <Mail className="w-5 h-5" />,
       title: 'Email:',
-      lines: ['ShipWithGodday@gmail.com'],
+      lines: ['ShipWithGoddayltd@gmail.com'],
     },
     {
       icon: <Clock className="w-5 h-5" />,

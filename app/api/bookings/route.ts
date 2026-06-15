@@ -1,12 +1,9 @@
 import { NextResponse } from 'next/server';
-import dbConnect from '@/lib/mongoose';
-import Booking from '@/models/Booking';
-import Customer from '@/models/Customer';
+import { db } from '@/lib/db';
+import { bookings } from '@/lib/db/schema';
 
 export async function POST(request: Request) {
   try {
-    await dbConnect();
-
     const body = await request.json();
     const {
       date,
@@ -14,38 +11,32 @@ export async function POST(request: Request) {
       fullName,
       email,
       phoneNumber,
+      whatsappNumber,
       organization,
       desiredService,
       meetingType,
     } = body;
 
-    // Check if customer exists, if not create them
-    let customer = await Customer.findOne({ email });
-    if (!customer) {
-      // Silently create new customer without notifying the user
-      customer = await Customer.create({
+    // Bookers are intentionally NOT added to the customers table.
+    const [booking] = await db
+      .insert(bookings)
+      .values({
+        date,
+        time,
         fullName,
         email,
         phoneNumber,
-      });
-    }
-
-    // Create the booking
-    const booking = await Booking.create({
-      date,
-      time,
-      fullName,
-      email,
-      phoneNumber,
-      organization,
-      desiredService,
-      meetingType,
-    });
+        whatsappNumber: whatsappNumber ?? null,
+        organization: organization ?? null,
+        desiredService,
+        meetingType,
+      })
+      .returning();
 
     return NextResponse.json({
       message: 'Booking created successfully',
       booking: {
-        id: booking._id,
+        id: booking.id,
         date: booking.date,
         time: booking.time,
         fullName: booking.fullName,
@@ -53,6 +44,12 @@ export async function POST(request: Request) {
       },
     });
   } catch (error) {
+    if ((error as { code?: string }).code === '23505') {
+      return NextResponse.json(
+        { error: 'This time slot is already booked' },
+        { status: 409 }
+      );
+    }
     console.error('Error creating booking:', error);
     return NextResponse.json(
       { error: 'Failed to create booking' },

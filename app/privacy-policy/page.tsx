@@ -75,11 +75,11 @@ function PrivacyPolicy() {
             <div className="prose prose-lg max-w-none">
               <h2 className="text-3xl font-bold">Introduction</h2>
               <p className="mt-5">
-                At Lucky Godday Business Services (&quot;we&quot;,
-                &quot;our&quot;, or &quot;us&quot;), we take your
-                privacy seriously. This Privacy Policy explains how we
-                collect and use the limited information you provide
-                when using our website.
+                At Ship With Godday (&quot;we&quot;, &quot;our&quot;,
+                or &quot;us&quot;), we take your privacy seriously.
+                This Privacy Policy explains how we collect and use
+                the limited information you provide when using our
+                website.
               </p>
 
               <h2 className="text-3xl font-bold mt-5">

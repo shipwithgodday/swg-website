@@ -9,7 +9,7 @@ export default function SignInPage() {
             Sign in to your account
           </h2>
           <p className="mt-2 text-sm text-gray-600">
-            Access your email dashboard
+            Access your dashboard
           </p>
         </div>
         <SignIn
@@ -36,7 +36,10 @@ export default function SignInPage() {
           routing="path"
           path="/sign-in"
           // signUpUrl="/sign-up"
-          redirectUrl="/email"
+          // Only admins use the standalone /sign-in route (everyone else
+          // signs in via Clerk's in-page modal on /shop/checkout, /account,
+          // etc.), so send them to the admin dashboard by default.
+          fallbackRedirectUrl="/admin"
         />
       </div>
     </div>

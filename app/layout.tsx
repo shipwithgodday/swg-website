@@ -1,14 +1,18 @@
 import type { Metadata } from 'next';
 import './globals.css';
-import Navbar from '@/components/shared/navbar';
 import { ClerkProvider } from '@clerk/nextjs';
-import Footer from '@/components/shared/Footer';
+import {
+  SiteNavbar,
+  SiteFooter,
+} from '@/components/shared/SiteChrome';
 import { GoogleAnalytics } from '@next/third-parties/google';
 import { WebVitals } from '@/components/analytics/WebVitals';
+import { Toaster } from '@/components/ui/sonner';
+import { CartProvider } from '@/lib/cart-context';
 
 export const metadata: Metadata = {
   title: {
-    default: 'Ship With Godday | Lucky Godday Business Services',
+    default: 'Ship With Godday',
     template: '%s | Ship With Godday',
   },
   description:
@@ -27,7 +31,7 @@ export const metadata: Metadata = {
   ],
   authors: [{ name: 'Godday' }],
   creator: 'Godday',
-  publisher: 'Lucky Godday Business Services',
+  publisher: 'Ship With Godday',
   formatDetection: {
     email: false,
     address: false,
@@ -41,7 +45,7 @@ export const metadata: Metadata = {
     type: 'website',
     locale: 'en_US',
     url: 'https://shipwithgodday.com',
-    title: 'Ship With Godday | Lucky Godday Business Services',
+    title: 'Ship With Godday',
     description:
       'Your trusted partner for seamless shipping solutions between China and Ghana. Experience reliable logistics, procurement, and payment services tailored to your business needs.',
     siteName: 'Ship With Godday',
@@ -56,7 +60,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Ship With Godday | Lucky Godday Business Services',
+    title: 'Ship With Godday',
     description:
       'Your trusted partner for seamless shipping solutions between China and Ghana.',
     images: ['/logo.png'],
@@ -83,13 +87,25 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <ClerkProvider>
+    <ClerkProvider
+      appearance={{
+        // Hides the 'Secured by Clerk' badge on every Clerk surface
+        // (sign-in / sign-up modals, UserButton menu, UserProfile,
+        // and the standalone /sign-in route). Inherited globally so
+        // individual components don't need to override.
+        elements: {
+          footer: { display: 'none' },
+        },
+      }}>
       <html lang="en">
         <body>
-          <Navbar />
-          {children}
-          <Footer />
+          <CartProvider>
+            <SiteNavbar />
+            {children}
+            <SiteFooter />
+          </CartProvider>
           <WebVitals />
+          <Toaster />
         </body>
         <GoogleAnalytics gaId="G-GHJH5C564E" />
       </html>

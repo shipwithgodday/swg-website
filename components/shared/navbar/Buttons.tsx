@@ -2,9 +2,16 @@
 
 import { Dispatch, SetStateAction } from 'react';
 import { FiMenu, FiX } from 'react-icons/fi';
+import {
+  SignedIn,
+  SignedOut,
+  SignInButton,
+  UserButton,
+} from '@clerk/nextjs';
+import { Package, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import Link from 'next/link';
 import { Icon } from '@/components/ui/icon';
+import { CartLink } from './CartLink';
 
 const Buttons = ({
   menuOpen,
@@ -14,13 +21,44 @@ const Buttons = ({
   setMenuOpen: Dispatch<SetStateAction<boolean>>;
 }) => (
   <div className="flex items-center gap-4">
+    <CartLink />
+
     <div className="hidden md:block">
-      <Button className="hover:scale-105 transition-all duration-300">
-        <Link className="flex items-center gap-1" href={'/schedule'}>
-          Schedule a Call
-          <Icon name="ArrowRight" />
-        </Link>
-      </Button>
+      <SignedOut>
+        <SignInButton mode="modal">
+          <Button className="hover:scale-105 transition-all duration-300">
+            <span className="flex items-center gap-1">
+              Sign in
+              <Icon name="ArrowRight" />
+            </span>
+          </Button>
+        </SignInButton>
+      </SignedOut>
+      <SignedIn>
+        <UserButton
+          afterSignOutUrl="/"
+          appearance={{
+            elements: {
+              avatarBox: 'size-9',
+              footer: {
+                display: 'none',
+              },
+            },
+          }}>
+          <UserButton.MenuItems>
+            <UserButton.Link
+              label="My account"
+              labelIcon={<User className="size-4" />}
+              href="/account"
+            />
+            <UserButton.Link
+              label="My orders"
+              labelIcon={<Package className="size-4" />}
+              href="/shop/orders"
+            />
+          </UserButton.MenuItems>
+        </UserButton>
+      </SignedIn>
     </div>
 
     <button

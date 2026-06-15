@@ -56,7 +56,7 @@ function CEO() {
             </div>
             <div className="w-20 h-1.5 bg-primary rounded-full"></div>
             <p className="text-gray-700 leading-relaxed">
-              With over 4 years of experience in international
+              With over 5 years of experience in international
               logistics and supply chain management, Godday has
               revolutionized how businesses approach global
               procurement and shipping. His innovative vision has
@@ -64,11 +64,11 @@ function CEO() {
               is also fluent in both Mandarin Chinese and English.
             </p>
             <p className="text-gray-700 leading-relaxed">
-              Godday oversees both our China and Ghana operations,
-              ensuring seamless coordination between procurement,
-              quality control, customs clearance, and client services.
-              His commitment to excellence drives our company&apos;s
-              success.
+              Godday oversees China, Ghana, Jamaica and Barbados
+              operations, ensuring seamless coordination between
+              procurement, quality control, customs clearance, and
+              client services. His commitment to excellence drives our
+              company&apos;s success.
             </p>
             <div className="mt-4">
               <Button>
