@@ -10,12 +10,12 @@ import Footer from '@/components/shared/Footer';
  */
 export function SiteNavbar() {
   const pathname = usePathname();
-  if (pathname?.startsWith('/admin')) return null;
+  if (pathname?.startsWith('/swg-admin')) return null;
   return <Navbar />;
 }
 
 export function SiteFooter() {
   const pathname = usePathname();
-  if (pathname?.startsWith('/admin')) return null;
+  if (pathname?.startsWith('/swg-admin')) return null;
   return <Footer />;
 }

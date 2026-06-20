@@ -27,7 +27,7 @@ export function DateRangeTabs() {
           key={range}
           type="button"
           onClick={() =>
-            startTransition(() => router.push(`/admin?range=${range}`))
+            startTransition(() => router.push(`/swg-admin?range=${range}`))
           }
           className={cn(
             'cursor-pointer rounded-md px-3 py-1.5 text-sm font-medium transition-colors',

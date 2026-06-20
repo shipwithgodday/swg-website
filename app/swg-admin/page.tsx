@@ -86,7 +86,7 @@ export default async function AdminDashboardPage({
             {metrics.recentOrders.map((o) => (
               <Link
                 key={o.id}
-                href={`/admin/orders/${o.id}`}
+                href={`/swg-admin/orders/${o.id}`}
                 className="flex flex-wrap items-center gap-x-3 gap-y-1 rounded-lg px-2 py-2 transition-colors hover:bg-zinc-50">
                 <span className="font-medium text-zinc-900">
                   {o.orderNumber}
@@ -115,7 +115,7 @@ export default async function AdminDashboardPage({
           {metrics.lowStock.map((v) => (
             <Link
               key={v.id}
-              href={`/admin/products?edit=${v.productId}`}
+              href={`/swg-admin/products?edit=${v.productId}`}
               className="flex flex-wrap items-center gap-x-3 gap-y-1 rounded-lg px-2 py-2 transition-colors hover:bg-zinc-50">
               <span className="min-w-0 flex-1 text-sm text-zinc-800">
                 {v.productName}

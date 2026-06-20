@@ -155,7 +155,7 @@ export function CustomerDetailDialog({
                 {detail?.orders.map((o) => (
                   <Link
                     key={o.id}
-                    href={`/admin/orders/${o.id}`}
+                    href={`/swg-admin/orders/${o.id}`}
                     className="flex flex-wrap items-center gap-x-3 gap-y-1.5 rounded-md border border-border p-3 text-sm hover:bg-accent">
                     <span className="font-medium">{o.orderNumber}</span>
                     <span className="text-muted-foreground">

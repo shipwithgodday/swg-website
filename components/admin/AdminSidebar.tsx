@@ -23,15 +23,15 @@ const NAV = [
   {
     section: 'Overview',
     items: [
-      { href: '/admin', label: 'Dashboard', icon: LayoutDashboard },
+      { href: '/swg-admin', label: 'Dashboard', icon: LayoutDashboard },
     ],
   },
   {
     section: 'Catalog',
     items: [
-      { href: '/admin/products', label: 'Products', icon: Package },
+      { href: '/swg-admin/products', label: 'Products', icon: Package },
       {
-        href: '/admin/categories',
+        href: '/swg-admin/categories',
         label: 'Categories',
         icon: FolderTree,
       },
@@ -40,25 +40,25 @@ const NAV = [
   {
     section: 'Sales',
     items: [
-      { href: '/admin/orders', label: 'Orders', icon: ShoppingCart },
-      { href: '/admin/customers', label: 'Customers', icon: Users },
+      { href: '/swg-admin/orders', label: 'Orders', icon: ShoppingCart },
+      { href: '/swg-admin/customers', label: 'Customers', icon: Users },
     ],
   },
   {
     section: 'Logistics',
     items: [
-      { href: '/admin/shipments', label: 'Shipments', icon: Ship },
+      { href: '/swg-admin/shipments', label: 'Shipments', icon: Ship },
     ],
   },
   {
     section: 'Marketing',
-    items: [{ href: '/admin/emails', label: 'Emails', icon: Mail }],
+    items: [{ href: '/swg-admin/emails', label: 'Emails', icon: Mail }],
   },
   {
     section: 'Settings',
     items: [
       {
-        href: '/admin/settings/availability',
+        href: '/swg-admin/settings/availability',
         label: 'Scheduling',
         icon: CalendarClock,
       },
@@ -67,8 +67,8 @@ const NAV = [
 ];
 
 function isActive(pathname: string, href: string): boolean {
-  return href === '/admin'
-    ? pathname === '/admin'
+  return href === '/swg-admin'
+    ? pathname === '/swg-admin'
     : pathname.startsWith(href);
 }
 
@@ -166,7 +166,7 @@ export function AdminSidebar() {
     <>
       {/* Mobile top bar */}
       <header className="sticky top-0 z-30 flex h-14 items-center justify-between border-b border-zinc-900 bg-zinc-950 px-4 text-zinc-200 md:hidden">
-        <Link href="/admin" className="flex items-center gap-2.5">
+        <Link href="/swg-admin" className="flex items-center gap-2.5">
           <span className="grid size-7 place-items-center rounded-lg bg-primary text-zinc-950">
             <span className="text-xs font-bold">G</span>
           </span>

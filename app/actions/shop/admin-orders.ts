@@ -38,7 +38,7 @@ export async function updateOrderStatus(
     console.error('updateOrderStatus: email send failed', error);
   }
 
-  revalidatePath('/admin/orders');
-  revalidatePath(`/admin/orders/${orderId}`);
+  revalidatePath('/swg-admin/orders');
+  revalidatePath(`/swg-admin/orders/${orderId}`);
   return { ok: true };
 }

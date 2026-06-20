@@ -43,7 +43,7 @@ export function OrdersTable({ orders }: { orders: AdminOrderRow[] }) {
         header: 'Order',
         cell: ({ row }) => (
           <Link
-            href={`/admin/orders/${row.original.id}`}
+            href={`/swg-admin/orders/${row.original.id}`}
             className="font-medium text-zinc-900 underline-offset-4 hover:underline">
             {row.original.orderNumber}
           </Link>
@@ -119,7 +119,7 @@ export function OrdersTable({ orders }: { orders: AdminOrderRow[] }) {
         searchable
         searchPlaceholder="Search order #, customer, or mark"
         initialSorting={[{ id: 'createdAt', desc: true }]}
-        onRowClick={(o) => router.push(`/admin/orders/${o.id}`)}
+        onRowClick={(o) => router.push(`/swg-admin/orders/${o.id}`)}
       />
     </div>
   );

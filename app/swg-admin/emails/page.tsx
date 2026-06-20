@@ -5,7 +5,10 @@ import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import Link from 'next/link';
+import { Trash2 } from 'lucide-react';
+import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
+import { deleteRecipient } from '@/app/actions/shop/admin-emails';
 
 // TipTap imports
 import { useEditor, EditorContent } from '@tiptap/react';
@@ -90,6 +93,7 @@ export default function AdminEmailsPage() {
     { value: string; label: string; shippingMark?: string | null }[]
   >([]);
   const [selectedEmails, setSelectedEmails] = useState<string[]>([]);
+  const [deletingEmail, setDeletingEmail] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [status, setStatus] = useState<{
@@ -164,6 +168,33 @@ export default function AdminEmailsPage() {
         ? prev.filter((e) => e !== email)
         : [...prev, email]
     );
+  };
+
+  const handleDeleteRecipient = async (email: string, label: string) => {
+    if (
+      !window.confirm(
+        `Delete ${label} from your audience?\n\nThis removes their newsletter signup and their shop customer record (order history is kept but anonymized). This cannot be undone.`
+      )
+    ) {
+      return;
+    }
+
+    setDeletingEmail(email);
+    try {
+      const res = await deleteRecipient(email);
+      if (!res.ok) {
+        toast.error(res.error);
+        return;
+      }
+      // Drop them from the visible list and any pending send selection.
+      setEmails((prev) => prev.filter((e) => e.value !== email));
+      setSelectedEmails((prev) => prev.filter((e) => e !== email));
+      toast.success(`${label} removed from your audience`);
+    } catch {
+      toast.error('Could not delete recipient. Please try again.');
+    } finally {
+      setDeletingEmail(null);
+    }
   };
 
   const selectAll = () => {
@@ -547,7 +578,7 @@ export default function AdminEmailsPage() {
                   .map((email) => (
                     <div
                       key={email.value}
-                      className="flex items-center">
+                      className="group flex items-center gap-2">
                       <input
                         type="checkbox"
                         id={`email-${email.value}`}
@@ -557,7 +588,7 @@ export default function AdminEmailsPage() {
                       />
                       <label
                         htmlFor={`email-${email.value}`}
-                        className="ml-2 flex flex-wrap items-center gap-2 text-sm text-gray-200">
+                        className="ml-1 flex flex-1 flex-wrap items-center gap-2 text-sm text-gray-200">
                         <span>{email.label}</span>
                         {email.shippingMark && (
                           <span className="inline-flex items-center rounded-full bg-blue-500/20 px-2 py-0.5 text-xs font-medium text-blue-200 ring-1 ring-inset ring-blue-400/30">
@@ -565,6 +596,17 @@ export default function AdminEmailsPage() {
                           </span>
                         )}
                       </label>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          handleDeleteRecipient(email.value, email.label)
+                        }
+                        disabled={deletingEmail === email.value}
+                        aria-label={`Delete ${email.label}`}
+                        title="Delete from audience"
+                        className="shrink-0 rounded-md p-1.5 text-gray-400 transition-colors hover:bg-red-500/15 hover:text-red-300 disabled:opacity-50 sm:opacity-0 sm:group-hover:opacity-100 sm:focus:opacity-100">
+                        <Trash2 className="h-4 w-4" />
+                      </button>
                     </div>
                   ))}
               </div>

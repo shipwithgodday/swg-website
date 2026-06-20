@@ -118,7 +118,7 @@ export async function createProduct(raw: unknown): Promise<ActionResult> {
       error: 'Could not save — a product or SKU with this name may exist.',
     };
   }
-  revalidatePath('/admin/products');
+  revalidatePath('/swg-admin/products');
   return { ok: true };
 }
 
@@ -274,7 +274,7 @@ export async function updateProduct(
     return { ok: false, error: 'Could not save the product.' };
   }
 
-  revalidatePath('/admin/products');
+  revalidatePath('/swg-admin/products');
   return { ok: true };
 }
 
@@ -295,6 +295,6 @@ export async function deleteProduct(id: string): Promise<ActionResult> {
     };
   }
   await Promise.all(images.map((img) => destroyImage(img.publicId)));
-  revalidatePath('/admin/products');
+  revalidatePath('/swg-admin/products');
   return { ok: true };
 }
