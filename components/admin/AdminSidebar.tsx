@@ -2,10 +2,12 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { SignOutButton } from '@clerk/nextjs';
 import {
   CalendarClock,
   FolderTree,
   LayoutDashboard,
+  LogOut,
   Mail,
   Menu,
   Package,
@@ -115,8 +117,17 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
         ))}
       </nav>
 
-      <div className="border-t border-zinc-900 px-5 py-4">
-        <p className="text-xs text-zinc-600">Ship With Godday</p>
+      <div className="space-y-3 border-t border-zinc-900 px-3 py-4">
+        <SignOutButton redirectUrl="/">
+          <button
+            type="button"
+            onClick={onNavigate}
+            className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-zinc-400 transition-colors hover:bg-zinc-900 hover:text-white">
+            <LogOut className="size-4" />
+            Log out
+          </button>
+        </SignOutButton>
+        <p className="px-3 text-xs text-zinc-600">Ship With Godday</p>
       </div>
     </>
   );
