@@ -66,7 +66,7 @@ export default async function AdminOrderDetailPage({
             {customer ? (
               <div className="mt-3 space-y-1 text-sm">
                 <Link
-                  href={`/admin/customers/${customer.id}`}
+                  href={`/swg-admin/customers/${customer.id}`}
                   className="font-semibold text-zinc-900 underline-offset-4 hover:underline">
                   {customer.name ?? customer.shippingMark}
                 </Link>

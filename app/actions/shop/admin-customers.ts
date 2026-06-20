@@ -9,6 +9,10 @@ import {
   listMergeCandidates,
 } from '@/lib/shop/admin-customers';
 import {
+  deleteOrAnonymizeCustomer,
+  purgeSubscribersByEmail,
+} from '@/lib/shop/audience-delete';
+import {
   customerCreateSchema,
   customerEditSchema,
 } from '@/lib/shop/validation';
@@ -113,7 +117,7 @@ export async function createCustomer(
       })
       .returning({ id: customers.id });
 
-    revalidatePath('/admin/customers');
+    revalidatePath('/swg-admin/customers');
     return { ok: true, id: created.id };
   } catch (err) {
     // 23505 = unique violation; shipping_mark is unique.
@@ -148,8 +152,8 @@ export async function updateCustomer(
       updatedAt: new Date(),
     })
     .where(eq(customers.id, id));
-  revalidatePath(`/admin/customers/${id}`);
-  revalidatePath('/admin/customers');
+  revalidatePath(`/swg-admin/customers/${id}`);
+  revalidatePath('/swg-admin/customers');
   return { ok: true };
 }
 
@@ -194,8 +198,8 @@ export async function mergeCustomers(
     db.delete(customers).where(eq(customers.id, mergedId)),
   ]);
 
-  revalidatePath('/admin/customers');
-  revalidatePath(`/admin/customers/${survivorId}`);
+  revalidatePath('/swg-admin/customers');
+  revalidatePath(`/swg-admin/customers/${survivorId}`);
   return { ok: true };
 }
 
@@ -229,56 +233,30 @@ export async function deleteCustomer(
 ): Promise<DeleteCustomerResult> {
   await requireAdmin();
 
+  // Capture the email before we delete/anonymize so we can also purge any
+  // matching newsletter subscriber — otherwise this customer would reappear
+  // in the bulk-email list via the `subscribers` source (keeps the two
+  // lists in sync).
   const [c] = await db
-    .select({
-      id: customers.id,
-      shippingMarkNo: customers.shippingMarkNo,
-    })
+    .select({ id: customers.id, email: customers.email })
     .from(customers)
     .where(eq(customers.id, id));
   if (!c) return { ok: false, error: 'Customer not found.' };
 
-  const [oc] = await db
-    .select({ n: sql<number>`count(*)` })
-    .from(orders)
-    .where(eq(orders.customerId, id));
-  const orderCount = Number(oc?.n ?? 0);
+  const orderCount = Number(
+    (
+      await db
+        .select({ n: sql<number>`count(*)` })
+        .from(orders)
+        .where(eq(orders.customerId, id))
+    )[0]?.n ?? 0
+  );
 
-  if (orderCount > 0) {
-    // Anonymize — keep the row + shipping mark + orders, strip PII.
-    await db
-      .update(customers)
-      .set({
-        name: null,
-        email: null,
-        phone: null,
-        clerkUserId: null,
-        source: 'deleted',
-        updatedAt: new Date(),
-      })
-      .where(eq(customers.id, id));
-    revalidatePath('/admin/customers');
-    return { ok: true, mode: 'anonymized', orderCount };
-  }
+  const mode = await deleteOrAnonymizeCustomer(id);
+  await purgeSubscribersByEmail(c.email);
 
-  await db.delete(customers).where(eq(customers.id, id));
-
-  // Rewind the shipping-mark sequence to the new max so that if we just
-  // deleted the most-recently-allocated mark, the next new customer
-  // picks it up again instead of skipping past it. setval(seq, n, true)
-  // sets last_value=n with is_called=true, so the next nextval()
-  // returns n + 1. Skip entirely if no customers remain (sequences with
-  // MINVALUE=1 reject setval(0)).
-  const [maxRow] = await db
-    .select({ m: sql<number | null>`max(${customers.shippingMarkNo})` })
-    .from(customers);
-  const newMax = Number(maxRow?.m ?? 0);
-  if (newMax > 0) {
-    await db.execute(
-      sql`SELECT setval('shipping_mark_seq', ${newMax}, true)`
-    );
-  }
-
-  revalidatePath('/admin/customers');
-  return { ok: true, mode: 'deleted' };
+  revalidatePath('/swg-admin/customers');
+  return mode === 'anonymized'
+    ? { ok: true, mode: 'anonymized', orderCount }
+    : { ok: true, mode: 'deleted' };
 }

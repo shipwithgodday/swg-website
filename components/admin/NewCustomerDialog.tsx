@@ -65,7 +65,7 @@ export function NewCustomerDialog() {
         toast.success('Customer created');
         setOpen(false);
         reset();
-        router.push(`/admin/customers/${res.id}`);
+        router.push(`/swg-admin/customers/${res.id}`);
       } else {
         toast.error(res.ok ? 'Could not create customer' : res.error);
       }

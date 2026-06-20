@@ -30,7 +30,7 @@ export async function createCategory(
   } catch {
     return { ok: false, error: 'A category with this name already exists.' };
   }
-  revalidatePath('/admin/categories');
+  revalidatePath('/swg-admin/categories');
   return { ok: true };
 }
 
@@ -58,13 +58,13 @@ export async function updateCategory(
   } catch {
     return { ok: false, error: 'A category with this name already exists.' };
   }
-  revalidatePath('/admin/categories');
+  revalidatePath('/swg-admin/categories');
   return { ok: true };
 }
 
 export async function deleteCategory(id: string): Promise<ActionResult> {
   await requireAdmin();
   await db.delete(categories).where(eq(categories.id, id));
-  revalidatePath('/admin/categories');
+  revalidatePath('/swg-admin/categories');
   return { ok: true };
 }

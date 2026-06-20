@@ -39,7 +39,7 @@ export default function SignInPage() {
           // Only admins use the standalone /sign-in route (everyone else
           // signs in via Clerk's in-page modal on /shop/checkout, /account,
           // etc.), so send them to the admin dashboard by default.
-          fallbackRedirectUrl="/admin"
+          fallbackRedirectUrl="/swg-admin"
         />
       </div>
     </div>

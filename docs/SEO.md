@@ -42,7 +42,7 @@ Sitemap: https://shipwithgodday.com/sitemap.xml
 
 # Disallow admin and API routes
 Disallow: /api/
-Disallow: /admin/
+Disallow: /swg-admin/
 Disallow: /_next/
 Disallow: /static/
 ```

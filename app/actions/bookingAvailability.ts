@@ -16,7 +16,7 @@ import {
 
 export type ActionResult = { ok: true } | { ok: false; error: string };
 
-const PAGE_PATH = '/admin/settings/availability';
+const PAGE_PATH = '/swg-admin/settings/availability';
 
 export async function saveWeekdayHours(raw: unknown): Promise<ActionResult> {
   await requireAdmin();

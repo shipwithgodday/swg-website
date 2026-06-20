@@ -83,7 +83,7 @@ export function ProductsTable({
     });
   }
 
-  // Deep link support: /admin/products?edit=<id> opens that product.
+  // Deep link support: /swg-admin/products?edit=<id> opens that product.
   useEffect(() => {
     const id = searchParams.get('edit');
     if (!id) return;
