@@ -69,6 +69,7 @@ export default function AdminShipmentsPage() {
           containers={containers}
           onEdit={handleEdit}
           onArrivalMarked={loadContainers}
+          onDeleted={loadContainers}
         />
       </MotionReveal>
 

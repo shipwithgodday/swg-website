@@ -90,6 +90,16 @@ export async function createContainer(data: {
   return row;
 }
 
+export async function deleteContainer(id: string): Promise<void> {
+  // eta_adjustments and shipment_notification_subscribers both cascade-delete
+  // via their foreign keys, so removing the container is enough.
+  const [deleted] = await db
+    .delete(containers)
+    .where(eq(containers.id, id))
+    .returning({ id: containers.id });
+  if (!deleted) throw new Error(`Container ${id} not found`);
+}
+
 export async function updateContainerEtas(
   id: string,
   updates: {
@@ -191,6 +201,37 @@ export async function markContainerArrived(
     if (!existing) throw new Error(`Container ${id} not found`);
     return existing;
   }
+  return updated;
+}
+
+export async function unmarkContainerArrived(
+  id: string,
+  milestone: 'port' | 'warehouse'
+): Promise<Container> {
+  const col =
+    milestone === 'port'
+      ? { arrivedAtPort: null }
+      : { arrivedAtWarehouse: null };
+
+  const [updated] = await db
+    .update(containers)
+    .set(col)
+    .where(eq(containers.id, id))
+    .returning();
+
+  if (!updated) throw new Error(`Container ${id} not found`);
+
+  // Reset the "arrived" notification flags so re-marking re-sends the email.
+  // (Any emails already sent cannot be recalled.)
+  const flag =
+    milestone === 'port'
+      ? { notifiedPortArrived: false as const }
+      : { notifiedWarehouseArrived: false as const };
+  await db
+    .update(shipmentNotificationSubscribers)
+    .set(flag)
+    .where(eq(shipmentNotificationSubscribers.containerId, id));
+
   return updated;
 }
 

@@ -1,7 +1,7 @@
 'use client';
 import { useState } from 'react';
 import { format } from 'date-fns';
-import { Ship, Warehouse } from 'lucide-react';
+import { Ship, Warehouse, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 import {
   Table,
@@ -17,6 +17,7 @@ interface Props {
   containers: ContainerRow[];
   onEdit: (container: ContainerRow) => void;
   onArrivalMarked: () => void;
+  onDeleted: () => void;
 }
 
 function formatDate(date: Date | null): string {
@@ -68,6 +69,37 @@ function EtaCell({
     }
   }
 
+  async function handleUndoArrived() {
+    const place = milestone === 'port' ? 'Tema Port' : 'Ghana Warehouse';
+    const confirmed = window.confirm(
+      `Undo arrival at ${place}? Any arrival emails already sent to subscribers cannot be recalled, but they'll be notified again if you re-mark it.`
+    );
+    if (!confirmed) return;
+
+    setLoading(true);
+    try {
+      const res = await fetch(
+        `/api/admin/containers/${containerId}/arrive`,
+        {
+          method: 'DELETE',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ milestone }),
+        }
+      );
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        toast.error(data.error ?? 'Failed to undo arrival');
+        return;
+      }
+      toast.success(`Arrival at ${place} undone`);
+      onArrivalMarked();
+    } catch {
+      toast.error('Something went wrong');
+    } finally {
+      setLoading(false);
+    }
+  }
+
   if (arrived) {
     return (
       <div>
@@ -75,6 +107,13 @@ function EtaCell({
         <span className="inline-flex items-center gap-1 rounded-full bg-green-50 px-2 py-0.5 text-xs font-medium text-green-700">
           ✓ Arrived {formatDate(arrived)}
         </span>
+        <button
+          type="button"
+          onClick={handleUndoArrived}
+          disabled={loading}
+          className="mt-0.5 block text-xs text-zinc-400 underline hover:text-zinc-700 disabled:opacity-50 transition-colors">
+          {loading ? 'Undoing…' : 'Undo'}
+        </button>
       </div>
     );
   }
@@ -97,7 +136,61 @@ function EtaCell({
   );
 }
 
-export function ContainerTable({ containers, onEdit, onArrivalMarked }: Props) {
+function DeleteContainerButton({
+  container,
+  onDeleted,
+}: {
+  container: ContainerRow;
+  onDeleted: () => void;
+}) {
+  const [loading, setLoading] = useState(false);
+
+  async function handleDelete() {
+    const warning =
+      container.subscriberCount > 0
+        ? `Delete container ${container.containerNumber}? This will also remove its ${container.subscriberCount} subscriber${
+            container.subscriberCount === 1 ? '' : 's'
+          } and ETA history. This cannot be undone.`
+        : `Delete container ${container.containerNumber}? This cannot be undone.`;
+    if (!window.confirm(warning)) return;
+
+    setLoading(true);
+    try {
+      const res = await fetch(`/api/admin/containers/${container.id}`, {
+        method: 'DELETE',
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        toast.error(data.error ?? 'Failed to delete container');
+        return;
+      }
+      toast.success(`Deleted ${container.containerNumber}`);
+      onDeleted();
+    } catch {
+      toast.error('Something went wrong');
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  return (
+    <button
+      type="button"
+      onClick={handleDelete}
+      disabled={loading}
+      aria-label={`Delete ${container.containerNumber}`}
+      className="rounded-lg px-2 py-1.5 text-xs font-medium text-zinc-400 hover:bg-red-50 hover:text-red-600 disabled:opacity-50 transition-colors">
+      <Trash2 className="size-4" />
+    </button>
+  );
+}
+
+export function ContainerTable({
+  containers,
+  onEdit,
+  onArrivalMarked,
+  onDeleted,
+}: Props) {
   if (containers.length === 0) {
     return (
       <div className="rounded-2xl border border-zinc-200/70 bg-white p-10 text-center shadow-sm">
@@ -155,12 +248,15 @@ export function ContainerTable({ containers, onEdit, onArrivalMarked }: Props) {
                 {c.subscriberCount}
               </TableCell>
               <TableCell className="text-right">
-                <button
-                  type="button"
-                  onClick={() => onEdit(c)}
-                  className="rounded-lg px-3 py-1.5 text-xs font-medium text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 transition-colors">
-                  Edit ETAs
-                </button>
+                <div className="flex items-center justify-end gap-1">
+                  <button
+                    type="button"
+                    onClick={() => onEdit(c)}
+                    className="rounded-lg px-3 py-1.5 text-xs font-medium text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 transition-colors">
+                    Edit ETAs
+                  </button>
+                  <DeleteContainerButton container={c} onDeleted={onDeleted} />
+                </div>
               </TableCell>
             </TableRow>
           ))}

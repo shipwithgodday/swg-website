@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { auth } from '@clerk/nextjs/server';
 import { isAdmin } from '@/lib/shop/auth';
-import { updateContainerEtas } from '@/lib/shipment/queries';
+import { updateContainerEtas, deleteContainer } from '@/lib/shipment/queries';
 import { sendShipmentNotifications } from '@/lib/shipment/notifications';
 
 function unauthorized() {
@@ -87,4 +87,24 @@ export async function PATCH(
   }
 
   return NextResponse.json(updated);
+}
+
+export async function DELETE(
+  _req: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  if (!(await isAdmin())) return unauthorized();
+
+  const { id } = await params;
+
+  try {
+    await deleteContainer(id);
+  } catch (err) {
+    if (err instanceof Error && err.message.includes('not found')) {
+      return NextResponse.json({ error: 'Container not found' }, { status: 404 });
+    }
+    throw err;
+  }
+
+  return new NextResponse(null, { status: 204 });
 }
