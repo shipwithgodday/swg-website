@@ -1,5 +1,5 @@
 'use client';
-import { SignUpButton } from '@clerk/nextjs';
+import Link from 'next/link';
 import { Package } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
@@ -22,9 +22,9 @@ export function SignUpForOrders() {
         future one — to your shipping mark, so you always know where
         your shipment is.
       </p>
-      <SignUpButton mode="modal" forceRedirectUrl="/shop/orders">
-        <Button className="mt-4 w-full">Create account</Button>
-      </SignUpButton>
+      <Button asChild className="mt-4 w-full">
+        <Link href="/sign-up?redirect_url=/shop/orders">Create account</Link>
+      </Button>
     </aside>
   );
 }

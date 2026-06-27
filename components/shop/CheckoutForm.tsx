@@ -1,7 +1,8 @@
 'use client';
 import { useState, useTransition } from 'react';
 import { toast } from 'sonner';
-import { SignInButton, SignUpButton } from '@clerk/nextjs';
+import { SignInButton } from '@clerk/nextjs';
+import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 // The storefront Input/Select are styled for dark hero panels (white text,
@@ -94,15 +95,11 @@ export function CheckoutForm({ signedIn, prefill }: CheckoutFormProps) {
                   Sign in
                 </button>
               </SignInButton>
-              <SignUpButton
-                mode="modal"
-                forceRedirectUrl="/shop/checkout">
-                <button
-                  type="button"
-                  className="rounded-full bg-primary px-4 py-1.5 text-sm font-medium text-black transition-transform hover:scale-105">
-                  Create account
-                </button>
-              </SignUpButton>
+              <Link
+                href="/sign-up?redirect_url=/shop/checkout"
+                className="rounded-full bg-primary px-4 py-1.5 text-sm font-medium text-black transition-transform hover:scale-105">
+                Create account
+              </Link>
             </div>
           </div>
         )}
