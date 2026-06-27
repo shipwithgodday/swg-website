@@ -131,28 +131,43 @@ export interface ResolveCustomerInput {
   email: string | null;
   phone: string | null;
   name: string | null;
+  company?: string | null;
+  source?: string;
+}
+
+export interface ResolveCustomerResult {
+  customerId: string;
+  shippingMark: string;
+  created: boolean;
 }
 
 /**
- * Resolves the customer for an order:
+ * Resolves the customer for an order or sign-up:
  * 1. existing row by clerkUserId, else
- * 2. an imported row matched by email then phone (claimed by setting
+ * 2. an unlinked row matched by email then phone (claimed by setting
  *    clerk_user_id), else
  * 3. a brand-new customer with the next shipping mark from the sequence.
- * Returns the customer id.
+ *
+ * `created` is true only in case 3 (a fresh GD{n} mark was allocated).
  */
 export async function resolveCustomerId(
   input: ResolveCustomerInput
-): Promise<string> {
+): Promise<ResolveCustomerResult> {
   // 1. Already linked.
   const linked = await db
-    .select({ id: customers.id })
+    .select({ id: customers.id, shippingMark: customers.shippingMark })
     .from(customers)
     .where(eq(customers.clerkUserId, input.clerkUserId))
     .limit(1);
-  if (linked[0]) return linked[0].id;
+  if (linked[0]) {
+    return {
+      customerId: linked[0].id,
+      shippingMark: linked[0].shippingMark,
+      created: false,
+    };
+  }
 
-  // 2. Match an imported/offline customer with no Clerk link yet.
+  // 2. Match an unlinked imported/guest customer.
   const candidates = await db
     .select()
     .from(customers)
@@ -183,10 +198,15 @@ export async function resolveCustomerId(
         email: match.email ?? input.email,
         phone: match.phone ?? input.phone,
         name: match.name ?? input.name,
+        company: match.company ?? input.company ?? null,
         updatedAt: new Date(),
       })
       .where(eq(customers.id, match.id));
-    return match.id;
+    return {
+      customerId: match.id,
+      shippingMark: match.shippingMark,
+      created: false,
+    };
   }
 
   // 3. New customer — allocate the next shipping mark.
@@ -194,17 +214,19 @@ export async function resolveCustomerId(
     sql`SELECT nextval('shipping_mark_seq') AS n`
   );
   const markNo = Number((seq.rows[0] as { n: string | number }).n);
+  const shippingMark = `GD${markNo}`;
   const [created] = await db
     .insert(customers)
     .values({
       clerkUserId: input.clerkUserId,
-      shippingMark: `GD${markNo}`,
+      shippingMark,
       shippingMarkNo: markNo,
       email: input.email,
       phone: input.phone,
       name: input.name,
-      source: 'system',
+      company: input.company ?? null,
+      source: input.source ?? 'system',
     })
     .returning({ id: customers.id });
-  return created.id;
+  return { customerId: created.id, shippingMark, created: true };
 }

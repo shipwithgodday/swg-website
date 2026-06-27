@@ -144,12 +144,13 @@ export async function createCheckout(
       };
     }
     email = clerkEmail;
-    customerId = await resolveCustomerId({
+    const resolved = await resolveCustomerId({
       clerkUserId: userId,
       email,
       phone: input.shipPhone,
       name: input.shipName,
     });
+    customerId = resolved.customerId;
   } else {
     // Guard above ensures shipEmail is present.
     email = input.shipEmail as string;
