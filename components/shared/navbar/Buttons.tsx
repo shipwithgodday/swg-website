@@ -40,9 +40,6 @@ const Buttons = ({
           appearance={{
             elements: {
               avatarBox: 'size-9',
-              footer: {
-                display: 'none',
-              },
             },
           }}>
           <UserButton.MenuItems>

@@ -3,6 +3,19 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/*
+ * Hide Clerk's "Secured by Clerk" badge on auth cards (sign-in / sign-up
+ * modals and the standalone /sign-in route) while keeping the card's footer
+ * actions — most importantly the "Sign up" link — visible. Clerk exposes no
+ * element descriptor for the badge, so we target the branding link itself;
+ * footer action links point at the app, never at clerk.com.
+ * The badge in the UserButton popover is hidden separately via the
+ * `userButtonPopoverFooter` descriptor in app/layout.tsx.
+ */
+.cl-footer a[href*='clerk.com'] {
+  display: none;
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
