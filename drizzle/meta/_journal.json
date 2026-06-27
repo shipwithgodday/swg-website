@@ -64,6 +64,13 @@
       "when": 1781208620305,
       "tag": "0008_smooth_calypso",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1782572757935,
+      "tag": "0009_woozy_silver_samurai",
+      "breakpoints": true
     }
   ]
 }

@@ -92,6 +92,7 @@ export const customers = pgTable(
     shippingMark: text('shipping_mark').notNull().unique(),
     shippingMarkNo: integer('shipping_mark_no').notNull(),
     name: text('name'),
+    company: text('company'),
     email: text('email'),
     phone: text('phone'),
     source: text('source').notNull().default('system'),

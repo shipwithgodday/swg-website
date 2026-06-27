@@ -1,5 +1,6 @@
 'use client';
-import { SignInButton, SignUpButton } from '@clerk/nextjs';
+import { SignInButton } from '@clerk/nextjs';
+import Link from 'next/link';
 import { LogIn } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
@@ -32,9 +33,16 @@ export function SignInCard({
           signUpForceRedirectUrl={redirectUrl}>
           <Button>Sign in</Button>
         </SignInButton>
-        <SignUpButton mode="modal" forceRedirectUrl={redirectUrl}>
-          <Button variant="outline">Create account</Button>
-        </SignUpButton>
+        <Button asChild variant="outline">
+          <Link
+            href={`/sign-up${
+              redirectUrl
+                ? `?redirect_url=${encodeURIComponent(redirectUrl)}`
+                : ''
+            }`}>
+            Create account
+          </Link>
+        </Button>
       </div>
     </div>
   );

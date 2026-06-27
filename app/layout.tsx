@@ -88,13 +88,16 @@ export default function RootLayout({
 }) {
   return (
     <ClerkProvider
+      signUpUrl="/sign-up"
       appearance={{
-        // Hides the 'Secured by Clerk' badge on every Clerk surface
-        // (sign-in / sign-up modals, UserButton menu, UserProfile,
-        // and the standalone /sign-in route). Inherited globally so
-        // individual components don't need to override.
         elements: {
-          footer: { display: 'none' },
+          // Hide the 'Secured by Clerk' badge in the UserButton /
+          // account popover. The badge on auth cards (sign-in / sign-up
+          // modals, /sign-in) has no element descriptor, so it's hidden
+          // via CSS in globals.css — that approach keeps the card's
+          // footer actions (e.g. the "Sign up" link) visible, which
+          // hiding the whole `footer` element would not.
+          userButtonPopoverFooter: { display: 'none' },
         },
       }}>
       <html lang="en">
