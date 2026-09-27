@@ -3,6 +3,8 @@ import { z } from 'zod';
 import { eq } from 'drizzle-orm';
 import { db } from '@/lib/db';
 import { subscribers } from '@/lib/db/schema';
+import { resolveContactCustomer } from '@/lib/shop/customer';
+import { sendAdminSignupEmail } from '@/lib/email/admin-signup-email';
 
 const subscribeSchema = z.object({
   fullName: z.string().trim().min(2, 'Name must be at least 2 characters'),
@@ -50,6 +52,16 @@ export async function POST(request: Request) {
       );
     }
 
+    // Mailing-list signups are also shop customers: link to an existing
+    // customer by email/phone or allocate a new shipping mark, so they show
+    // up in the admin Customers list and shipment tracking.
+    const resolved = await resolveContactCustomer({
+      email: normalizedEmail,
+      phone: phoneNumber,
+      name: fullName,
+      source: 'subscribe',
+    });
+
     const [customer] = await db
       .insert(subscribers)
       .values({ fullName, email: normalizedEmail, phoneNumber })
@@ -59,9 +71,21 @@ export async function POST(request: Request) {
         email: subscribers.email,
       });
 
+    if (resolved.created) {
+      await sendAdminSignupEmail({
+        fullName,
+        email: normalizedEmail,
+        phone: phoneNumber,
+        company: null,
+        shippingMark: resolved.shippingMark,
+        createdAt: new Date(),
+      });
+    }
+
     return NextResponse.json({
       message: 'Customer registered successfully',
       customer,
+      shippingMark: resolved.shippingMark,
     });
   } catch (error) {
     // 23505 = unique_violation: a concurrent signup beat us to the email.

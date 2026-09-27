@@ -49,13 +49,14 @@ export default function SignupPage() {
       if (response.ok) {
         setStatus({
           success: true,
-          message:
-            'Registration successful! You will now receive email updates.',
+          message: result.shippingMark
+            ? `Registration successful! Your shipping mark is ${result.shippingMark}. You will now receive email updates.`
+            : 'Registration successful! You will now receive email updates.',
         });
-        // Redirect to schedule page after 2 seconds
+        // Redirect to schedule page, leaving time to note the shipping mark
         setTimeout(() => {
           router.push('/schedule');
-        }, 2000);
+        }, 6000);
       } else {
         setStatus({
           success: false,

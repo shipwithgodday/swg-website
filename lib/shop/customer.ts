@@ -84,46 +84,82 @@ export interface ResolveGuestInput {
 export async function resolveGuestCustomer(
   input: ResolveGuestInput
 ): Promise<string> {
+  const result = await resolveContactCustomer({ ...input, source: 'guest' });
+  return result.customerId;
+}
+
+export interface ResolveContactInput extends ResolveGuestInput {
+  source: string;
+}
+
+/**
+ * Resolves (or creates) the customer for someone identified only by contact
+ * details — a guest checkout or a mailing-list signup. Matches by email
+ * first, then phone; otherwise creates a customer with the next shipping
+ * mark. On a match, fills in any contact fields the row is missing.
+ *
+ * `created` is true only when a fresh GD{n} mark was allocated.
+ */
+export async function resolveContactCustomer(
+  input: ResolveContactInput
+): Promise<ResolveCustomerResult> {
   const normalizedEmail = input.email.trim().toLowerCase();
 
   // Match by email (case-insensitive). A pre-existing Clerk-linked row with
   // the same email is fine to reuse — it's the same person.
   const byEmail = await db
-    .select({ id: customers.id })
+    .select()
     .from(customers)
     .where(sql`lower(${customers.email}) = ${normalizedEmail}`)
     .limit(1);
-  if (byEmail[0]) return byEmail[0].id;
+  let match: (typeof byEmail)[number] | undefined = byEmail[0];
 
   // Match by phone, normalized to the last 9 digits.
-  if (input.phone) {
+  if (!match && input.phone) {
     const target = normalizePhone(input.phone);
     if (target) {
       const candidates = await db.select().from(customers);
-      const match = candidates.find(
-        (c) => normalizePhone(c.phone) === target
-      );
-      if (match) return match.id;
+      match = candidates.find((c) => normalizePhone(c.phone) === target);
     }
   }
 
-  // Brand-new guest — allocate the next shipping mark.
+  if (match) {
+    if (!match.email || !match.phone || !match.name) {
+      await db
+        .update(customers)
+        .set({
+          email: match.email ?? input.email,
+          phone: match.phone ?? input.phone,
+          name: match.name ?? input.name,
+          updatedAt: new Date(),
+        })
+        .where(eq(customers.id, match.id));
+    }
+    return {
+      customerId: match.id,
+      shippingMark: match.shippingMark,
+      created: false,
+    };
+  }
+
+  // Brand-new contact — allocate the next shipping mark.
   const seq = await db.execute(
     sql`SELECT nextval('shipping_mark_seq') AS n`
   );
   const markNo = Number((seq.rows[0] as { n: string | number }).n);
+  const shippingMark = `GD${markNo}`;
   const [created] = await db
     .insert(customers)
     .values({
-      shippingMark: `GD${markNo}`,
+      shippingMark,
       shippingMarkNo: markNo,
       email: input.email,
       phone: input.phone,
       name: input.name,
-      source: 'guest',
+      source: input.source,
     })
     .returning({ id: customers.id });
-  return created.id;
+  return { customerId: created.id, shippingMark, created: true };
 }
 
 export interface ResolveCustomerInput {
