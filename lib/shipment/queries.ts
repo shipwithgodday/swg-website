@@ -10,7 +10,7 @@ import {
   type EtaAdjustment,
   type ShipmentNotificationSubscriber,
 } from '@/lib/db/schema';
-import { parseInvoiceNumber } from './parseInvoice';
+import { matchContainerPrefix, parseInvoiceNumber } from './parseInvoice';
 
 export type ResolvedInvoice = {
   containerNumber: string;
@@ -28,23 +28,54 @@ export async function resolveInvoice(
   const marks = allMarks.map((r) => r.shippingMark);
 
   const parsed = parseInvoiceNumber(invoiceNumber, marks);
-  if (!parsed) return null;
 
-  const [container] = await db
-    .select()
-    .from(containers)
-    .where(eq(containers.containerNumber, parsed.containerNumber));
+  if (parsed) {
+    const [container] = await db
+      .select()
+      .from(containers)
+      .where(eq(containers.containerNumber, parsed.containerNumber));
 
-  const [customer] = await db
-    .select({ id: customers.id, name: customers.name, email: customers.email })
-    .from(customers)
-    .where(eq(customers.shippingMark, parsed.shippingMark));
+    if (container) {
+      const [customer] = await db
+        .select({ id: customers.id, name: customers.name, email: customers.email })
+        .from(customers)
+        .where(eq(customers.shippingMark, parsed.shippingMark));
+
+      return {
+        containerNumber: parsed.containerNumber,
+        shippingMark: parsed.shippingMark,
+        container,
+        customer: customer ?? null,
+      };
+    }
+  }
+
+  // Workaround: customers added only via the mailing list have no customers
+  // row, so their shipping mark can't be parsed. Match the container number
+  // directly and show the shipment without customer details.
+  const allContainers = await db.select().from(containers);
+  const containerNumber = matchContainerPrefix(
+    invoiceNumber,
+    allContainers.map((c) => c.containerNumber)
+  );
+  const container = containerNumber
+    ? allContainers.find((c) => c.containerNumber.toUpperCase() === containerNumber)
+    : undefined;
+
+  if (!container) {
+    return parsed
+      ? { ...parsed, container: null, customer: null }
+      : null;
+  }
 
   return {
-    containerNumber: parsed.containerNumber,
-    shippingMark: parsed.shippingMark,
-    container: container ?? null,
-    customer: customer ?? null,
+    containerNumber: container.containerNumber,
+    shippingMark: invoiceNumber
+      .toUpperCase()
+      .trim()
+      .slice(container.containerNumber.length),
+    container,
+    customer: null,
   };
 }
 

@@ -1,4 +1,4 @@
-import { parseInvoiceNumber } from './parseInvoice';
+import { matchContainerPrefix, parseInvoiceNumber } from './parseInvoice';
 
 const marks = ['GD01', 'GD351', 'D01', 'MM'];
 
@@ -44,5 +44,29 @@ describe('parseInvoiceNumber', () => {
       containerNumber: 'C5',
       shippingMark: 'MM',
     });
+  });
+});
+
+describe('matchContainerPrefix', () => {
+  const containers = ['C5', 'C51', 'X9'];
+
+  it('matches the container number at the start of the invoice', () => {
+    expect(matchContainerPrefix('X9ZZ99', containers)).toBe('X9');
+  });
+
+  it('prefers the longest matching container number', () => {
+    expect(matchContainerPrefix('C51AB12', containers)).toBe('C51');
+  });
+
+  it('normalises case and whitespace', () => {
+    expect(matchContainerPrefix('  c5ab12 ', containers)).toBe('C5');
+  });
+
+  it('matches an exact container number', () => {
+    expect(matchContainerPrefix('C5', containers)).toBe('C5');
+  });
+
+  it('returns null when no container matches', () => {
+    expect(matchContainerPrefix('Z1AB12', containers)).toBeNull();
   });
 });

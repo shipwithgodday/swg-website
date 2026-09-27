@@ -24,3 +24,19 @@ export function parseInvoiceNumber(
   }
   return null;
 }
+
+/**
+ * Fallback for invoices whose shipping mark doesn't belong to a known customer
+ * (e.g. customers added only via the mailing list). Returns the longest known
+ * container number the invoice starts with, uppercased, or null if none match.
+ */
+export function matchContainerPrefix(
+  invoice: string,
+  containerNumbers: string[]
+): string | null {
+  const normalized = invoice.toUpperCase().trim();
+  const sorted = [...containerNumbers]
+    .map((c) => c.toUpperCase())
+    .sort((a, b) => b.length - a.length);
+  return sorted.find((c) => c.length > 0 && normalized.startsWith(c)) ?? null;
+}
