@@ -68,11 +68,15 @@ async function main() {
   await db.insert(customers).values(deduped);
 
   const maxNo = deduped.reduce((m, r) => Math.max(m, r.shippingMarkNo), 1);
-  await db.execute(sql`SELECT setval('shipping_mark_seq', ${maxNo})`);
+  await db.execute(sql`SELECT setval('shipping_mark_seq', greatest(
+    (SELECT last_value FROM shipping_mark_seq),
+    coalesce((SELECT max(mark_no) FROM shipping_mark_reservations), 1),
+    ${maxNo}
+  ), true)`);
 
   console.log(
     `Imported ${deduped.length} customers, skipped ${skipped}. ` +
-      `shipping_mark_seq set to ${maxNo} (next mark: GD${maxNo + 1}).`
+      `Shipping marks reserved; sequence high water preserved.`
   );
   process.exit(0);
 }

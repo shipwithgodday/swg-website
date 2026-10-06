@@ -1,6 +1,7 @@
 import { sql, eq } from 'drizzle-orm';
 import { db } from '@/lib/db';
 import { customers } from '@/lib/db/schema';
+import { allocateShippingMark } from './shipping-mark-allocation';
 
 /** Reduces a raw phone string to its last 9 digits for fuzzy matching. */
 export function normalizePhone(raw: string | null | undefined): string {
@@ -143,11 +144,7 @@ export async function resolveContactCustomer(
   }
 
   // Brand-new contact — allocate the next shipping mark.
-  const seq = await db.execute(
-    sql`SELECT nextval('shipping_mark_seq') AS n`
-  );
-  const markNo = Number((seq.rows[0] as { n: string | number }).n);
-  const shippingMark = `GD${markNo}`;
+  const { markNo, shippingMark } = await allocateShippingMark();
   const [created] = await db
     .insert(customers)
     .values({
@@ -246,11 +243,7 @@ export async function resolveCustomerId(
   }
 
   // 3. New customer — allocate the next shipping mark.
-  const seq = await db.execute(
-    sql`SELECT nextval('shipping_mark_seq') AS n`
-  );
-  const markNo = Number((seq.rows[0] as { n: string | number }).n);
-  const shippingMark = `GD${markNo}`;
+  const { markNo, shippingMark } = await allocateShippingMark();
   const [created] = await db
     .insert(customers)
     .values({

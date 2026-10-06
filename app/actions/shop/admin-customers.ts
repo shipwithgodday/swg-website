@@ -4,6 +4,7 @@ import { eq, sql } from 'drizzle-orm';
 import { db } from '@/lib/db';
 import { customers, orders } from '@/lib/db/schema';
 import { requireAdmin } from '@/lib/shop/auth';
+import { allocateShippingMark, peekNextShippingMark } from '@/lib/shop/shipping-mark-allocation';
 import {
   getAdminCustomer,
   listMergeCandidates,
@@ -77,13 +78,7 @@ export async function getCustomerDetail(
  */
 export async function getNextShippingMark(): Promise<string> {
   await requireAdmin();
-  const [row] = await db
-    .select({
-      max: sql<number>`coalesce(max(${customers.shippingMarkNo}), 0)`,
-    })
-    .from(customers);
-  const next = Number(row?.max ?? 0) + 1;
-  return `GD${next}`;
+  return peekNextShippingMark();
 }
 
 /** Creates a customer manually from the admin, allocating a shipping mark. */
@@ -97,19 +92,13 @@ export async function createCustomer(
   }
   const { name, email, phone, shippingMark } = parsed.data;
 
-  // Always advance the sequence so `shippingMarkNo` (used for sorting) stays
-  // monotonic, even when the visible mark is a custom string.
-  const seq = await db.execute(
-    sql`SELECT nextval('shipping_mark_seq') AS n`
-  );
-  const markNo = Number((seq.rows[0] as { n: string | number }).n);
-
   try {
+    const allocated = await allocateShippingMark(shippingMark);
     const [created] = await db
       .insert(customers)
       .values({
-        shippingMark: shippingMark ?? `GD${markNo}`,
-        shippingMarkNo: markNo,
+        shippingMark: allocated.shippingMark,
+        shippingMarkNo: allocated.markNo,
         name,
         email: email ?? null,
         phone: phone ?? null,
@@ -211,10 +200,8 @@ export type DeleteCustomerResult =
 /**
  * Removes a customer. The behaviour depends on whether they have orders:
  *
- * - **No orders:** the row is hard-deleted and, if it held the
- *   highest `shippingMarkNo`, the `shipping_mark_seq` is rewound so
- *   the next new customer reuses that mark (no permanent gap at the
- *   top).
+ * - **No orders:** the row is hard-deleted. Its mark remains reserved so
+ *   another customer can never be assigned a deleted contact's mark.
  *
  * - **Has orders:** the row is *anonymized* — name, email, phone and
  *   clerkUserId are cleared and `source` is set to `'deleted'`. The

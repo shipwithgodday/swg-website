@@ -84,6 +84,13 @@ export const productVariants = pgTable('product_variants', {
   optionValues: jsonb('option_values').$type<string[]>(),
 });
 
+/** Permanent reservations prevent reusing historical or deleted shipping marks. */
+export const shippingMarkReservations = pgTable('shipping_mark_reservations', {
+  mark: text('mark').primaryKey(),
+  markNo: integer('mark_no'),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+});
+
 export const customers = pgTable(
   'customers',
   {

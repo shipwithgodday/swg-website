@@ -19,8 +19,7 @@ export type CustomerDeleteMode = 'deleted' | 'anonymized';
 
 /**
  * Removes a single customer row. Hard-deletes when they have no orders
- * (and rewinds `shipping_mark_seq` if they held the top mark, so the next
- * new customer reuses it). Anonymizes — strips PII, keeps the row + shipping
+ * while retaining their shipping-mark reservation. Anonymizes — strips PII, keeps the row + shipping
  * mark + orders — when they have orders, so revenue history survives.
  */
 export async function deleteOrAnonymizeCustomer(
@@ -49,17 +48,7 @@ export async function deleteOrAnonymizeCustomer(
 
   await db.delete(customers).where(eq(customers.id, id));
 
-  // Rewind the shipping-mark sequence to the new max so a deleted top mark
-  // is reused rather than skipped. setval(seq, n, true) makes the next
-  // nextval() return n + 1. Skip when no customers remain (MINVALUE=1
-  // sequences reject setval(0)).
-  const [maxRow] = await db
-    .select({ m: sql<number | null>`max(${customers.shippingMarkNo})` })
-    .from(customers);
-  const newMax = Number(maxRow?.m ?? 0);
-  if (newMax > 0) {
-    await db.execute(sql`SELECT setval('shipping_mark_seq', ${newMax}, true)`);
-  }
+  // Reservations and the sequence high water survive deletion.
 
   return 'deleted';
 }
