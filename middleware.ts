@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server';
 
 // /api/send-bulk is admin-only — it's gated by the admin matcher below.
 // (The page that calls it, /swg-admin/emails, already requires admin role.)
-const isAdminRoute = createRouteMatcher(['/swg-admin(.*)', '/api/send-bulk']);
+const isAdminRoute = createRouteMatcher(['/swg-admin(.*)', '/api/send-bulk', '/api/bookings/emails']);
 
 // NOTE: /shop/checkout, /shop/orders and /account are intentionally NOT
 // gated here. Each page renders an in-page SignInCard (with Clerk's

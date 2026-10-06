@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 
@@ -20,7 +20,6 @@ const signupSchema = z.object({
 type SignupFormValues = z.infer<typeof signupSchema>;
 
 export default function SignupPage() {
-  const router = useRouter();
   const [status, setStatus] = useState<{
     success?: boolean;
     message?: string;
@@ -49,14 +48,8 @@ export default function SignupPage() {
       if (response.ok) {
         setStatus({
           success: true,
-          message: result.shippingMark
-            ? `Registration successful! Your shipping mark is ${result.shippingMark}. You will now receive email updates.`
-            : 'Registration successful! You will now receive email updates.',
+          message: 'You have subscribed to email updates.',
         });
-        // Redirect to schedule page, leaving time to note the shipping mark
-        setTimeout(() => {
-          router.push('/schedule');
-        }, 6000);
       } else {
         setStatus({
           success: false,
@@ -98,10 +91,10 @@ export default function SignupPage() {
         <form onSubmit={handleSubmit(onSubmit)} className="">
           <div className="px-6 py-2 max-w-md mx-auto space-y-6">
             <h1 className="text-xl md:text-2xl mb-2 text-white">
-              Customer Sign Up
+              Subscribe to updates
             </h1>
             <p className="text-gray-200 font-light">
-              Create an account to receive email updates
+              Receive shipping news and email updates
             </p>
             <div className="space-y-4">
               <div>
@@ -151,8 +144,11 @@ export default function SignupPage() {
                   ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
                   : ''
               }`}>
-              {isSubmitting ? 'Signing up...' : 'Sign Up'}
+              {isSubmitting ? 'Subscribing...' : 'Subscribe'}
             </Button>
+            <p className="text-sm text-gray-200">
+              Need a shipping mark? <Link href="/sign-up" className="underline">Create an account and verify your email</Link>.
+            </p>
           </div>
         </form>
       </div>

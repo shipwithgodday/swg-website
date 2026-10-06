@@ -32,7 +32,11 @@ export async function completeSignup(
   const { fullName, phone, company } = schema.parse(input);
 
   const user = await currentUser();
-  const email = user?.primaryEmailAddress?.emailAddress ?? null;
+  const primaryEmail = user?.primaryEmailAddress;
+  if (!primaryEmail || primaryEmail.verification?.status !== 'verified') {
+    throw new Error('Verify your email address before creating a shipping mark.');
+  }
+  const email = primaryEmail.emailAddress;
 
   const result = await resolveCustomerId({
     clerkUserId: userId,

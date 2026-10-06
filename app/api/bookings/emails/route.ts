@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server';
 import { isNotNull } from 'drizzle-orm';
+import { auth } from '@clerk/nextjs/server';
+import { hasAdminRole } from '@/lib/shop/auth';
 import { db } from '@/lib/db';
 import {
   subscribers,
@@ -13,6 +15,14 @@ interface Recipient {
 }
 
 export async function GET() {
+  const { userId, sessionClaims } = await auth();
+  if (!userId) {
+    return NextResponse.json({ error: 'Authentication required.' }, { status: 401 });
+  }
+  if (!hasAdminRole(sessionClaims as { metadata?: { role?: string } } | null)) {
+    return NextResponse.json({ error: 'Admin access required.' }, { status: 403 });
+  }
+
   try {
     // The bulk-email audience is the union of two Postgres sources, deduped
     // by email: newsletter signups (`subscribers`) and shop `customers` that

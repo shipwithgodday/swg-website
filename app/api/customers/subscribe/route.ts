@@ -3,19 +3,28 @@ import { z } from 'zod';
 import { eq } from 'drizzle-orm';
 import { db } from '@/lib/db';
 import { subscribers } from '@/lib/db/schema';
-import { resolveContactCustomer } from '@/lib/shop/customer';
-import { sendAdminSignupEmail } from '@/lib/email/admin-signup-email';
+import { checkBotId } from 'botid/server';
 
 const subscribeSchema = z.object({
-  fullName: z.string().trim().min(2, 'Name must be at least 2 characters'),
-  email: z.string().trim().email('Please enter a valid email address'),
+  fullName: z.string().trim().min(2, 'Name must be at least 2 characters').max(150),
+  email: z.string().trim().email('Please enter a valid email address').max(254),
   phoneNumber: z
     .string()
     .trim()
-    .min(10, 'Please enter a valid phone number'),
+    .min(10, 'Please enter a valid phone number').max(30),
 });
 
 export async function POST(request: Request) {
+  // Reject automated submissions before parsing input or touching the database.
+  try {
+    const verification = await checkBotId();
+    if (verification.isBot) {
+      return NextResponse.json({ error: 'Unable to verify your browser. Please try again.' }, { status: 403 });
+    }
+  } catch {
+    return NextResponse.json({ error: 'Verification is temporarily unavailable. Please try again.' }, { status: 503 });
+  }
+
   let body: unknown;
   try {
     body = await request.json();
@@ -52,16 +61,6 @@ export async function POST(request: Request) {
       );
     }
 
-    // Mailing-list signups are also shop customers: link to an existing
-    // customer by email/phone or allocate a new shipping mark, so they show
-    // up in the admin Customers list and shipment tracking.
-    const resolved = await resolveContactCustomer({
-      email: normalizedEmail,
-      phone: phoneNumber,
-      name: fullName,
-      source: 'subscribe',
-    });
-
     const [customer] = await db
       .insert(subscribers)
       .values({ fullName, email: normalizedEmail, phoneNumber })
@@ -71,21 +70,9 @@ export async function POST(request: Request) {
         email: subscribers.email,
       });
 
-    if (resolved.created) {
-      await sendAdminSignupEmail({
-        fullName,
-        email: normalizedEmail,
-        phone: phoneNumber,
-        company: null,
-        shippingMark: resolved.shippingMark,
-        createdAt: new Date(),
-      });
-    }
-
     return NextResponse.json({
       message: 'Customer registered successfully',
       customer,
-      shippingMark: resolved.shippingMark,
     });
   } catch (error) {
     // 23505 = unique_violation: a concurrent signup beat us to the email.
