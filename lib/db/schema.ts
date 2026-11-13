@@ -336,6 +336,55 @@ export const subscribers = pgTable('subscribers', {
   ...timestamps,
 });
 
+/**
+ * One row per bulk-email send attempt from /swg-admin/emails. Inserted with
+ * status 'sending' *before* Mailjet is called, so a send that crashes or
+ * times out still leaves a trace. `retryOfId` links a resend of the failures
+ * back to the attempt it retries.
+ */
+export const emailSends = pgTable(
+  'email_sends',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    subject: text('subject').notNull(),
+    content: text('content').notNull(),
+    requestedBy: text('requested_by'), // Clerk user id of the admin
+    retryOfId: uuid('retry_of_id'),
+    // 'sending' | 'sent' | 'partial' | 'failed'
+    status: text('status').notNull().default('sending'),
+    recipientCount: integer('recipient_count').notNull(),
+    sentCount: integer('sent_count').notNull().default(0),
+    failedCount: integer('failed_count').notNull().default(0),
+    error: text('error'),
+    createdAt: timestamp('created_at', { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    completedAt: timestamp('completed_at', { withTimezone: true }),
+  },
+  (t) => [index('email_sends_created_at_idx').on(t.createdAt)]
+);
+
+/** Per-recipient outcome of an `email_sends` attempt. */
+export const emailSendRecipients = pgTable(
+  'email_send_recipients',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    sendId: uuid('send_id')
+      .notNull()
+      .references(() => emailSends.id, { onDelete: 'cascade' }),
+    email: text('email').notNull(),
+    status: text('status').notNull(), // 'sent' | 'failed'
+    error: text('error'),
+    createdAt: timestamp('created_at', { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (t) => [
+    index('email_send_recipients_send_id_idx').on(t.sendId),
+    index('email_send_recipients_email_idx').on(t.email),
+  ]
+);
+
 export const bookingWeekdayHours = pgTable('booking_weekday_hours', {
   weekday: integer('weekday').primaryKey(), // 0 = Sunday … 6 = Saturday
   isOpen: boolean('is_open').notNull().default(true),

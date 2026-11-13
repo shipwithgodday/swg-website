@@ -101,6 +101,8 @@ export default function AdminEmailsPage() {
     message?: string;
   } | null>(null);
   const [editorContent, setEditorContent] = useState('');
+  // Set after a partly failed send, so the retry is logged against it.
+  const [retryOfId, setRetryOfId] = useState<string | null>(null);
 
   const {
     register,
@@ -240,6 +242,7 @@ export default function AdminEmailsPage() {
           subject: data.subject,
           content: data.content,
           recipients: data.recipients,
+          retryOfId: retryOfId ?? undefined,
         }),
       });
 
@@ -253,13 +256,32 @@ export default function AdminEmailsPage() {
       }
 
       if (response.ok) {
-        setStatus({
-          success: true,
-          message: 'Emails sent successfully!',
-        });
-        reset();
-        setSelectedEmails([]);
-        editor?.commands.clearContent();
+        const sentCount: number = result.sentCount ?? 0;
+        const failed: { email: string; error: string }[] =
+          result.failed ?? [];
+
+        if (failed.length === 0) {
+          setStatus({
+            success: true,
+            message: `Sent to ${sentCount} recipient${sentCount === 1 ? '' : 's'}.`,
+          });
+          reset();
+          setSelectedEmails([]);
+          setRetryOfId(null);
+          editor?.commands.clearContent();
+        } else {
+          setRetryOfId(result.sendId ?? null);
+          // Keep the subject/content but select ONLY the failures, so
+          // pressing Send again can't email the people who already got it.
+          setSelectedEmails(failed.map((f) => f.email));
+          const reasons = [...new Set(failed.map((f) => f.error))]
+            .slice(0, 3)
+            .join('; ');
+          setStatus({
+            success: false,
+            message: `Sent to ${sentCount}, but ${failed.length} failed (${reasons}). Only the failed recipients are still selected — do not reselect everyone.`,
+          });
+        }
       } else {
         setStatus({
           success: false,
